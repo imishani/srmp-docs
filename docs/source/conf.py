@@ -2,9 +2,9 @@
 
 # -- Project information
 
-project = 'Lumache'
+project = 'SRMP'
 copyright = '2021, Graziella'
-author = 'Graziella'
+author = 'Itamar Mishani, Yorai Shaoul, Ramkumar Natarajan'
 
 release = '0.1'
 version = '0.1.0'
