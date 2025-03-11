@@ -18,7 +18,7 @@ Key Features
 - **Multi-Robot Motion Planning**: First-of-its-kind support for planning coordinated motions in multi-manipulator systems.
 - **Reliable and Consistent Trajectories**: Generates predictable and repeatable motions, making it ideal for high-precision and safety-critical applications.
 - **Seamless Integration**: Compatible with major simulators, including MuJoCo, Sapien, Genesis, PyBullet and Isaac.
-- **Multi-Lingual **: Available in both Python and C++ for easy integration into research and industrial workflows.
+- **Multi-Lingual**: Available in both Python and C++ for easy integration into research and industrial workflows.
 - **MoveIt! Plugin**: Enables deployment on real-world robotic systems with minimal setup.
 
 Getting Started
