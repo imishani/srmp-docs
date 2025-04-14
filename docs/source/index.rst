@@ -29,7 +29,8 @@ Learn More
 ==========
 
 - `Documentation <https://srmp-docs.readthedocs.io>`_
-- :doc:`Tutorials <tutorials>`
+- :doc:`installation <usage>`
+.. - :doc:`Tutorials <tutorials>`
 - :doc:`API Reference <api>`
 
 
