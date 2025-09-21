@@ -29,22 +29,27 @@ Learn More
 ==========
 
 - `Documentation <https://srmp-docs.readthedocs.io>`_
-- :doc:`installation <usage>`
-.. - :doc:`Tutorials <tutorials>`
+- :doc:`Getting Started <usage>`
 - :doc:`API Reference <api>`
 
+.. note::
 
-.. Check out the :doc:`usage` section for further information, including
-.. how to :ref:`installation` the project.
+   This project is under active development.
 
-.. .. note::
+Contents
+--------
 
-..    This project is under active development.
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide
 
-.. Contents
-.. --------
+   usage
+   api
 
-.. .. toctree::
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples
 
-..    usage
-..    api
+   examples/single_robot
+   examples/multi_robot
+   examples/simulator_integration
