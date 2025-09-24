@@ -45,6 +45,7 @@ Contents
 
    usage
    api
+   data_downloads
 
 .. toctree::
    :maxdepth: 2
