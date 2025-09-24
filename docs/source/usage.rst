@@ -28,6 +28,10 @@ Then, import it in your script and follow the instructions on the docs:
 Basic Single Robot Planning
 ---------------------------
 
+.. note::
+
+   You can download pre-configured robot models (URDF/SRDF files) from our :doc:`data_downloads` page.
+
 Create a planner interface:
 
 .. code-block:: python
@@ -126,6 +130,10 @@ Compute a trajectory:
 
 Multi-Robot Planning
 --------------------
+
+.. note::
+
+   Multi-robot URDF/SRDF configurations are available for download on the :doc:`data_downloads` page.
 
 Add multiple robots to the world:
 
