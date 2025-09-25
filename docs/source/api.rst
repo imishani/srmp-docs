@@ -39,25 +39,68 @@ The main interface for robot motion planning.
       :param list articulation_names: List of robot names to plan for
       :param dict planner_context: Dictionary containing planner configuration
 
+      **Required Parameters:**
+
+      - ``planner_id`` (string): Planner algorithm to use
+
       **Single Robot Planner Context Options:**
 
-      - ``planner_id``: Planner type ("wAstar", "ARAstar", "MHAstar", "wPASE", "Astar")
-      - ``heuristic``: Heuristic function ("bfs", "joint_euclidean", etc.)
-      - ``weight``: Weight for weighted planners (string, e.g., "10.0")
-      - ``weight_delta``: Weight reduction per iteration for ARAstar
-      - ``final_weight``: Final weight for ARAstar
-      - ``inadmissible_heuristics``: Heuristics for MHAstar
-      - ``w1``, ``w2``: Weights for MHAstar
-      - ``num_threads``: Number of threads for parallel planners
+      Available single-robot planners: "Astar", "wAstar", "ARAstar", "MHAstar", "wPASE"
+
+      **General Parameters:**
+
+      - ``heuristic`` (string): Heuristic function ("bfs", "joint_euclidean", "joint_euclidean_remove_time"). Default: "bfs"
+      - ``resolution`` (string): Joint angle discretization in degrees. Default: "1"
+      - ``mprim_path`` (string): Path to motion primitives file. Default: auto-generated based on DOF
+      - ``time_limit`` or ``allowed_planning_time`` (string): Planning time limit in seconds. Default: "10"
+
+      **Planner-Specific Parameters:**
+
+      *A\* ("Astar"):*
+        Uses only general parameters above.
+
+      *Weighted A\* ("wAstar"):*
+        - ``weight`` (string): Heuristic weight. Default: "50"
+
+      *ARA\* ("ARAstar"):*
+        - ``weight`` (string): Initial heuristic weight. Default: "50"
+        - ``weight_delta`` (string): Weight reduction per iteration. Default: "10.0"
+        - ``final_weight`` (string): Final weight to reach. Default: "1.0"
+
+      *MHA\* ("MHAstar"):*
+        - ``heuristic`` (string): Anchor heuristic. Default: "joint_euclidean"
+        - ``inadmissible_heuristics`` (vector<string>): List of inadmissible heuristics. Default: ["bfs"]
+        - ``w1`` (string): Anchor heuristic weight. Default: "20"
+        - ``w2`` (string): Inadmissible heuristic weight. Default: "5"
+
+      *wPASE ("wPASE"):*
+        - ``heuristic`` (string): Primary heuristic. Default: "joint_euclidean"
+        - ``i_heuristic`` (string): Secondary heuristic. Default: "joint_euclidean"
+        - ``weight`` (string): Primary heuristic weight. Default: "50"
+        - ``i_weight`` (string): Secondary heuristic weight. Default: "100.0"
+        - ``num_threads`` (string): Number of parallel threads. Default: "4"
 
       **Multi-Robot Planner Context Options:**
 
-      - ``planner_id``: "xECBS" for multi-robot planning
-      - ``weight_low_level_heuristic``: Weight for low-level heuristic
-      - ``high_level_focal_suboptimality``: High-level focal weight
-      - ``low_level_focal_suboptimality``: Low-level focal weight
-      - ``heuristic_{robot_name}``: Heuristic for specific robot
-      - ``mprim_path_{robot_name}``: Motion primitive file for specific robot
+      Available multi-robot planners: "ECBS", "xECBS"
+
+      **Required Multi-Robot Parameters:**
+
+      - ``planner_id``: "ECBS" or "xECBS"
+
+      **Agent-Specific Parameters (per robot):**
+
+      For each robot with name ``{robot_name}``:
+
+      - ``heuristic_{robot_name}`` (string): Heuristic for this robot. Default: "bfs" (ECBS), "joint_euclidean_remove_time" (xECBS)
+      - ``mprim_path_{robot_name}`` (string): Motion primitives path for this robot. Default: auto-generated timed version
+      - ``resolution_{robot_name}`` (string): Discretization for this robot. Default: "1"
+
+      **ECBS/xECBS Parameters:**
+
+      - ``weight_low_level_heuristic`` (string): Low-level search weight. Default: "1.0" (ECBS), "55.0" (xECBS)
+      - ``high_level_focal_suboptimality`` (string): High-level focal search bound. Default: "1.3"
+      - ``low_level_focal_suboptimality`` (string): Low-level focal search bound. Default: "1.3"
 
    .. method:: plan(start_state, goal_constraint)
 
@@ -449,3 +492,127 @@ Point Cloud Example
    robot_position = [0, 0, 0.5]
    sensor_cloud = generate_lidar_point_cloud(robot_position)
    planner.add_point_cloud("sensor_obstacles", sensor_cloud, resolution=0.03)
+
+Motion Primitives Configuration
+-------------------------------
+
+Motion primitives define the discrete actions available to the robot during planning. SRMP uses YAML configuration files to define motion primitive families and their properties.
+
+YAML Configuration Files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**File Structure:**
+
+.. code-block:: yaml
+
+   <family_name>:
+     <primitive_name>:
+       mprim_sequence:
+         - [0, 0, 0, ...]  # Always starts with origin (all zeros)
+         - [delta1, delta2, ...]  # Delta values from origin
+         - [delta1, delta2, ...]  # Additional steps (optional)
+       mprim_sequence_transition_costs: [cost1, cost2, 0]  # Last is always 0
+       mprim_sequence_transition_times: [time1, time2, 0]  # Optional timing
+       generate_negative: true/false  # Whether to generate negative deltas
+
+**Key Components:**
+
+- **Family Name**: Groups related primitives (e.g., ``long_primitives``, ``short_primitives``)
+- **Primitive Name**: Unique identifier for each motion primitive
+- **mprim_sequence**: Sequence of states, always starting with zeros (origin)
+- **mprim_sequence_transition_costs**: Cost for each transition in the sequence
+- **mprim_sequence_transition_times**: Optional time constraints for each transition
+- **generate_negative**: Automatically creates negative versions of primitives
+
+**Units:**
+
+- **Joint space (manipulators)**: Degrees for angular movements
+
+**Example: 7DOF Manipulator Primitives**
+
+.. code-block:: yaml
+
+   long_primitives:
+     joint0:
+       mprim_sequence:
+         - [0, 0, 0, 0, 0, 0, 0]  # Origin state
+         - [15, 0, 0, 0, 0, 0, 0]  # Move joint 0 by 15 degrees
+       mprim_sequence_transition_costs: [1, 0]
+       generate_negative: true
+
+     joint1:
+       mprim_sequence:
+         - [0, 0, 0, 0, 0, 0, 0]
+         - [0, 15, 0, 0, 0, 0, 0]  # Move joint 1 by 15 degrees
+       mprim_sequence_transition_costs: [1, 0]
+       generate_negative: true
+
+   short_primitives:
+     joint0:
+       mprim_sequence:
+         - [0, 0, 0, 0, 0, 0, 0]
+         - [7, 0, 0, 0, 0, 0, 0]  # Move joint 0 by 7 degrees
+       mprim_sequence_transition_costs: [1, 0]
+       generate_negative: true
+
+**Example: Timed Motion Primitives**
+
+.. code-block:: yaml
+
+   long_primitives:
+     joint0:
+       mprim_sequence:
+         - [0, 0, 0, 0, 0, 0, 0]
+         - [15, 0, 0, 0, 0, 0, 0]
+       mprim_sequence_transition_costs: [1, 0]
+       mprim_sequence_transition_times: [1, 0]  # 1 time unit per transition
+       generate_negative: true
+
+Creating Custom Motion Primitives
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Step 1: Define YAML Configuration**
+
+1. Create a new YAML file with appropriate naming (e.g., ``custom_7dof_mprim.yaml``)
+2. Define motion primitive families based on your robot's requirements
+3. Specify primitives for each joint
+4. Set appropriate costs and timing constraints
+
+**Step 2: File Naming Convention**
+
+- **Manipulators**: ``<robot_type>_<dof>dof[_additional_info]_mprim.yaml``
+- **Timed variants**: Include ``_timed`` in the filename for multi-robot coordination
+
+**Step 3: Integration with Planner**
+
+.. code-block:: python
+
+   # Use custom motion primitives
+   planner.make_planner(["robot_name"], {
+       "planner_id": "wAstar",
+       "heuristic": "bfs",
+       "mprim_path": "/path/to/custom_7dof_mprim.yaml"
+   })
+
+   # For multi-robot with custom primitives per robot
+   planner.make_planner(["robot1", "robot2"], {
+       "planner_id": "xECBS",
+       "mprim_path_robot1": "/path/to/robot1_timed_mprim.yaml",
+       "mprim_path_robot2": "/path/to/robot2_timed_mprim.yaml"
+   })
+
+**Design Guidelines:**
+
+1. **Start Simple**: Begin with single-joint movements before complex combinations
+2. **Balance Resolution vs Speed**: More primitives = finer control but slower planning
+3. **Cost Weighting**: Use costs to prefer certain types of movements
+4. **Symmetric Movements**: Use ``generate_negative: true`` for symmetric joint movements
+5. **Multi-Robot**: Use timed primitives (``_timed_mprim.yaml``) for coordination
+
+**Available Primitive Files:**
+
+The SRMP package includes pre-configured motion primitive files for manipulators:
+
+- ``manip_6dof_mprim.yaml`` - 6DOF manipulator primitives
+- ``manip_7dof_mprim.yaml`` - 7DOF manipulator primitives
+- ``manip_7dof_timed_mprim.yaml`` - 7DOF with timing for multi-robot coordination
