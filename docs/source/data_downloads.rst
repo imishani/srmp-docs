@@ -35,7 +35,15 @@ Rail-Mounted Configuration:
 Mesh Files
 ----------
 
-All necessary mesh files for collision detection and visualization are included in the robot descriptions above. The mesh files are organized within the robot model directories and will be automatically accessible when using the URDF files.
+**Panda Robot Mesh Files**
+
+- :download:`franka_description.tar.gz <_static/data/panda/franka_description.tar.gz>` - Complete Panda robot mesh files archive
+
+**Environment Mesh Files**
+
+- :download:`crate.stl <_static/data/meshes/crate.stl>` - Crate mesh for environment setup
+
+The Panda robot mesh archive contains all necessary STL files for collision detection and visualization. Extract the archive to access individual mesh files organized in the standard franka_description directory structure.
 
 Usage
 -----
