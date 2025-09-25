@@ -256,50 +256,6 @@ Trajectory
 
       :type: list
 
-Examples
---------
-
-Basic Single Robot Example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   import srmp
-   import numpy as np
-
-   # Create planner
-   planner = srmp.PlannerInterface()
-
-   # Add robot
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
-
-   # Add obstacle
-   obstacle_pose = srmp.Pose()
-   obstacle_pose.p = np.array([0.5, 0.2, 0.4])
-   planner.add_box("obstacle", np.array([0.1, 0.1, 0.4]), obstacle_pose)
-
-   # Configure planner
-   planner.make_planner(["panda"], {
-       "planner_id": "wAstar",
-       "heuristic": "bfs",
-       "weight": "10.0"
-   })
-
-   # Plan trajectory
-   start_state = np.radians([0, -45, 0, -135, 0, 90, 45])
-
-   goal_pose = srmp.Pose()
-   goal_pose.p = np.array([0.6, 0.0, 0.5])
-   goal_pose.q = np.array([0, 0, 0, 1])
-   goal = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
-
-   trajectory = planner.plan(start_state, goal)
-
 
 Motion Primitives Configuration
 -------------------------------
@@ -424,6 +380,54 @@ The SRMP package includes pre-configured motion primitive files for manipulators
 - ``manip_6dof_mprim.yaml`` - 6DOF manipulator primitives
 - ``manip_7dof_mprim.yaml`` - 7DOF manipulator primitives
 - ``manip_7dof_timed_mprim.yaml`` - 7DOF with timing for multi-robot coordination
+
+
+
+Examples
+--------
+
+Basic Single Robot Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   import srmp
+   import numpy as np
+
+   # Create planner
+   planner = srmp.PlannerInterface()
+
+   # Add robot
+   planner.add_articulation(
+       urdf_path="/path/to/panda.urdf",
+       srdf_path="/path/to/panda.srdf",
+       name="panda",
+       end_effector="panda_hand"
+   )
+
+   # Add obstacle
+   obstacle_pose = srmp.Pose()
+   obstacle_pose.p = np.array([0.5, 0.2, 0.4])
+   planner.add_box("obstacle", np.array([0.1, 0.1, 0.4]), obstacle_pose)
+
+   # Configure planner
+   planner.make_planner(["panda"], {
+       "planner_id": "wAstar",
+       "heuristic": "bfs",
+       "weight": "10.0"
+   })
+
+   # Plan trajectory
+   start_state = np.radians([0, -45, 0, -135, 0, 90, 45])
+
+   goal_pose = srmp.Pose()
+   goal_pose.p = np.array([0.6, 0.0, 0.5])
+   goal_pose.q = np.array([0, 0, 0, 1])
+   goal = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
+
+   trajectory = planner.plan(start_state, goal)
+
+
 
 Multi-Robot Example
 ~~~~~~~~~~~~~~~~~~~
@@ -630,4 +634,3 @@ Point Cloud Example
    sensor_cloud = generate_lidar_point_cloud(robot_position)
    planner.add_point_cloud("sensor_obstacles", sensor_cloud, resolution=0.03)
 
-   
