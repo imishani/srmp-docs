@@ -244,6 +244,18 @@ Trajectory
 
       :type: list
 
+   .. attribute:: velocities
+
+      List of joint velocities along the trajectory
+
+      :type: list
+
+   .. attribute:: accelerations
+
+      List of joint accelerations along the trajectory
+
+      :type: list
+
 Examples
 --------
 
