@@ -1,9 +1,4 @@
-Template for the Read the Docs tutorial
+SRMP Read the Docs Repository
 =======================================
 
-This GitHub template includes fictional Python library
-with some basic Sphinx docs.
-
-Read the tutorial here:
-
-https://docs.readthedocs.io/en/stable/tutorial/
+Based on the tutorial here: https://docs.readthedocs.io/en/stable/tutorial/
