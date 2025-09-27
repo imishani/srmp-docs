@@ -34,7 +34,7 @@ Learn More
 
 .. note::
 
-   This project is under active development.
+   This project is under active development. We are working on getting you the SRMP MoveIt! plugin as soon as possible. We are ironing out some details :).
 
 Contents
 --------
