@@ -4,17 +4,10 @@ MoveIt Integration
 SRMP MoveIt! Plugin Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. raw:: html
-
-   <div style="text-align: center; margin: 30px 0;">
-       <video muted loop style="width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-           <source src="../srmp_moveit2.mp4" type="video/mp4">
-           Your browser does not support the video tag. 
-       </video>
-       <p style="margin-top: 10px; color: #666; font-size: 14px;">
-           SRMP MoveIt! Plugin Demo - Click play to watch
-       </p>
-   </div>
+.. image:: _static/assets/srmp_moveit2.gif
+   :align: center
+   :width: 300px
+   :alt: SRMP MoveIt! Plugin Demo
 
 SRMP provides seamless integration with MoveIt through a plugin. We provide two ways to set up SRMP with MoveIt! The first is a pre-configured Docker container. This package contains everything you need to run SRMP with MoveIt, including the SRMP libraries, MoveIt planners, and a pre-built user workspace. The second is a ROS package that you can install and use in your existing ROS workspace. Let's start with the Docker container.
 
