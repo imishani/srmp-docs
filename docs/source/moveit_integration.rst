@@ -6,7 +6,7 @@ SRMP MoveIt! Plugin Demo
 
 .. image:: _static/assets/srmp_moveit2.gif
    :align: center
-   :width: 300px
+   :width: 800px
    :alt: SRMP MoveIt! Plugin Demo
 
 SRMP provides seamless integration with MoveIt through a plugin. We provide two ways to set up SRMP with MoveIt! The first is a pre-configured Docker container. This package contains everything you need to run SRMP with MoveIt, including the SRMP libraries, MoveIt planners, and a pre-built user workspace. The second is a ROS package that you can install and use in your existing ROS workspace. Let's start with the Docker container.
