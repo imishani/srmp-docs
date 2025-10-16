@@ -1,12 +1,15 @@
 MoveIt Integration
 ==================
 
+SRMP MoveIt! Plugin Demo
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. raw:: html
 
    <div style="text-align: center; margin: 30px 0;">
-       <video controls muted loop style="width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-           <source src="_static/assets/srmp_moveit2.mp4" type="video/mp4">
-           Your browser does not support the video tag.
+       <video muted loop style="width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+           <source src="../srmp_moveit2.mp4" type="video/mp4">
+           Your browser does not support the video tag. 
        </video>
        <p style="margin-top: 10px; color: #666; font-size: 14px;">
            SRMP MoveIt! Plugin Demo - Click play to watch

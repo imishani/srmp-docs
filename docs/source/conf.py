@@ -34,5 +34,8 @@ html_theme = 'sphinx_rtd_theme'
 # Copy static files from assets directory
 html_static_path = ['_static']
 
+# Copy additional files (including videos)
+html_extra_path = ['_static/assets/srmp_moveit2.mp4']
+
 # -- Options for EPUB output
 epub_show_urls = 'footnote'
