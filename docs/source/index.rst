@@ -1,5 +1,12 @@
+
+
+.. image:: _static/assets/srmp_logo.png
+   :align: center
+   :width: 400px
+   :alt: SRMP Logo
+
 Welcome to Search-Based Robot Motion Planning (SRMP) documentation!
-===================================
+===================================================================
 
 **SRMP** is a motion planning software for robotic manipulation, leveraging state-of-the-art search-based algorithms. It ensures consistent and predictable motions, backed by rigorous theoretical guarantees. Additionally, SRMP can efficiently plan for up to dozens of manipulators while guaranteeing collision-free execution—both between robots and with the environment—while maintaining motion consistency and predictability.
 
@@ -32,10 +39,6 @@ Learn More
 - :doc:`Getting Started <usage>`
 - :doc:`API Reference <api>`
 
-.. note::
-
-   This project is under active development. We are working on getting you the SRMP MoveIt! plugin as soon as possible. We are ironing out some details :).
-
 Contents
 --------
 
@@ -44,6 +47,7 @@ Contents
    :caption: User Guide
 
    usage
+   moveit_integration
    api
    data_downloads
 
