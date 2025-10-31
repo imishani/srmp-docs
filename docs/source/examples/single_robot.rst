@@ -33,7 +33,7 @@ Here's a simple example showing the complete workflow for planning a trajectory 
    goal_state = np.radians(goal_state)
 
    # Create goal constraint
-   goal_constraint = srmp.GoalConstraint(srmp.GoalType.JOINTS, goal_state)
+   goal_constraint = srmp.GoalConstraint(srmp.GoalType.JOINTS, [goal_state])
 
    # Configure planner
    planner.make_planner(["panda"], {

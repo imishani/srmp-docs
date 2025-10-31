@@ -82,7 +82,7 @@ Define goal constraints:
    # Goal as joint angles
    goal_state = np.array([21, 29, -30, -104, -162, 52, -118])
    goal_state = np.radians(goal_state)
-   goal_joints = srmp.GoalConstraint(srmp.GoalType.JOINTS, goal_state)
+   goal_joints = srmp.GoalConstraint(srmp.GoalType.JOINTS, [goal_state])
 
    # Goal as end-effector pose
    goal_pose = srmp.Pose()

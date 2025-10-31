@@ -35,7 +35,7 @@ Whether you're working on robotic manipulation, industrial automation, or large-
 Learn More
 ==========
 
-- `Documentation <https://srmp-docs.readthedocs.io>`_
+.. - `Documentation <https://srmp-docs.readthedocs.io>`_
 - :doc:`Getting Started <usage>`
 - :doc:`API Reference <api>`
 
