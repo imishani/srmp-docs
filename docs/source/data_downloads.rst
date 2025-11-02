@@ -3,6 +3,13 @@ Data Downloads
 
 This page provides access to robot models, mesh files, and configuration data used in SRMP examples and tutorials.
 
+Complete Download
+-------------------------
+
+Download the complete archive containing all Panda robot description files and mesh assets:
+
+:download:`data.zip <_static/data/data.zip>` - Full robot descriptions and meshes
+
 Robot Models
 ------------
 
