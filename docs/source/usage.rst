@@ -109,11 +109,11 @@ Configure the planner:
                                     "weight_delta": "1.",
                                     "final_weight": "1."})
 
-   # MHA* planner
-   planner.make_planner(["panda"], {"planner_id": "MHAstar",
-                                    "inadmissible_heuristics": "bfs",
-                                    "w1": "100.",
-                                    "w2": "100."})
+   # PA*SE
+   planner.make_planner(["panda"], {"planner_id": "wPASE",
+                                    "heuristic": "bfs", "weight": "50.", "time_limit": "5.",
+                                    "num_threads": "8"})
+
 
 Compute a trajectory:
 
