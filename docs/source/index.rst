@@ -10,6 +10,11 @@ Welcome to Search-Based Robot Motion Planning (SRMP) documentation!
 
 **SRMP** is a motion planning software for robotic manipulation, leveraging state-of-the-art search-based algorithms. It ensures consistent and predictable motions, backed by rigorous theoretical guarantees. Additionally, SRMP can efficiently plan for up to dozens of manipulators while guaranteeing collision-free execution—both between robots and with the environment—while maintaining motion consistency and predictability.
 
+.. video:: _static/assets/srmp-video.mp4
+   :width: 640
+   :height: 480
+   :autoplay:
+
 Key Features
 ============
 
