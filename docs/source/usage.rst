@@ -40,12 +40,23 @@ Create a planner interface:
 
 Add a robot model to the world:
 
+.. note::
+
+   The `srdf_path` argument is optional. If you don't have an SRDF file, omit
+   the argument or pass an empty string (`srdf_path=""`).
+
 .. code-block:: python
 
-   planner.add_articulation(urdf_path="/path/to/panda.urdf",
-                            srdf_path="/path/to/panda.srdf",
-                            name="panda",
-                            end_effector="panda_hand")
+   # With SRDF (recommended when semantic info is available)
+   planner.add_articulation(name="panda",
+                            end_effector="panda_hand", 
+                            urdf_path="/path/to/panda.urdf",
+                            srdf_path="/path/to/panda.srdf")
+
+   # Or without SRDF (URDF only)
+   planner.add_articulation(name="panda",
+                            end_effector="panda_hand", 
+                            urdf_path="/path/to/panda.urdf")
 
 Add objects to the environment:
 
@@ -143,18 +154,18 @@ Add multiple robots to the world:
 
    # Add first robot
    planner.add_articulation(
-       urdf_path="/path/to/panda0.urdf",
-       srdf_path="/path/to/panda0.srdf",
        name="panda0",
-       end_effector="panda0_hand"
+       end_effector="panda0_hand", 
+       urdf_path="/path/to/panda0.urdf",
+       srdf_path="/path/to/panda0.srdf"
    )
 
    # Add second robot
    planner.add_articulation(
-       urdf_path="/path/to/panda1.urdf",
-       srdf_path="/path/to/panda1.srdf",
        name="panda1",
-       end_effector="panda1_hand"
+       end_effector="panda1_hand",
+       urdf_path="/path/to/panda1.urdf",
+       srdf_path="/path/to/panda1.srdf"
    )
 
 Set base poses for robots:
@@ -186,7 +197,12 @@ Configure multi-robot planner:
        "heuristic_panda0": "joint_euclidean_remove_time",
        "heuristic_panda1": "joint_euclidean_remove_time",
    }
-   planner.make_planner(articulation_names, planner_context)
+      # Add robot-specific parameters similar to test_mramp.py
+      for name in articulation_names:
+         planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+         planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
+
+      planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
 Define start and goal states for multiple robots:
 
@@ -271,6 +287,7 @@ SRMP provides several search-based planning algorithms:
 - **MHAstar**: Multi-heuristic A* - Uses multiple heuristics for better performance
 - **wPASE**: Weighted PASE - Parallel search for improved performance
 - **Astar**: Standard A* - Optimal but potentially slower
+- **E-CBS**: Enhanced Conflict-Based Search - For multi-robot coordination
 - **xECBS**: Experience Accelerated Conflict-Based Search - For multi-robot coordination
 
 You can view available planners programmatically:
@@ -295,6 +312,8 @@ Supported geometric primitives:
 - **Cylinders**: `add_cylinder(name, radius, height, pose)`
 - **Meshes**: `add_mesh(name, mesh_path, scale, pose)`
 - **Point Clouds**: `add_point_cloud(name, vertices, resolution)`
+
+See the :doc:`API <api>` for detailed method signatures and additional functionality.
 
 Troubleshooting Installation
 -----------------------------

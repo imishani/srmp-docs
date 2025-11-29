@@ -15,15 +15,30 @@ The main interface for robot motion planning.
 
    **Methods:**
 
-   .. method:: add_articulation(urdf_path, srdf_path, name, end_effector, planned=True)
+   .. method:: add_articulation(name, end_effector, 
+                                urdf_path, srdf_path='', 
+                                link_names: List[str] = [],
+                                joint_names: List[str] = [],
+                                gravity: NDArray[np.float64] = np.array([0, 0, 0]), 
+                                planned=True)
 
-      Add a robot to the planning scene.
+      Add a robot to the planning scene. The `srdf_path` argument is optional — if you
+      don't have an SRDF file, you can omit this argument or pass an empty string.
 
-      :param str urdf_path: Path to the URDF file describing the robot
-      :param str srdf_path: Path to the SRDF file with semantic information
       :param str name: Unique name for this robot instance
       :param str end_effector: Name of the end-effector link
+      :param str urdf_path: Path to the URDF file describing the robot
+      :param str srdf_path: Path to the SRDF file with semantic information (optional, default: "")
+      :param list link_names: List of link names to include (default: all links)
+      :param list joint_names: List of joint names to include (default: all joints)
+      :param numpy.ndarray gravity: Gravity vector for the robot (default: [0, 0, 0])
       :param bool planned: Whether this robot should be planned for (default: True)
+
+   .. method:: remove_articulation(name)
+
+      Remove an articulation from the planning world.
+
+      :param str name: Name of the articulation to remove
 
    .. method:: set_base_pose(name, pose)
 
@@ -82,31 +97,31 @@ The main interface for robot motion planning.
 
       **Multi-Robot Planner Context Options:**
 
-      Available multi-robot planners: "ECBS", "xECBS"
+      Available multi-robot planners: "E-CBS", "xECBS"
 
       **Required Multi-Robot Parameters:**
 
-      - ``planner_id``: "ECBS" or "xECBS"
+      - ``planner_id``: "E-CBS" or "xECBS"
 
       **Agent-Specific Parameters (per robot):**
 
       For each robot with name ``{robot_name}``:
 
-      - ``heuristic_{robot_name}`` (string): Heuristic for this robot. Default: "bfs" (ECBS), "joint_euclidean_remove_time" (xECBS)
+      - ``heuristic_{robot_name}`` (string): Heuristic for this robot. Default: "bfs" (E-CBS), "joint_euclidean_remove_time" (xECBS)
       - ``mprim_path_{robot_name}`` (string): Motion primitives path for this robot. Default: auto-generated timed version
       - ``resolution_{robot_name}`` (string): Discretization for this robot. Default: "1"
 
-      **ECBS/xECBS Parameters:**
+      **E-CBS/xECBS Parameters:**
 
-      - ``weight_low_level_heuristic`` (string): Low-level search weight. Default: "1.0" (ECBS), "55.0" (xECBS)
+      - ``weight_low_level_heuristic`` (string): Low-level search weight. Default: "1.0" (E-CBS), "55.0" (xECBS)
       - ``high_level_focal_suboptimality`` (string): High-level focal search bound. Default: "1.3"
       - ``low_level_focal_suboptimality`` (string): Low-level focal search bound. Default: "1.3"
 
-   .. method:: plan(start_state, goal_constraint)
+   .. method:: plan(start, goal_constraint)
 
       Plan a trajectory for a single robot.
 
-      :param numpy.ndarray start_state: Starting joint configuration
+      :param numpy.ndarray start: Starting joint configuration
       :param GoalConstraint goal_constraint: Goal specification
       :returns: Trajectory object containing the planned path
       :rtype: Trajectory
@@ -179,6 +194,162 @@ The main interface for robot motion planning.
    .. method:: print_available_planners()
 
       Print available planners and their descriptions.
+
+   Note: `add_articulation` accepts an optional `srdf_path` parameter. Many examples
+   below include SRDF paths for completeness, but you can call `add_articulation`
+   with only the `urdf_path` if no SRDF is required for your use case.
+
+   .. method:: get_articulation_names()
+
+      Return the list of articulation names currently present in the planning world.
+
+      :returns: List of articulation names
+
+   .. method:: get_object_names()
+
+      Return the list of object names currently present in the planning world.
+
+      :returns: List of object names
+
+   .. method:: has_articulation(name)
+
+      Check whether an articulation with the given name exists in the planning world.
+
+      :param str name: Articulation name
+      :returns: True if the articulation exists, False otherwise
+
+   .. method:: has_object(name)
+
+      Check whether an object with the given name exists in the planning world.
+
+      :param str name: Object name
+      :returns: True if the object exists, False otherwise
+
+   .. method:: is_articulation_planned(name)
+
+      Check whether a named articulation is configured to be planned.
+
+      :param str name: Articulation name
+      :returns: True if the articulation is planned, False otherwise
+
+   .. method:: set_articulation_planned(name, planned)
+
+      Enable or disable planning for a specific articulation.
+
+      :param str name: Articulation name
+      :param bool planned: Whether to plan for this articulation
+
+   .. method:: is_object_attached(name)
+
+      Query whether an object is currently attached to a robot.
+
+      :param str name: Object name
+      :returns: True if attached, False otherwise
+
+   .. method:: attach_object(name, art_name, link_id, touch_links=None)
+
+      Attach an existing object to a robot link so it moves with the robot.
+
+      :param str name: Object name
+      :param str art_name: Articulation name to attach to
+      :param int link_id: Index of the link to attach the object to
+      :param list touch_links: Optional list of link names allowed to touch the object
+
+   .. method:: detach_object(name, also_remove=False)
+
+      Detach an attached object from its robot. Optionally remove it from the world.
+
+      :param str name: Object name
+      :param bool also_remove: If True, remove the object from the world after detaching
+      :returns: True if successful
+
+   .. method:: detach_all_objects(also_remove=False)
+
+      Detach all attached objects. Optionally remove them from the world.
+
+      :param bool also_remove: If True, remove detached objects from the world
+      :returns: True if successful
+
+   .. method:: is_state_colliding(articulation_name="")
+
+      Check whether the current state (optionally for a specific articulation) is in collision.
+
+      :param str articulation_name: Optional articulation name to check
+      :returns: True if a collision is detected
+
+   .. method:: is_robot_colliding_with_objects(art_name)
+
+      Check if the specified robot is colliding with any objects in the planning world.
+
+      :param str art_name: Articulation name
+      :returns: True if collision detected with environment objects
+
+   .. method:: distance_to_self_collision()
+
+      Get the minimum signed distance to self-collision for all robots.
+
+      :returns: Minimum self-collision distance (float)
+
+   .. method:: distance_to_robot_collision()
+
+      Get the minimum signed distance between robots and environment objects.
+
+      :returns: Minimum robot-to-environment collision distance (float)
+
+   .. method:: distance_to_collision()
+
+      Get the minimum distance to any collision (self or environment).
+
+      :returns: Minimum distance to collision (float)
+
+   .. method:: set_allowed_collision(name1, name2, allowed)
+
+      Set whether collisions between two named objects are allowed.
+
+      :param str name1: First object name
+      :param str name2: Second object name
+      :param bool allowed: True to allow collisions, False to disallow
+
+   .. method:: set_qpos(name, qpos)
+
+      Set the joint positions for a named articulation.
+
+      :param str name: Articulation name
+      :param numpy.ndarray qpos: Joint positions (1D array)
+
+   .. method:: set_qpos_all(state)
+
+      Set the joint positions for all planned articulations using a concatenated state vector.
+
+      :param numpy.ndarray state: Concatenated joint positions for all planned articulations
+
+   .. method:: update_attached_bodies_pose()
+
+      Update the poses of all objects attached to robots based on current robot joint states.
+
+   .. method:: compute_fk(articulation_name, qpos)
+
+      Compute forward kinematics for a specific articulation and joint configuration.
+
+      :param str articulation_name: Articulation name
+      :param numpy.ndarray qpos: Joint positions
+      :returns: Pose of the end-effector (Pose)
+
+   .. method:: compute_ik(articulation_name, ee_pose, init_state_val)
+
+      Compute inverse kinematics (CLIK) for a desired end-effector pose.
+
+      :param str articulation_name: Articulation name
+      :param list ee_pose: Desired end-effector pose [x, y, z, roll, pitch, yaw]
+      :param list init_state_val: Initial joint configuration for IK solver
+      :returns: Tuple `(success: bool, joint_state: list)`
+
+   .. method:: reset(reset_robots=True)
+
+      Reset the planner interface. When `reset_robots` is True, all articulations and objects
+      are removed; when False, only planner caches and internal data are reset.
+
+      :param bool reset_robots: Whether to remove robots and objects during reset
 
 Data Types
 ----------
@@ -456,18 +627,19 @@ Multi-Robot Example
        pose.q = np.array([1, 0, 0, 0])
        planner.set_base_pose(f"panda{i}", pose)
 
-   # Configure multi-robot planner
-   planner.make_planner(
-       ["panda0", "panda1"],
-       {
-           "planner_id": "xECBS",
-           "weight_low_level_heuristic": "55.0",
-           "high_level_focal_suboptimality": "1.8",
-           "low_level_focal_suboptimality": "1.0",
-           "heuristic_panda0": "joint_euclidean_remove_time",
-           "heuristic_panda1": "joint_euclidean_remove_time"
-       }
-   )
+      # Configure multi-robot planner (add per-robot heuristic and mprim paths like tests)
+      articulation_names = ["panda0", "panda1"]
+      planner_context = {
+         "planner_id": "xECBS",
+         "weight_low_level_heuristic": "55.0",
+         "high_level_focal_suboptimality": "1.8",
+         "low_level_focal_suboptimality": "1.0",
+      }
+      for name in articulation_names:
+         planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+         planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
+
+      planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Plan trajectories
    start_states = {

@@ -46,7 +46,8 @@ Basic SAPIEN Setup
    planner = srmp.PlannerInterface()
    planner.add_articulation(
        urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
+        # Note: `srdf_path` is optional. Provide an SRDF if available, otherwise omit it.
+        # srdf_path="/path/to/panda.srdf",
        name="panda",
        end_effector="panda_hand"
    )
@@ -102,7 +103,8 @@ Adding Objects to SAPIEN Scene
    planner = srmp.PlannerInterface()
    planner.add_articulation(
        urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
+        # SRDF is optional — omit if you don't have one
+        # srdf_path="/path/to/panda.srdf",
        name="panda",
        end_effector="panda_hand"
    )
@@ -221,7 +223,8 @@ Basic PyBullet Setup
    planner = srmp.PlannerInterface()
    planner.add_articulation(
        urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
+        # SRDF optional; include only if you need semantic configuration
+        # srdf_path="/path/to/panda.srdf",
        name="panda",
        end_effector="panda_hand"
    )
@@ -279,10 +282,12 @@ PyBullet Multi-Robot Example
    # Add both robots
    for i in range(2):
        planner.add_articulation(
-           urdf_path=f"/path/to/panda{i}.urdf",
-           srdf_path=f"/path/to/panda{i}.srdf",
-           name=f"panda{i}",
-           end_effector=f"panda{i}_hand"
+         urdf_path=f"/path/to/data/panda/panda{i}.urdf",
+                # SRDF optional for each robot
+                # srdf_path=f"/path/to/data/panda/panda{i}.srdf",
+         name=f"panda{i}",
+         end_effector=f"panda{i}_hand",
+         planned=True
        )
 
    # Set base poses to match PyBullet
@@ -300,17 +305,20 @@ PyBullet Multi-Robot Example
    planner.read_sim(physics_client, "pybullet", articulations=["panda0", "panda1"])
 
    # Configure multi-robot planner
-   planner.make_planner(
-       ["panda0", "panda1"],
-       {
-           "planner_id": "xECBS",
-           "weight_low_level_heuristic": "30.0",
-           "high_level_focal_suboptimality": "1.5",
-           "low_level_focal_suboptimality": "1.0",
-           "heuristic_panda0": "joint_euclidean_remove_time",
-           "heuristic_panda1": "joint_euclidean_remove_time"
-       }
-   )
+   articulation_names = ["panda0", "panda1"]
+   planner_context = {
+       "planner_id": "xECBS",
+       "weight_low_level_heuristic": "30.0",
+       "high_level_focal_suboptimality": "1.5",
+       "low_level_focal_suboptimality": "1.0",
+   }
+
+   # Add per-robot config entries (heuristics and timed mprims)
+   for name in articulation_names:
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
+
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Plan coordinated motion
    start_states = {
@@ -412,7 +420,8 @@ Genesis Setup and Planning
    planner = srmp.PlannerInterface()
    planner.add_articulation(
        urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
+       # SRDF is optional; include if you need additional semantic info
+       # srdf_path="/path/to/panda.srdf",
        name="panda",
        end_effector="panda_hand"
    )
@@ -528,7 +537,8 @@ MuJoCo integration for high-fidelity physics simulation:
    planner = srmp.PlannerInterface()
    planner.add_articulation(
        urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
+        # SRDF optional
+        # srdf_path="/path/to/panda.srdf",
        name="panda",
        end_effector="panda_hand"
    )

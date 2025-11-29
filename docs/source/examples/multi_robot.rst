@@ -17,16 +17,23 @@ Here's a complete example of planning for two Panda robots:
    # Create planner
    planner = srmp.PlannerInterface()
 
-   # Add two robots
+   # Add two robots (SRDF is optional). You can pass `srdf_path` if available,
+   # or omit it and provide only the URDF.
    for i in range(2):
+       # With SRDF (recommended when available):
+       # planner.add_articulation(urdf_path=f"/path/to/panda{i}.urdf",
+       #                          srdf_path=f"/path/to/panda{i}.srdf",
+       #                          name=f"panda{i}",
+       #                          end_effector=f"panda{i}_hand")
+
+       # Or without SRDF (URDF only):
        planner.add_articulation(
            urdf_path=f"/path/to/panda{i}.urdf",
-           srdf_path=f"/path/to/panda{i}.srdf",
            name=f"panda{i}",
            end_effector=f"panda{i}_hand"
        )
 
-   # Set base poses for robots
+   # Set base poses for robots using Pose objects
    pose0 = srmp.Pose()
    pose0.p = np.array([-0.5, 0.5, 0])
    pose0.q = np.array([1, 0, 0, 0])
@@ -37,7 +44,7 @@ Here's a complete example of planning for two Panda robots:
    pose1.q = np.array([0, 0, 0, 1])  # 180-degree rotation
    planner.set_base_pose("panda1", pose1)
 
-   # Configure multi-robot planner
+   # Configure multi-robot planner following test_mramp.py patterns
    articulation_names = ["panda0", "panda1"]
    planner_context = {
        "planner_id": "xECBS",
@@ -45,7 +52,13 @@ Here's a complete example of planning for two Panda robots:
        "high_level_focal_suboptimality": "1.8",
        "low_level_focal_suboptimality": "1.0",
    }
-   planner.make_planner(articulation_names, planner_context)
+
+   # Add robot-specific parameters (heuristics and timed mprims)
+   for i, name in enumerate(articulation_names):
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
+
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Define start and goal states
    start_states = {
@@ -114,7 +127,8 @@ This example shows coordination between three robots:
        pose.q = base_orientations[i]
        planner.set_base_pose(name, pose)
 
-   # Configure planner for three robots
+   # Configure planner for three robots (use per-robot heuristics and timed mprims)
+   articulation_names = robot_names
    planner_context = {
        "planner_id": "xECBS",
        "weight_low_level_heuristic": "55.0",
@@ -122,13 +136,11 @@ This example shows coordination between three robots:
        "low_level_focal_suboptimality": "1.0"
    }
 
-   # Add robot-specific parameters
    for name in robot_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       ### If you have custom motion primitives, specify them here
-       # planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
+       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
-   planner.make_planner(robot_names, planner_context)
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Define complex start and goal states
    start_states = {
@@ -183,7 +195,8 @@ This example shows how to use different goal types for different robots:
            urdf_path=f"/path/to/panda{i}.urdf",
            srdf_path=f"/path/to/panda{i}.srdf",
            name=f"panda{i}",
-           end_effector=f"panda{i}_hand"
+           end_effector=f"panda{i}_hand",
+           planned=True
        )
 
    # Set base poses
@@ -197,18 +210,19 @@ This example shows how to use different goal types for different robots:
    pose1.q = np.array([0, 0, 0, 1])
    planner.set_base_pose("panda1", pose1)
 
-   # Configure planner
-   planner.make_planner(
-       ["panda0", "panda1"],
-       {
-           "planner_id": "xECBS",
-           "weight_low_level_heuristic": "55.0",
-           "high_level_focal_suboptimality": "1.5",
-           "low_level_focal_suboptimality": "1.0",
-           "heuristic_panda0": "joint_euclidean_remove_time",
-           "heuristic_panda1": "joint_euclidean_remove_time"
-       }
-   )
+   # Configure planner (use per-robot heuristics and timed motion primitives)
+   articulation_names = ["panda0", "panda1"]
+   planner_context = {
+       "planner_id": "xECBS",
+       "weight_low_level_heuristic": "55.0",
+       "high_level_focal_suboptimality": "1.5",
+       "low_level_focal_suboptimality": "1.0",
+   }
+   for name in articulation_names:
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
+
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Start states
    start_states = {
@@ -274,17 +288,18 @@ This example demonstrates collision avoidance between robots working in close pr
    planner.set_base_pose("panda1", pose1)
 
    # Configure planner with collision checking
-   planner.make_planner(
-       ["panda0", "panda1"],
-       {
-           "planner_id": "xECBS",
-           "weight_low_level_heuristic": "10.0",  # Lower weight for better paths
-           "high_level_focal_suboptimality": "1.2",
-           "low_level_focal_suboptimality": "1.0",
-           "heuristic_panda0": "joint_euclidean_remove_time",
-           "heuristic_panda1": "joint_euclidean_remove_time"
-       }
-   )
+   articulation_names = ["panda0", "panda1"]
+   planner_context = {
+       "planner_id": "xECBS",
+       "weight_low_level_heuristic": "10.0",
+       "high_level_focal_suboptimality": "1.2",
+       "low_level_focal_suboptimality": "1.0",
+   }
+   for name in articulation_names:
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
+
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Start with robots in potential conflict
    start_states = {
