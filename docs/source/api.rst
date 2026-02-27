@@ -160,14 +160,24 @@ The main interface for robot motion planning.
       :param float height: Cylinder height
       :param Pose pose: Cylinder pose in world frame
 
-   .. method:: add_mesh(name, mesh_path, scale, pose)
+   .. method:: add_mesh(name, mesh_path=None, vertices=None, triangles=None, scale=np.ones(3), pose=None, convex=False)
 
-      Add a mesh obstacle to the environment.
+      Add a mesh obstacle to the environment.  Either ``mesh_path`` **or** both
+      ``vertices`` and ``triangles`` must be provided.
 
       :param str name: Unique name for the mesh
-      :param str mesh_path: Path to mesh file (STL, OBJ, etc.)
-      :param numpy.ndarray scale: Scaling factors [x, y, z]
+      :param str mesh_path: Path to a mesh file (STL, OBJ, DAE, …).  Mutually
+          exclusive with ``vertices``/``triangles``.
+      :param numpy.ndarray vertices: Mesh vertices as an Nx3 array.  Must be
+          supplied together with ``triangles``.
+      :param numpy.ndarray triangles: Triangle face indices as an Mx3 array of
+          integer indices into ``vertices``.  Must be supplied together with
+          ``vertices``.
+      :param numpy.ndarray scale: Uniform or per-axis scale factors [x, y, z]
+          (default: ``[1, 1, 1]``)
       :param Pose pose: Mesh pose in world frame
+      :param bool convex: Treat mesh as convex hull during collision checking.
+          Only applicable for file-based meshes (default: ``False``)
 
    .. method:: add_point_cloud(name, vertices, resolution=0.01)
 
@@ -805,4 +815,197 @@ Point Cloud Example
    robot_position = [0, 0, 0.5]
    sensor_cloud = generate_lidar_point_cloud(robot_position)
    planner.add_point_cloud("sensor_obstacles", sensor_cloud, resolution=0.03)
+
+
+Visualization Classes
+---------------------
+
+SRMP ships two optional visualization backends.  Both extend
+:class:`~srmp.PlannerInterface` and keep the 3D scene in sync automatically
+as robots and objects are added or removed.
+
+See the :doc:`visualization` page for installation instructions and full
+usage examples.
+
+VisualPlannerInterface
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: srmp.VisualPlannerInterface(zmq_url=None)
+
+   MeshCat-based visualizer.  Inherits all methods of
+   :class:`~srmp.PlannerInterface`.
+
+   :param str zmq_url: Optional ZMQ URL for an existing MeshCat server.
+       Leave as ``None`` to start a new server automatically.
+
+   Requires: ``pip install meshcat``
+
+   **Additional Methods:**
+
+   .. method:: visualize(open_browser=True)
+
+      Start the MeshCat server (if not already running) and render the
+      current scene.  Prints the browser URL to the console.
+
+      :param bool open_browser: Whether to print the URL (default: ``True``)
+
+   .. method:: animate_trajectory(trajectories, dt=0.05, robot_name=None)
+
+      Replay a planned trajectory in the 3D viewer by stepping through
+      joint configurations.
+
+      :param trajectories: A single :class:`~srmp.Trajectory` or a ``dict``
+          mapping robot names to trajectories.
+      :param float dt: Seconds to wait between frames (default: ``0.05``)
+      :param str robot_name: Robot name when a single trajectory is supplied.
+          Defaults to the first robot in the scene.
+
+   .. method:: add_gui_controls()
+
+      Add obstacle-editing sliders and controls to MeshCat.  Because MeshCat
+      is one-directional, use the ``set_gui_*`` helpers below to drive the
+      GUI state from Python.
+
+   .. method:: set_gui_position(x, y, z)
+
+      Set the current GUI position state and sync the MeshCat sliders.
+
+      :param float x: X position
+      :param float y: Y position
+      :param float z: Z position
+
+   .. method:: set_gui_size(width, height, depth)
+
+      Set the current GUI size state and sync the MeshCat sliders.
+
+   .. method:: set_gui_object_type(obj_type)
+
+      Set the current GUI object type (``"box"``, ``"sphere"``, or
+      ``"cylinder"``).
+
+   .. method:: set_gui_object_name(name)
+
+      Set the current GUI object name.
+
+   .. method:: add_obstacle_from_gui()
+
+      Add an obstacle using the current GUI state values.
+
+      :returns: Name of the added object, or ``None`` on failure.
+      :rtype: str or None
+
+   .. method:: update_object_from_gui(object_name)
+
+      Move an existing object to the position stored in the current GUI state.
+
+      :param str object_name: Name of the object to update
+      :returns: ``True`` if successful
+      :rtype: bool
+
+   .. method:: load_object_to_gui(object_name)
+
+      Load an object's properties into the GUI state (for subsequent editing).
+
+      :param str object_name: Name of the object to load
+      :returns: ``True`` if successful
+      :rtype: bool
+
+   .. attribute:: url
+
+      The MeshCat browser URL (read-only).  Returns an informational string
+      if the server has not been started yet.
+
+
+ViserPlannerInterface
+~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: srmp.ViserPlannerInterface(port=8080, share=False)
+
+   Interactive Viser-based visualizer.  Inherits all methods of
+   :class:`~srmp.PlannerInterface`.  Unlike the MeshCat backend, Viser
+   provides *bidirectional* browser ↔ Python communication: sliders,
+   dropdowns, and buttons in the browser directly invoke Python callbacks.
+
+   :param int port: TCP port for the Viser web server (default: ``8080``)
+   :param bool share: Request a public share URL from Viser
+       (default: ``False``)
+
+   Requires: ``pip install viser trimesh``
+
+   **Additional Methods:**
+
+   .. method:: visualize(open_browser=True, add_grid=True)
+
+      Start the Viser server (if not already running) and render the scene.
+
+      :param bool open_browser: Unused; kept for API symmetry with
+          :class:`VisualPlannerInterface`.
+      :param bool add_grid: Whether to render a ground grid
+          (default: ``True``)
+
+   .. method:: animate_trajectory(trajectories, dt=0.05, robot_name=None)
+
+      Replay a planned trajectory in the 3D viewer.
+
+      :param trajectories: A single :class:`~srmp.Trajectory` or a ``dict``
+          mapping robot names to trajectories.
+      :param float dt: Seconds between frames (default: ``0.05``)
+      :param str robot_name: Robot name when a single trajectory is supplied.
+
+   .. method:: add_robot_controls(robot_name)
+
+      Add interactive joint sliders, visibility toggles, and a Reset button
+      for the named robot.  Moving a slider updates both the Viser geometry
+      and the planner backend in real time.
+
+      :param str robot_name: Name of the robot
+
+   .. method:: add_ee_drag_control(robot_name)
+
+      Place a 6-DOF transform gizmo at the robot's end-effector.  Dragging
+      the gizmo in the browser triggers IK; on success the joint
+      configuration is updated.  On IK failure the gizmo snaps back to the
+      current end-effector pose.  If :meth:`add_robot_controls` was called
+      first, the joint sliders are kept in sync.
+
+      :param str robot_name: Name of the robot
+
+   .. method:: add_gui_controls()
+
+      Add an interactive "Object Controls" panel to the browser sidebar.
+      The panel includes type dropdown, position vector, size sliders, mesh
+      path input, file-browser button, and **Add / Update / Remove** buttons
+      that invoke Python callbacks.
+
+   .. method:: add_obstacle_from_gui()
+
+      Add an obstacle using the current GUI widget values.
+
+      :returns: Name of the added object, or ``None`` on failure.
+      :rtype: str or None
+
+   .. method:: update_object_from_gui(object_name)
+
+      Move an existing object to the position shown in the GUI.
+
+      :param str object_name: Name of the object to update
+      :returns: ``True`` if successful
+      :rtype: bool
+
+   .. method:: load_object_to_gui(object_name)
+
+      Load an object's properties into the GUI widgets for editing.
+
+      :param str object_name: Name of the object to load
+      :returns: ``True`` if successful
+      :rtype: bool
+
+   .. method:: stop()
+
+      Shut down the Viser web server.
+
+   .. attribute:: url
+
+      The Viser browser URL (e.g. ``http://localhost:8080``).  Returns an
+      informational string if the server has not been started yet.
 

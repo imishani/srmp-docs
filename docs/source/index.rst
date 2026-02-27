@@ -56,6 +56,7 @@ Contents
    :caption: User Guide
 
    usage
+   visualization
    moveit_integration
    api
    data_downloads
@@ -67,3 +68,4 @@ Contents
    examples/single_robot
    examples/multi_robot
    examples/simulator_integration
+   examples/visualization
