@@ -2,7 +2,7 @@ Visualization Examples
 ======================
 
 These examples show how to use SRMP's two visualization backends.  See the
-:doc:`../visualization` page for installation instructions and a feature
+:doc:`../user_guide/visualization` page for installation instructions and a feature
 comparison.
 
 MeshCat Visualization

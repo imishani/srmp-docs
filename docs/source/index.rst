@@ -26,7 +26,7 @@ Key Features
 Getting Started
 ===============
 
-To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <usage>`.
+To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <user_guide/usage>`.
 Check out the :doc:`quick start tutorial <examples/single_robot>` for an example of how to set up and run SRMP for your application.
 
 Why SRMP?
@@ -40,27 +40,12 @@ Learn More
 ==========
 
 .. - `Documentation <https://srmp-docs.readthedocs.io>`_
-- :doc:`Getting Started <usage>`
-- :doc:`API Reference <api>`
-
-Contents
---------
+- :doc:`Getting Started <user_guide/usage>`
+- :doc:`API Reference <user_guide/api>`
 
 .. toctree::
+   :hidden:
    :maxdepth: 2
-   :caption: User Guide
 
-   usage
-   visualization
-   moveit_integration
-   api
-   data_downloads
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Examples
-
-   examples/single_robot
-   examples/multi_robot
-   examples/simulator_integration
-   examples/visualization
+   user_guide/index
+   examples/index

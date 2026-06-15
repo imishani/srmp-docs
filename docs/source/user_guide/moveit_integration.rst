@@ -4,7 +4,7 @@ MoveIt Integration
 SRMP MoveIt! Plugin Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: _static/assets/srmp_moveit2.gif
+.. image:: ../_static/assets/srmp_moveit2.gif
    :align: center
    :width: 800px
    :alt: SRMP MoveIt! Plugin Demo
@@ -22,7 +22,7 @@ You can download the complete SRMP MoveIt! Docker package here:
 .. raw:: html
 
    <div style="text-align: center; margin: 20px 0;">
-       <a href="_static/assets/srmp-docker.zip" download="srmp-docker.zip" 
+       <a href="../_static/assets/srmp-docker.zip" download="srmp-docker.zip"
           style="display: inline-block; padding: 15px 30px; background-color: #2980b9; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
            📦 Download SRMP Docker Package
        </a>
@@ -103,7 +103,7 @@ You can download the SRMP MoveIt! local installation package here:
 .. raw:: html
 
    <div style="text-align: center; margin: 20px 0;">
-       <a href="_static/assets/srmp-local.zip" download="srmp-local.zip" 
+       <a href="../_static/assets/srmp-local.zip" download="srmp-local.zip"
           style="display: inline-block; padding: 15px 30px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
            📦 Download SRMP Local Package
        </a>
