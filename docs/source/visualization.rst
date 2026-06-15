@@ -65,8 +65,6 @@ Basic Usage
        srdf_path="/path/to/panda.srdf",   # optional
    )
 
-   box_pose = planner.Pose() if hasattr(planner, 'Pose') else __import__('srmp').Pose()
-
    import srmp
    box_pose = srmp.Pose()
    box_pose.p = np.array([0.5, 0.2, 0.4])

@@ -381,7 +381,7 @@ Pose
 
    .. attribute:: q
 
-      Orientation as quaternion [w, x, y, z]
+      Orientation as quaternion [x, y, z, w]
 
       :type: numpy.ndarray
 
@@ -637,19 +637,19 @@ Multi-Robot Example
        pose.q = np.array([1, 0, 0, 0])
        planner.set_base_pose(f"panda{i}", pose)
 
-      # Configure multi-robot planner (add per-robot heuristic and mprim paths like tests)
-      articulation_names = ["panda0", "panda1"]
-      planner_context = {
-         "planner_id": "xECBS",
-         "weight_low_level_heuristic": "55.0",
-         "high_level_focal_suboptimality": "1.8",
-         "low_level_focal_suboptimality": "1.0",
-      }
-      for name in articulation_names:
-         planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-         planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
+   # Configure multi-robot planner
+   articulation_names = ["panda0", "panda1"]
+   planner_context = {
+       "planner_id": "xECBS",
+       "weight_low_level_heuristic": "55.0",
+       "high_level_focal_suboptimality": "1.8",
+       "low_level_focal_suboptimality": "1.0",
+   }
+   for name in articulation_names:
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
 
-      planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
    # Plan trajectories
    start_states = {

@@ -3,7 +3,7 @@
 # -- Project information
 
 project = 'SRMP'
-copyright = '2021, Graziella'
+copyright = '2024, Itamar Mishani, Yorai Shaoul, Ramkumar Natarajan'
 author = 'Itamar Mishani, Yorai Shaoul, Ramkumar Natarajan'
 
 release = '0.0.8'
@@ -30,6 +30,18 @@ templates_path = ['_templates']
 # -- Options for HTML output
 
 html_theme = 'pydata_sphinx_theme'
+
+html_logo = '_static/assets/srmp_logo.png'
+
+html_theme_options = {
+    'logo': {
+        'image_light': '_static/assets/srmp_logo.png',
+        'image_dark': '_static/assets/srmp-logo-dark.png',
+    },
+    'github_url': 'https://github.com/imishani/srmp-docs',
+    'navbar_align': 'left',
+    'show_toc_level': 2,
+}
 
 # Copy static files from assets directory
 html_static_path = ['_static']

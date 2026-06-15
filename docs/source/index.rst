@@ -1,10 +1,5 @@
 
 
-.. image:: _static/assets/srmp_logo.png
-   :align: center
-   :width: 400px
-   :alt: SRMP Logo
-
 Welcome to Search-Based Robot Motion Planning (SRMP) documentation!
 ===================================================================
 
@@ -31,8 +26,8 @@ Key Features
 Getting Started
 ===============
 
-To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <installation>`.  
-Check out the :doc:`quick start tutorial <quick_start>` for an example of how to set up and run SRMP for your application.
+To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <usage>`.
+Check out the :doc:`quick start tutorial <examples/single_robot>` for an example of how to set up and run SRMP for your application.
 
 Why SRMP?
 =========

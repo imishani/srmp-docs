@@ -194,15 +194,12 @@ Configure multi-robot planner:
        "weight_low_level_heuristic": "55.0",
        "high_level_focal_suboptimality": "1.8",
        "low_level_focal_suboptimality": "1.0",
-       "heuristic_panda0": "joint_euclidean_remove_time",
-       "heuristic_panda1": "joint_euclidean_remove_time",
    }
-      # Add robot-specific parameters similar to test_mramp.py
-      for name in articulation_names:
-         planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-         planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
+   for name in articulation_names:
+       planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
+       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
 
-      planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
+   planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
 Define start and goal states for multiple robots:
 
