@@ -41,6 +41,11 @@ html_theme_options = {
     'github_url': 'https://github.com/imishani/srmp-docs',
     'navbar_align': 'left',
     'show_toc_level': 2,
+    'navigation_depth': 3,
+}
+
+html_sidebars = {
+    '**': ['sidebar-nav-bs'],
 }
 
 # Copy static files from assets directory
