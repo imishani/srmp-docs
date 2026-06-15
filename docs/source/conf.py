@@ -29,7 +29,7 @@ templates_path = ['_templates']
 
 # -- Options for HTML output
 
-html_theme = 'furo'
+html_theme = 'pydata_sphinx_theme'
 
 # Copy static files from assets directory
 html_static_path = ['_static']
