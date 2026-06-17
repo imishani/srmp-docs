@@ -49,18 +49,21 @@ This opens a Viser 3D viewer with an embedded chat panel. You can interact with 
 Example Interaction
 -------------------
 
-Here's an example conversation with the agent:
+Here's an example conversation with the agent. Robots, obstacles, and planner settings persist between messages, so you can build up a scene incrementally:
 
 .. code-block:: text
 
-   You: Load a Franka Panda robot and plan a motion from home position to a goal pose at [0.5, 0.2, 0.4]
+   You: Load a Panda robot
+   Agent: Done! Loaded Panda robot.
 
-   Agent: I'll help you with that. Let me set up the planner and compute a trajectory.
+   You: Add a box obstacle at [0.5, 0, 0.3]
+   Agent: Added box obstacle.
 
-   [Agent executes Python code internally]
+   You: Plan a motion to reach [0.4, 0.2, 0.5]
+   Agent: Planned trajectory with 52 waypoints.
 
-   Done! I've loaded the Panda robot and computed a trajectory with 45 waypoints
-   from the home position to the goal pose at [0.5, 0.2, 0.4].
+   You: Now plan a motion to reach underneath the box
+   Agent: Planned trajectory with 48 waypoints to position [0.5, 0, 0.15].
 
 The agent understands the full SRMP API and can:
 
