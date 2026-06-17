@@ -6,8 +6,8 @@ project = 'SRMP'
 copyright = '2024, Itamar Mishani, Yorai Shaoul, Ramkumar Natarajan'
 author = 'Itamar Mishani, Yorai Shaoul, Ramkumar Natarajan'
 
-release = '0.0.8'
-version = '0.0.8'
+release = '0.1.2'
+version = '0.1.2'
 
 # -- General configuration
 

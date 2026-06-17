@@ -6,6 +6,7 @@ User Guide
    :caption: User Guide
 
    usage
+   agent_mode
    visualization
    moveit_integration
    api
