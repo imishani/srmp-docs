@@ -3,6 +3,16 @@ Data Downloads
 
 This page provides access to robot models, mesh files, and configuration data used in SRMP examples and tutorials.
 
+.. tip::
+
+   **Automatic Downloads**: You can skip manual downloads by using the :doc:`robot_registry`.
+   Just call ``planner.add_robot("panda")`` and the data downloads automatically!
+
+   .. code-block:: python
+
+      # No manual download needed - just use the robot name
+      planner.add_robot("panda")
+
 Complete Download
 -------------------------
 

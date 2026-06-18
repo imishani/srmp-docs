@@ -28,34 +28,40 @@ Then, import it in your script and follow the instructions on the docs:
 Basic Single Robot Planning
 ---------------------------
 
-.. note::
-
-   You can download pre-configured robot models (URDF/SRDF files) from our :doc:`data_downloads` page.
-
 Create a planner interface:
 
 .. code-block:: python
 
    planner = srmp.PlannerInterface()
 
-Add a robot model to the world:
+Add a robot model to the world. The easiest way is to use the :doc:`robot_registry`:
+
+.. code-block:: python
+
+   # Add robot by name - downloads automatically if needed
+   planner.add_robot("panda")
+
+   # Or with a custom articulation name
+   planner.add_robot("panda", name="my_panda")
+
+Alternatively, you can use ``add_articulation`` with explicit file paths:
 
 .. note::
 
-   The `srdf_path` argument is optional. If you don't have an SRDF file, omit
-   the argument or pass an empty string (`srdf_path=""`).
+   You can download pre-configured robot models (URDF/SRDF files) from our :doc:`data_downloads` page,
+   or use the robot registry which downloads them automatically.
 
 .. code-block:: python
 
    # With SRDF (recommended when semantic info is available)
    planner.add_articulation(name="panda",
-                            end_effector="panda_hand", 
+                            end_effector="panda_hand",
                             urdf_path="/path/to/panda.urdf",
                             srdf_path="/path/to/panda.srdf")
 
    # Or without SRDF (URDF only)
    planner.add_articulation(name="panda",
-                            end_effector="panda_hand", 
+                            end_effector="panda_hand",
                             urdf_path="/path/to/panda.urdf")
 
 Add objects to the environment:
@@ -142,11 +148,21 @@ Compute a trajectory:
 Multi-Robot Planning
 --------------------
 
+Add multiple robots to the world. You can use the registry with custom names:
+
+.. code-block:: python
+
+   planner = srmp.PlannerInterface()
+
+   # Add robots using the registry
+   planner.add_robot("panda", name="panda0")
+   planner.add_robot("panda", name="panda1")
+
+Or use explicit file paths with multi-robot URDF configurations:
+
 .. note::
 
    Multi-robot URDF/SRDF configurations are available for download on the :doc:`data_downloads` page.
-
-Add multiple robots to the world:
 
 .. code-block:: python
 
@@ -155,7 +171,7 @@ Add multiple robots to the world:
    # Add first robot
    planner.add_articulation(
        name="panda0",
-       end_effector="panda0_hand", 
+       end_effector="panda0_hand",
        urdf_path="/path/to/panda0.urdf",
        srdf_path="/path/to/panda0.srdf"
    )
