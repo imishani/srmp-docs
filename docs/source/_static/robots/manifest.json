@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "base_url": "https://srmp.readthedocs.io/en/latest/_static/robots/",
+  "robots": {
+    "panda": {
+      "archive": "panda.tar.gz",
+      "urdf": "panda/panda.urdf",
+      "srdf": "panda/panda.srdf",
+      "end_effector": "panda_hand",
+      "description": "Franka Emika Panda 7-DOF manipulator",
+      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
+      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
+                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+    },
+    "panda_on_rail": {
+      "archive": "panda_on_rail.tar.gz",
+      "urdf": "panda_on_rail/panda_on_rail.urdf",
+      "srdf": "panda_on_rail/panda_on_rail.srdf",
+      "end_effector": "panda_hand",
+      "description": "Panda mounted on linear rail (8-DOF)"
+    },
+    "so101": {
+      "archive": "so101.tar.gz",
+      "urdf": "so101/so101.urdf",
+      "srdf": "so101/so101.srdf",
+      "end_effector": "gripper_frame_link",
+      "description": "SO101 6-DOF manipulator with gripper",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex",
+                      "wrist_flex", "wrist_roll", "gripper"]
+    }
+  },
+  "all_archive": "all_robots.tar.gz"
+}
