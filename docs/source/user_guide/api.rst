@@ -15,14 +15,31 @@ The main interface for robot motion planning.
 
    **Methods:**
 
-   .. method:: add_articulation(name, end_effector, 
-                                urdf_path, srdf_path='', 
+   .. method:: add_robot(robot, name=None, srdf_path=None, end_effector=None, planned=True, gravity=None, link_names=None, joint_names=None)
+
+      Add a robot from the registry or by file path. This is the recommended way to add robots.
+
+      :param str robot: Robot name from registry (e.g., "panda", "so101"), or path to URDF file
+      :param str name: Override the articulation name (default: robot name)
+      :param str srdf_path: Override SRDF path (required if robot is a file path)
+      :param str end_effector: Override end effector link name (required if robot is a file path)
+      :param bool planned: Whether this robot should be planned for (default: True)
+      :param numpy.ndarray gravity: Gravity vector for the robot (default: [0, 0, 0])
+      :param list link_names: Override link names
+      :param list joint_names: Override joint names
+      :raises RobotNotFoundError: If robot not in registry and not a valid path
+      :raises ValueError: If using file path without srdf_path and end_effector
+
+      See :doc:`robot_registry` for available robots and registry functions.
+
+   .. method:: add_articulation(name, end_effector,
+                                urdf_path, srdf_path='',
                                 link_names: List[str] = [],
                                 joint_names: List[str] = [],
-                                gravity: NDArray[np.float64] = np.array([0, 0, 0]), 
+                                gravity: NDArray[np.float64] = np.array([0, 0, 0]),
                                 planned=True)
 
-      Add a robot to the planning scene. The `srdf_path` argument is optional — if you
+      Add a robot to the planning scene with explicit file paths. The `srdf_path` argument is optional — if you
       don't have an SRDF file, you can omit this argument or pass an empty string.
 
       :param str name: Unique name for this robot instance
@@ -438,6 +455,150 @@ Trajectory
       :type: list
 
 
+Robot Registry
+--------------
+
+The ``srmp.robots`` module provides functions for managing robot data downloads and registration.
+See :doc:`robot_registry` for detailed usage.
+
+.. module:: srmp.robots
+
+Functions
+~~~~~~~~~
+
+.. function:: download(name, force=False)
+
+   Download a robot's data from the registry.
+
+   :param str name: Robot name (e.g., "panda", "so101")
+   :param bool force: Re-download even if already cached (default: False)
+   :returns: Path to the downloaded robot directory
+   :rtype: pathlib.Path
+   :raises DownloadError: If download fails
+
+.. function:: download_all(force=False)
+
+   Download all available robots.
+
+   :param bool force: Re-download even if already cached (default: False)
+   :returns: Path to the robots cache directory
+   :rtype: pathlib.Path
+
+.. function:: get(name)
+
+   Get robot information by name.
+
+   :param str name: Robot name
+   :returns: Robot information including paths and metadata
+   :rtype: RobotInfo
+   :raises RobotNotFoundError: If robot not found
+
+.. function:: info(name)
+
+   Alias for :func:`get`.
+
+.. function:: list_available()
+
+   List all available robots.
+
+   :returns: Dictionary with keys "remote", "local", and "custom"
+   :rtype: dict
+
+.. function:: register(name, urdf_path, srdf_path, end_effector, description=None, default_qpos=None, joint_names=None)
+
+   Register a custom robot for easy reuse.
+
+   :param str name: Unique name for the robot
+   :param str urdf_path: Path to URDF file
+   :param str srdf_path: Path to SRDF file
+   :param str end_effector: End effector link name
+   :param str description: Optional description
+   :param list default_qpos: Optional default joint configuration
+   :param list joint_names: Optional list of joint names
+
+.. function:: unregister(name)
+
+   Remove a custom robot registration.
+
+   :param str name: Robot name to unregister
+
+.. function:: get_cache_dir()
+
+   Get the current robot cache directory.
+
+   :returns: Path to cache directory
+   :rtype: pathlib.Path
+
+.. function:: set_cache_dir(path)
+
+   Set a custom robot cache directory.
+
+   :param str path: Path to new cache directory
+
+Classes
+~~~~~~~
+
+.. class:: RobotInfo
+
+   Information about a registered robot.
+
+   **Attributes:**
+
+   .. attribute:: name
+
+      Robot name
+
+      :type: str
+
+   .. attribute:: urdf_path
+
+      Path to URDF file
+
+      :type: str
+
+   .. attribute:: srdf_path
+
+      Path to SRDF file
+
+      :type: str
+
+   .. attribute:: end_effector
+
+      End effector link name
+
+      :type: str
+
+   .. attribute:: description
+
+      Optional description
+
+      :type: str or None
+
+   .. attribute:: default_qpos
+
+      Optional default joint configuration
+
+      :type: list or None
+
+   .. attribute:: joint_names
+
+      Optional list of joint names
+
+      :type: list or None
+
+Exceptions
+~~~~~~~~~~
+
+.. exception:: RobotNotFoundError
+
+   Raised when a robot is not found in the registry. The error message includes
+   available robots and instructions for downloading or registering.
+
+.. exception:: DownloadError
+
+   Raised when downloading robot data fails.
+
+
 Motion Primitives Configuration
 -------------------------------
 
@@ -578,13 +739,8 @@ Basic Single Robot Example
    # Create planner
    planner = srmp.PlannerInterface()
 
-   # Add robot
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   # Add robot (downloads automatically if needed)
+   planner.add_robot("panda")
 
    # Add obstacle
    obstacle_pose = srmp.Pose()
@@ -621,14 +777,9 @@ Multi-Robot Example
    # Create planner
    planner = srmp.PlannerInterface()
 
-   # Add two robots
-   for i in range(2):
-       planner.add_articulation(
-           urdf_path=f"/path/to/panda{i}.urdf",
-           srdf_path=f"/path/to/panda{i}.srdf",
-           name=f"panda{i}",
-           end_effector=f"panda{i}_hand"
-       )
+   # Add two robots using the registry
+   planner.add_robot("panda", name="panda0")
+   planner.add_robot("panda", name="panda1")
 
    # Set base poses
    for i in range(2):
@@ -692,12 +843,7 @@ Simulator Integration Example
    planner = srmp.PlannerInterface()
 
    # Add robot
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Import scene objects automatically
    planner.read_sim(scene, "sapien")
@@ -716,12 +862,7 @@ Point Cloud Example
    planner = srmp.PlannerInterface()
 
    # Add robot
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Load point cloud from file (example formats: PLY, PCD, or custom)
    # For this example, we'll generate a synthetic point cloud

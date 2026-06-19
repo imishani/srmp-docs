@@ -17,21 +17,18 @@ Here's a complete example of planning for two Panda robots:
    # Create planner
    planner = srmp.PlannerInterface()
 
-   # Add two robots (SRDF is optional). You can pass `srdf_path` if available,
-   # or omit it and provide only the URDF.
-   for i in range(2):
-       # With SRDF (recommended when available):
-       # planner.add_articulation(urdf_path=f"/path/to/panda{i}.urdf",
-       #                          srdf_path=f"/path/to/panda{i}.srdf",
-       #                          name=f"panda{i}",
-       #                          end_effector=f"panda{i}_hand")
+   # Add two robots using the registry (downloads automatically if needed)
+   planner.add_robot("panda", name="panda0")
+   planner.add_robot("panda", name="panda1")
 
-       # Or without SRDF (URDF only):
-       planner.add_articulation(
-           urdf_path=f"/path/to/panda{i}.urdf",
-           name=f"panda{i}",
-           end_effector=f"panda{i}_hand"
-       )
+   # Or use explicit paths:
+   # for i in range(2):
+   #     planner.add_articulation(
+   #         urdf_path=f"/path/to/panda{i}.urdf",
+   #         srdf_path=f"/path/to/panda{i}.srdf",
+   #         name=f"panda{i}",
+   #         end_effector=f"panda{i}_hand"
+   #     )
 
    # Set base poses for robots using Pose objects
    pose0 = srmp.Pose()
@@ -100,7 +97,7 @@ This example shows coordination between three robots:
    # Create planner
    planner = srmp.PlannerInterface()
 
-   # Add three robots
+   # Add three robots using the registry
    robot_names = ["panda0", "panda1", "panda2"]
    base_positions = [
        np.array([-0.5, 0.5, 0]),
@@ -114,12 +111,7 @@ This example shows coordination between three robots:
    ]
 
    for i, name in enumerate(robot_names):
-       planner.add_articulation(
-           urdf_path=f"/path/to/{name}.urdf",
-           srdf_path=f"/path/to/{name}.srdf",
-           name=name,
-           end_effector=f"{name}_hand"
-       )
+       planner.add_robot("panda", name=name)
 
        # Set base pose
        pose = srmp.Pose()
@@ -190,14 +182,8 @@ This example shows how to use different goal types for different robots:
    # Setup two robots
    planner = srmp.PlannerInterface()
 
-   for i in range(2):
-       planner.add_articulation(
-           urdf_path=f"/path/to/panda{i}.urdf",
-           srdf_path=f"/path/to/panda{i}.srdf",
-           name=f"panda{i}",
-           end_effector=f"panda{i}_hand",
-           planned=True
-       )
+   planner.add_robot("panda", name="panda0")
+   planner.add_robot("panda", name="panda1")
 
    # Set base poses
    pose0 = srmp.Pose()

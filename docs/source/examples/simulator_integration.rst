@@ -44,13 +44,7 @@ Basic SAPIEN Setup
 
    # Create SRMP planner
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-        # Note: `srdf_path` is optional. Provide an SRDF if available, otherwise omit it.
-        # srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")  # Downloads automatically if needed
 
    # Automatically import scene objects
    planner.read_sim(scene, "sapien")
@@ -101,13 +95,7 @@ Adding Objects to SAPIEN Scene
 
    # Create planner and import scene
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-        # SRDF is optional — omit if you don't have one
-        # srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Import all collision objects automatically
    planner.read_sim(scene, "sapien")
@@ -221,13 +209,7 @@ Basic PyBullet Setup
 
    # Create SRMP planner
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-        # SRDF optional; include only if you need semantic configuration
-        # srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Import PyBullet scene (exclude robot from collision checking)
    planner.read_sim(physics_client, "pybullet", articulations=["panda"])
@@ -279,16 +261,9 @@ PyBullet Multi-Robot Example
    # Setup SRMP planner
    planner = srmp.PlannerInterface()
 
-   # Add both robots
-   for i in range(2):
-       planner.add_articulation(
-         urdf_path=f"/path/to/data/panda/panda{i}.urdf",
-                # SRDF optional for each robot
-                # srdf_path=f"/path/to/data/panda/panda{i}.srdf",
-         name=f"panda{i}",
-         end_effector=f"panda{i}_hand",
-         planned=True
-       )
+   # Add both robots using the registry
+   planner.add_robot("panda", name="panda0")
+   planner.add_robot("panda", name="panda1")
 
    # Set base poses to match PyBullet
    pose0 = srmp.Pose()
@@ -418,13 +393,7 @@ Genesis Setup and Planning
 
    # Create SRMP planner
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       # SRDF is optional; include if you need additional semantic info
-       # srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Set robot base pose to match Genesis
    robot_pose = srmp.Pose()
@@ -535,13 +504,7 @@ MuJoCo integration for high-fidelity physics simulation:
 
    # Create SRMP planner
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-        # SRDF optional
-        # srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Import MuJoCo scene
    planner.read_sim(sim, "mujoco")

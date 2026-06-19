@@ -17,13 +17,16 @@ Here's a simple example showing the complete workflow for planning a trajectory 
    # Create planner interface
    planner = srmp.PlannerInterface()
 
-   # Add robot to the scene
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   # Add robot to the scene (downloads automatically if needed)
+   planner.add_robot("panda")
+
+   # Or use explicit paths:
+   # planner.add_articulation(
+   #     urdf_path="/path/to/panda.urdf",
+   #     srdf_path="/path/to/panda.srdf",
+   #     name="panda",
+   #     end_effector="panda_hand"
+   # )
 
    # Define start and goal configurations
    start_state = np.array([50, 47, -10, -35, -22, 93, 39])
@@ -62,12 +65,7 @@ This example shows how to add obstacles to the environment and plan around them:
 
    # Create planner and add robot
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Add various obstacles
    # Box obstacle
@@ -179,12 +177,7 @@ This example shows how to plan to specific end-effector poses rather than joint 
 
    # Setup planner and robot
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Configure planner
    planner.make_planner(["panda"], {
@@ -272,12 +265,7 @@ SRMP supports point cloud obstacles for sensor-based planning:
 
    # Create planner and add robot
    planner = srmp.PlannerInterface()
-   planner.add_articulation(
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",
-       name="panda",
-       end_effector="panda_hand"
-   )
+   planner.add_robot("panda")
 
    # Generate sample point cloud (table surface)
    table_points = []

@@ -14,11 +14,28 @@ This page provides access to robot models, mesh files, and configuration data us
       planner.add_robot("panda")
 
 Complete Download
--------------------------
+-----------------
 
 Download the complete archive containing all Panda robot description files and mesh assets:
 
 :download:`data.zip <../_static/data/data.zip>` - Full robot descriptions and meshes
+
+Robot Registry Archives
+-----------------------
+
+These archives are used by the :doc:`robot_registry` for automatic downloads. You can also download them manually:
+
+**Individual Robot Archives:**
+
+- :download:`panda.tar.gz <../_static/robots/panda.tar.gz>` - Franka Emika Panda 7-DOF manipulator
+- :download:`panda_on_rail.tar.gz <../_static/robots/panda_on_rail.tar.gz>` - Panda mounted on linear rail (8-DOF)
+- :download:`so101.tar.gz <../_static/robots/so101.tar.gz>` - SO101 6-DOF manipulator with gripper
+
+**All Robots:**
+
+- :download:`all_robots.tar.gz <../_static/robots/all_robots.tar.gz>` - All available robots in one archive
+
+Each archive contains the URDF, SRDF, and mesh files needed for planning.
 
 Robot Models
 ------------
