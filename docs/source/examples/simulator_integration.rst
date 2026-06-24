@@ -492,22 +492,19 @@ MuJoCo integration for high-fidelity physics simulation:
 .. code-block:: python
 
    import srmp
-   import mujoco_py as mj
+   import mujoco
    import numpy as np
 
    # Load MuJoCo model
-   model = mj.load_model_from_path("/path/to/scene.xml")
-   sim = mj.MjSim(model)
-
-   # Create viewer (optional)
-   viewer = mj.MjViewer(sim)
+   model = mujoco.MjModel.from_xml_path("/path/to/scene.xml")
+   data = mujoco.MjData(model)
 
    # Create SRMP planner
    planner = srmp.PlannerInterface()
    planner.add_robot("panda")
 
    # Import MuJoCo scene
-   planner.read_sim(sim, "mujoco")
+   planner.read_sim(model, "mujoco")
 
    # Plan and execute trajectory
    # ... (similar to other examples) ...
