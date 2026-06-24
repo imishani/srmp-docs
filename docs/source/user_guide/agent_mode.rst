@@ -36,7 +36,7 @@ Quick Start
 
 .. code-block:: console
 
-   (.venv) $ python -m agent.gui
+   (.venv) $ python -m srmp.agent.gui
 
 This opens a Viser 3D viewer with an embedded chat panel. You can interact with the planner using natural language while watching the robot move in real-time.
 
@@ -44,7 +44,7 @@ This opens a Viser 3D viewer with an embedded chat panel. You can interact with 
 
 .. code-block:: console
 
-   (.venv) $ python -m agent.cli
+   (.venv) $ python -m srmp.agent.cli
 
 Example Interaction
 -------------------
@@ -81,8 +81,8 @@ Both CLI and GUI modes support the following options:
 
 .. code-block:: console
 
-   python -m agent.cli [OPTIONS]
-   python -m agent.gui [OPTIONS]
+   (.venv) $ python -m srmp.agent.cli [OPTIONS]
+   (.venv) $ python -m srmp.agent.gui [OPTIONS]
 
 Available options:
 
@@ -126,7 +126,7 @@ For privacy or offline usage, you can use Ollama with local models:
    $ ollama pull llama3
 
    # Run agent with Ollama
-   $ python -m agent.cli --backend ollama --model llama3
+   $ python -m srmp.agent.cli --backend ollama --model llama3
 
 CLI Special Commands
 --------------------
