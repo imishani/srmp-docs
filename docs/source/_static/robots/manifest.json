@@ -28,6 +28,16 @@
       "default_qpos": [0, 0, 0, 0, 0, 0],
       "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex",
                       "wrist_flex", "wrist_roll", "gripper"]
+    },
+    "so107": {
+      "archive": "so107.tar.gz",
+      "urdf": "so107/so107.urdf",
+      "srdf": "so107/so107.srdf",
+      "end_effector": "gripper_frame_link",
+      "description": "SO107 7-DOF manipulator with gripper (SO101 + forearm roll)",
+      "default_qpos": [0, 0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex", "forearm_roll",
+                      "wrist_flex", "wrist_roll", "gripper"]
     }
   },
   "all_archive": "all_robots.tar.gz"

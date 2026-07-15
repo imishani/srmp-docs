@@ -30,6 +30,7 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`panda.tar.gz <../_static/robots/panda.tar.gz>` - Franka Emika Panda 7-DOF manipulator
 - :download:`panda_on_rail.tar.gz <../_static/robots/panda_on_rail.tar.gz>` - Panda mounted on linear rail (8-DOF)
 - :download:`so101.tar.gz <../_static/robots/so101.tar.gz>` - SO101 6-DOF manipulator with gripper
+- :download:`so107.tar.gz <../_static/robots/so107.tar.gz>` - SO107 7-DOF manipulator with gripper (SO101 + forearm roll)
 
 **All Robots:**
 

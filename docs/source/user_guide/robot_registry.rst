@@ -40,6 +40,9 @@ The following robots are available in the registry:
    * - ``so101``
      - SO101 6-DOF manipulator with gripper
      - ``gripper_frame_link``
+   * - ``so107``
+     - SO107 7-DOF manipulator with gripper (SO101 + forearm roll)
+     - ``gripper_frame_link``
 
 Using the Registry
 ------------------
@@ -89,7 +92,7 @@ View what robots are available:
 
    available = robots.list_available()
    print(available)
-   # {'remote': ['panda', 'panda_on_rail', 'so101'],
+   # {'remote': ['panda', 'panda_on_rail', 'so101', 'so107'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 
