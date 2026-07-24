@@ -19,6 +19,26 @@
       "end_effector": "panda_hand",
       "description": "Panda mounted on linear rail (8-DOF)"
     },
+    "panda_stick": {
+      "archive": "panda_stick.tar.gz",
+      "urdf": "panda_stick/panda_stick.urdf",
+      "srdf": "panda_stick/panda_stick.srdf",
+      "end_effector": "panda_hand",
+      "description": "Franka Emika Panda 7-DOF manipulator with rigid stick end-effector (no gripper, for pushing tasks)",
+      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
+      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
+                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+    },
+    "panda_wristcam": {
+      "archive": "panda_wristcam.tar.gz",
+      "urdf": "panda_wristcam/panda_wristcam.urdf",
+      "srdf": "panda_wristcam/panda_wristcam.srdf",
+      "end_effector": "panda_hand",
+      "description": "Franka Emika Panda 7-DOF manipulator with wrist-mounted RealSense D415 camera",
+      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
+      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
+                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+    },
     "so101": {
       "archive": "so101.tar.gz",
       "urdf": "so101/so101.urdf",
@@ -38,6 +58,100 @@
       "default_qpos": [0, 0, 0, 0, 0, 0, 0],
       "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex", "forearm_roll",
                       "wrist_flex", "wrist_roll", "gripper"]
+    },
+    "koch": {
+      "archive": "koch.tar.gz",
+      "urdf": "koch/koch.urdf",
+      "srdf": "koch/koch.srdf",
+      "end_effector": "gripper_tcp",
+      "description": "Koch v1.1 6-DOF manipulator arm with gripper",
+      "default_qpos": [0, 2.2, 3.017, -0.25, 0],
+      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
+    },
+    "xarm7_ability": {
+      "archive": "xarm7_ability.tar.gz",
+      "urdf": "xarm7_ability/xarm7_ability.urdf",
+      "srdf": "xarm7_ability/xarm7_ability.srdf",
+      "end_effector": "base",
+      "description": "UFactory XArm7 7-DOF arm with Psyonic Ability dexterous hand (10-DOF, not part of the planned move group)",
+      "default_qpos": [0.0, -0.4, 0.0, 0.5, 0.0, 0.9, -3.0],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6", "joint7"]
+    },
+    "xarm6": {
+      "archive": "xarm6.tar.gz",
+      "urdf": "xarm6/xarm6.urdf",
+      "srdf": "xarm6/xarm6.srdf",
+      "end_effector": "link6",
+      "description": "UFactory XArm6 6-DOF manipulator (no gripper)",
+      "default_qpos": [0.00156, -1.10912, -0.09713, 0.00015, 1.20607, 0.00166],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+    },
+    "xarm6_robotiq": {
+      "archive": "xarm6_robotiq.tar.gz",
+      "urdf": "xarm6_robotiq/xarm6_robotiq.urdf",
+      "srdf": "xarm6_robotiq/xarm6_robotiq.srdf",
+      "end_effector": "eef",
+      "description": "UFactory XArm6 6-DOF manipulator with Robotiq 2F-85 gripper",
+      "default_qpos": [0, 0.22, -1.23, 0, 1.01, 0],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+    },
+    "widowxai": {
+      "archive": "widowxai.tar.gz",
+      "urdf": "widowxai/widowxai.urdf",
+      "srdf": "widowxai/widowxai.srdf",
+      "end_effector": "ee_gripper_link",
+      "description": "Trossen Robotics WidowX AI 6-DOF manipulator with gripper",
+      "default_qpos": [0.0, 1.38, 1.04, -1.26, 0.0, 0.0],
+      "joint_names": ["joint_0", "joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
+    },
+    "fetch": {
+      "archive": "fetch.tar.gz",
+      "urdf": "fetch/fetch.urdf",
+      "srdf": "fetch/fetch.srdf",
+      "end_effector": "gripper_link",
+      "description": "Fetch mobile manipulator: holonomic base + torso lift + 7-DOF arm + gripper",
+      "default_qpos": [0, 0, 0, 0.386, 0.562, -1.032, 0.695, 0.955, -0.1, 2.077, 0],
+      "joint_names": ["root_x_axis_joint", "root_y_axis_joint", "root_z_rotation_joint",
+                      "torso_lift_joint", "shoulder_pan_joint", "shoulder_lift_joint",
+                      "upperarm_roll_joint", "elbow_flex_joint", "forearm_roll_joint",
+                      "wrist_flex_joint", "wrist_roll_joint"]
+    },
+    "xlerobot": {
+      "archive": "xlerobot.tar.gz",
+      "urdf": "xlerobot/xlerobot.urdf",
+      "srdf": "xlerobot/xlerobot.srdf",
+      "end_effector": "Fixed_Jaw",
+      "description": "XLeRobot bimanual mobile manipulator: holonomic base + dual SO-100-style arms + head (registry exposes the primary/left arm as the single end effector; no license available from upstream)",
+      "default_qpos": [0.0, 0.0, 0.0, 0, 3.14, 3.14, 0, 1.57],
+      "joint_names": ["root_x_axis_joint", "root_y_axis_joint", "root_z_rotation_joint",
+                      "Rotation", "Pitch", "Elbow", "Wrist_Pitch", "Wrist_Roll"]
+    },
+    "kinova_gen3": {
+      "archive": "kinova_gen3.tar.gz",
+      "urdf": "kinova_gen3/kinova_gen3.urdf",
+      "srdf": "kinova_gen3/kinova_gen3.srdf",
+      "end_effector": "end_effector_link",
+      "description": "Kinova Gen3 7-DOF manipulator with vision module",
+      "default_qpos": [1.57, -0.35, 3.14, -2.00, 0, -1.00, 1.57],
+      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6", "joint_7"]
+    },
+    "kinova_gen3_6dof": {
+      "archive": "kinova_gen3_6dof.tar.gz",
+      "urdf": "kinova_gen3_6dof/kinova_gen3_6dof.urdf",
+      "srdf": "kinova_gen3_6dof/kinova_gen3_6dof.srdf",
+      "end_effector": "end_effector_link",
+      "description": "Kinova Gen3 6-DOF manipulator with vision module",
+      "default_qpos": [1.57, -0.35, -2.00, 0, -1.00, 1.57],
+      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
+    },
+    "kinova_gen3_lite": {
+      "archive": "kinova_gen3_lite.tar.gz",
+      "urdf": "kinova_gen3_lite/kinova_gen3_lite.urdf",
+      "srdf": "kinova_gen3_lite/kinova_gen3_lite.srdf",
+      "end_effector": "DUMMY",
+      "description": "Kinova Gen3 Lite compact 6-DOF manipulator",
+      "default_qpos": [0, -0.28, 1.309, 0, -1.047, 0],
+      "joint_names": ["J0", "J1", "J2", "J3", "J4", "J5"]
     }
   },
   "all_archive": "all_robots.tar.gz"

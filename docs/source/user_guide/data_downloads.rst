@@ -29,8 +29,20 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 
 - :download:`panda.tar.gz <../_static/robots/panda.tar.gz>` - Franka Emika Panda 7-DOF manipulator
 - :download:`panda_on_rail.tar.gz <../_static/robots/panda_on_rail.tar.gz>` - Panda mounted on linear rail (8-DOF)
+- :download:`panda_stick.tar.gz <../_static/robots/panda_stick.tar.gz>` - Panda 7-DOF manipulator with rigid stick end-effector (no gripper, for pushing tasks)
+- :download:`panda_wristcam.tar.gz <../_static/robots/panda_wristcam.tar.gz>` - Panda 7-DOF manipulator with wrist-mounted RealSense D415 camera
 - :download:`so101.tar.gz <../_static/robots/so101.tar.gz>` - SO101 6-DOF manipulator with gripper
 - :download:`so107.tar.gz <../_static/robots/so107.tar.gz>` - SO107 7-DOF manipulator with gripper (SO101 + forearm roll)
+- :download:`koch.tar.gz <../_static/robots/koch.tar.gz>` - Koch v1.1 6-DOF manipulator arm with gripper
+- :download:`xarm7_ability.tar.gz <../_static/robots/xarm7_ability.tar.gz>` - UFactory XArm7 7-DOF arm with Psyonic Ability dexterous hand
+- :download:`xarm6.tar.gz <../_static/robots/xarm6.tar.gz>` - UFactory XArm6 6-DOF manipulator (no gripper)
+- :download:`xarm6_robotiq.tar.gz <../_static/robots/xarm6_robotiq.tar.gz>` - UFactory XArm6 6-DOF manipulator with Robotiq 2F-85 gripper
+- :download:`widowxai.tar.gz <../_static/robots/widowxai.tar.gz>` - Trossen Robotics WidowX AI 6-DOF manipulator with gripper
+- :download:`fetch.tar.gz <../_static/robots/fetch.tar.gz>` - Fetch mobile manipulator (holonomic base + torso + 7-DOF arm + gripper)
+- :download:`xlerobot.tar.gz <../_static/robots/xlerobot.tar.gz>` - XLeRobot bimanual mobile manipulator (holonomic base + dual arms + head)
+- :download:`kinova_gen3.tar.gz <../_static/robots/kinova_gen3.tar.gz>` - Kinova Gen3 7-DOF manipulator with vision module
+- :download:`kinova_gen3_6dof.tar.gz <../_static/robots/kinova_gen3_6dof.tar.gz>` - Kinova Gen3 6-DOF manipulator with vision module
+- :download:`kinova_gen3_lite.tar.gz <../_static/robots/kinova_gen3_lite.tar.gz>` - Kinova Gen3 Lite compact 6-DOF manipulator
 
 **All Robots:**
 

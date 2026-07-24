@@ -37,12 +37,48 @@ The following robots are available in the registry:
    * - ``panda_on_rail``
      - Panda mounted on linear rail (8-DOF)
      - ``panda_hand``
+   * - ``panda_stick``
+     - Panda 7-DOF manipulator with rigid stick end-effector (no gripper, for pushing tasks)
+     - ``panda_hand``
+   * - ``panda_wristcam``
+     - Panda 7-DOF manipulator with wrist-mounted RealSense D415 camera
+     - ``panda_hand``
    * - ``so101``
      - SO101 6-DOF manipulator with gripper
      - ``gripper_frame_link``
    * - ``so107``
      - SO107 7-DOF manipulator with gripper (SO101 + forearm roll)
      - ``gripper_frame_link``
+   * - ``koch``
+     - Koch v1.1 6-DOF manipulator arm with gripper
+     - ``gripper_tcp``
+   * - ``xarm7_ability``
+     - UFactory XArm7 7-DOF arm with Psyonic Ability dexterous hand (10-DOF, not part of the planned move group)
+     - ``base``
+   * - ``xarm6``
+     - UFactory XArm6 6-DOF manipulator (no gripper)
+     - ``link6``
+   * - ``xarm6_robotiq``
+     - UFactory XArm6 6-DOF manipulator with Robotiq 2F-85 gripper
+     - ``eef``
+   * - ``widowxai``
+     - Trossen Robotics WidowX AI 6-DOF manipulator with gripper
+     - ``ee_gripper_link``
+   * - ``fetch``
+     - Fetch mobile manipulator: holonomic base + torso lift + 7-DOF arm + gripper
+     - ``gripper_link``
+   * - ``xlerobot``
+     - XLeRobot bimanual mobile manipulator: holonomic base + dual SO-100-style arms + head (single end effector only)
+     - ``Fixed_Jaw``
+   * - ``kinova_gen3``
+     - Kinova Gen3 7-DOF manipulator with vision module
+     - ``end_effector_link``
+   * - ``kinova_gen3_6dof``
+     - Kinova Gen3 6-DOF manipulator with vision module
+     - ``end_effector_link``
+   * - ``kinova_gen3_lite``
+     - Kinova Gen3 Lite compact 6-DOF manipulator
+     - ``DUMMY``
 
 Using the Registry
 ------------------
@@ -92,7 +128,9 @@ View what robots are available:
 
    available = robots.list_available()
    print(available)
-   # {'remote': ['panda', 'panda_on_rail', 'so101', 'so107'],
+   # {'remote': ['panda', 'panda_on_rail', 'panda_stick', 'panda_wristcam', 'so101', 'so107',
+   #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot',
+   #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 
