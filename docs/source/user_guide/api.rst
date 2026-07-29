@@ -443,11 +443,11 @@ The main interface for robot motion planning.
    .. method:: start_visualizer(type="viser", **kwargs)
 
       Create, attach, and open a visualizer on this planner without subclassing
-      :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface`. This is the recommended
-      way to add visualization to a plain :class:`~srmp.PlannerInterface`, and supports
-      attaching more than one visualizer to the same planner. See :doc:`visualization`.
+      :class:`ViserPlannerInterface`. This is the recommended way to add visualization to a
+      plain :class:`~srmp.PlannerInterface`. See :doc:`visualization`.
 
-      :param str type: ``"viser"`` or ``"meshcat"``
+      :param str type: ``"viser"`` (a ``"meshcat"`` backend exists in the codebase but is
+         currently being reworked and isn't functional)
       :param kwargs: Additional arguments passed to the visualizer constructor (e.g. ``port``)
       :returns: The created visualizer instance
 
@@ -1066,101 +1066,13 @@ Point Cloud Example
 Visualization Classes
 ---------------------
 
-SRMP ships two optional visualization backends.  Both extend
-:class:`~srmp.PlannerInterface` and keep the 3D scene in sync automatically
-as robots and objects are added or removed.
+SRMP ships an optional Viser-based visualization backend, :class:`~srmp.ViserPlannerInterface`,
+which extends :class:`~srmp.PlannerInterface` and keeps the 3D scene in sync automatically
+as robots and objects are added or removed. Prefer :meth:`~srmp.PlannerInterface.start_visualizer`
+to attach it to a plain ``PlannerInterface`` without subclassing.
 
 See the :doc:`visualization` page for installation instructions and full
 usage examples.
-
-VisualPlannerInterface
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. class:: srmp.VisualPlannerInterface(zmq_url=None)
-
-   MeshCat-based visualizer.  Inherits all methods of
-   :class:`~srmp.PlannerInterface`.
-
-   :param str zmq_url: Optional ZMQ URL for an existing MeshCat server.
-       Leave as ``None`` to start a new server automatically.
-
-   Requires: ``pip install meshcat``
-
-   **Additional Methods:**
-
-   .. method:: visualize(open_browser=True)
-
-      Start the MeshCat server (if not already running) and render the
-      current scene.  Prints the browser URL to the console.
-
-      :param bool open_browser: Whether to print the URL (default: ``True``)
-
-   .. method:: animate_trajectory(trajectories, dt=0.05, robot_name=None)
-
-      Replay a planned trajectory in the 3D viewer by stepping through
-      joint configurations.
-
-      :param trajectories: A single :class:`~srmp.Trajectory` or a ``dict``
-          mapping robot names to trajectories.
-      :param float dt: Seconds to wait between frames (default: ``0.05``)
-      :param str robot_name: Robot name when a single trajectory is supplied.
-          Defaults to the first robot in the scene.
-
-   .. method:: add_gui_controls()
-
-      Add obstacle-editing sliders and controls to MeshCat.  Because MeshCat
-      is one-directional, use the ``set_gui_*`` helpers below to drive the
-      GUI state from Python.
-
-   .. method:: set_gui_position(x, y, z)
-
-      Set the current GUI position state and sync the MeshCat sliders.
-
-      :param float x: X position
-      :param float y: Y position
-      :param float z: Z position
-
-   .. method:: set_gui_size(width, height, depth)
-
-      Set the current GUI size state and sync the MeshCat sliders.
-
-   .. method:: set_gui_object_type(obj_type)
-
-      Set the current GUI object type (``"box"``, ``"sphere"``, or
-      ``"cylinder"``).
-
-   .. method:: set_gui_object_name(name)
-
-      Set the current GUI object name.
-
-   .. method:: add_obstacle_from_gui()
-
-      Add an obstacle using the current GUI state values.
-
-      :returns: Name of the added object, or ``None`` on failure.
-      :rtype: str or None
-
-   .. method:: update_object_from_gui(object_name)
-
-      Move an existing object to the position stored in the current GUI state.
-
-      :param str object_name: Name of the object to update
-      :returns: ``True`` if successful
-      :rtype: bool
-
-   .. method:: load_object_to_gui(object_name)
-
-      Load an object's properties into the GUI state (for subsequent editing).
-
-      :param str object_name: Name of the object to load
-      :returns: ``True`` if successful
-      :rtype: bool
-
-   .. attribute:: url
-
-      The MeshCat browser URL (read-only).  Returns an informational string
-      if the server has not been started yet.
-
 
 ViserPlannerInterface
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1168,9 +1080,9 @@ ViserPlannerInterface
 .. class:: srmp.ViserPlannerInterface(port=8080, share=False)
 
    Interactive Viser-based visualizer.  Inherits all methods of
-   :class:`~srmp.PlannerInterface`.  Unlike the MeshCat backend, Viser
-   provides *bidirectional* browser ↔ Python communication: sliders,
-   dropdowns, and buttons in the browser directly invoke Python callbacks.
+   :class:`~srmp.PlannerInterface`.  Provides *bidirectional* browser ↔ Python
+   communication: sliders, dropdowns, and buttons in the browser directly invoke
+   Python callbacks.
 
    :param int port: TCP port for the Viser web server (default: ``8080``)
    :param bool share: Request a public share URL from Viser
@@ -1184,8 +1096,7 @@ ViserPlannerInterface
 
       Start the Viser server (if not already running) and render the scene.
 
-      :param bool open_browser: Unused; kept for API symmetry with
-          :class:`VisualPlannerInterface`.
+      :param bool open_browser: Unused; kept for API symmetry
       :param bool add_grid: Whether to render a ground grid
           (default: ``True``)
 

@@ -1,27 +1,15 @@
 Visualization
 =============
 
-SRMP provides two visualization backends that wrap :class:`~srmp.PlannerInterface` with
-automatic scene tracking and 3D rendering:
-
-- :class:`~srmp.VisualPlannerInterface` — lightweight MeshCat-based visualizer
-- :class:`~srmp.ViserPlannerInterface` — interactive Viser-based visualizer with full
-  browser-to-Python bidirectional communication
-
-Both classes inherit from :class:`~srmp.PlannerInterface`, so every planning method
-(``add_articulation``, ``add_box``, ``plan``, ``read_sim``, …) is available and the
-scene is automatically kept in sync with the 3D view.
+SRMP ships an interactive 3D visualizer, :class:`~srmp.ViserPlannerInterface`, built on
+`Viser <https://viser.studio>`_ with full browser-to-Python bidirectional communication:
+browser sliders, dropdowns, and buttons trigger Python callbacks in real time. It wraps
+:class:`~srmp.PlannerInterface`, so every planning method (``add_articulation``, ``add_box``,
+``plan``, ``read_sim``, …) is available and the scene is kept in sync with the 3D view
+automatically.
 
 Installation
 ------------
-
-MeshCat visualizer:
-
-.. code-block:: console
-
-   $ pip install meshcat
-
-Viser visualizer:
 
 .. code-block:: console
 
@@ -30,18 +18,17 @@ Viser visualizer:
 .. note::
 
    The visualization dependencies are optional. When they are not installed, importing
-   ``VisualPlannerInterface`` or ``ViserPlannerInterface`` is silently skipped and
-   ``srmp.PlannerInterface`` remains fully functional.
+   ``ViserPlannerInterface`` is silently skipped and ``srmp.PlannerInterface`` remains
+   fully functional.
 
 Attaching a Visualizer (recommended)
 -------------------------------------
 
-Rather than subclassing :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface`, you can
-start with a plain :class:`~srmp.PlannerInterface` and attach a visualizer to it with
-:meth:`~srmp.PlannerInterface.start_visualizer`. Internally, visualizers are
-``VisualizerListener`` observers that get notified whenever the scene changes (``add_robot``,
-``add_box``, …); this also means a single planner can have **multiple** visualizers attached at
-once (e.g. a Viser GUI and a MeshCat feed side by side):
+Rather than subclassing :class:`ViserPlannerInterface`, you can start with a plain
+:class:`~srmp.PlannerInterface` and attach a visualizer to it with
+:meth:`~srmp.PlannerInterface.start_visualizer`. Internally, the visualizer is a
+``VisualizerListener`` observer that gets notified whenever the scene changes (``add_robot``,
+``add_box``, …):
 
 .. code-block:: python
 
@@ -56,98 +43,22 @@ once (e.g. a Viser GUI and a MeshCat feed side by side):
    viz = planner.start_visualizer(type="viser", port=8080)
    print(viz.url)
 
-   # A second visualizer can be attached to the same planner
-   meshcat_viz = planner.start_visualizer(type="meshcat")
-
    # Look up an attached visualizer later (e.g. from another function)
    viz = planner.get_visualizer()  # index=0 by default
 
    # Detach when done; attach_visualizer() is available for manually-constructed visualizers
    planner.detach_visualizer(viz)
 
-The :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface` subclasses documented below
-still work — they build a visualizer and attach it to themselves in their constructor — and all
-the ``add_*_controls`` / ``animate_trajectory`` methods below apply equally to a visualizer
-obtained via ``start_visualizer()``.
+The :class:`ViserPlannerInterface` subclass documented below still works — it builds a
+visualizer and attaches it to itself in its constructor — and all the ``add_*_controls`` /
+``animate_trajectory`` methods below apply equally to a visualizer obtained via
+``start_visualizer()``.
 
+.. note::
 
-VisualPlannerInterface (MeshCat)
----------------------------------
-
-``VisualPlannerInterface`` connects to a `MeshCat <https://github.com/rdeits/meshcat-python>`_
-WebGL viewer running in the browser. It is a good choice for quick scene inspection and
-trajectory animation when interactive widget editing is not required.
-
-**Limitations**
-
-- MeshCat does not support reading slider values from the browser back into Python.
-  Use the ``set_gui_*`` helper methods to drive GUI state programmatically.
-
-Basic Usage
-~~~~~~~~~~~
-
-.. code-block:: python
-
-   from srmp import VisualPlannerInterface
-   import numpy as np
-
-   # Create planner with MeshCat visualization
-   planner = VisualPlannerInterface()
-
-   # Add robot and obstacles (tracked automatically)
-   planner.add_articulation(
-       name="panda",
-       end_effector="panda_hand",
-       urdf_path="/path/to/panda.urdf",
-       srdf_path="/path/to/panda.srdf",   # optional
-   )
-
-   import srmp
-   box_pose = srmp.Pose()
-   box_pose.p = np.array([0.5, 0.2, 0.4])
-   planner.add_box("obstacle", np.array([0.1, 0.1, 0.4]), box_pose)
-
-   # Open the 3D viewer (prints the browser URL)
-   planner.visualize()
-
-   # Animate a planned trajectory
-   planner.make_planner(["panda"], {"planner_id": "wAstar", "weight": "10."})
-   start = np.radians([0, -45, 0, -135, 0, 90, 45])
-
-   goal_pose = srmp.Pose()
-   goal_pose.p = np.array([0.6, 0.0, 0.5])
-   goal_pose.q = np.array([1.0, 0.0, 0.0, 0.0])
-   goal = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
-
-   trajectory = planner.plan(start, goal)
-   planner.animate_trajectory(trajectory, dt=0.05)
-
-GUI Controls (MeshCat)
-~~~~~~~~~~~~~~~~~~~~~~
-
-Because MeshCat cannot relay browser input back to Python, obstacle editing is driven
-entirely from Python using the ``set_gui_*`` helpers:
-
-.. code-block:: python
-
-   # Must call visualize() first
-   planner.visualize()
-   planner.add_gui_controls()
-
-   # Set obstacle properties in Python, then add to the scene
-   planner.set_gui_object_type("box")
-   planner.set_gui_position(0.5, 0.0, 0.5)
-   planner.set_gui_size(0.1, 0.1, 0.1)
-   planner.set_gui_object_name("my_box")
-   planner.add_obstacle_from_gui()
-
-   # Load an existing object into the GUI state for editing
-   planner.load_object_to_gui("my_box")
-   planner.set_gui_position(0.6, 0.0, 0.5)
-   planner.update_object_from_gui("my_box")
-
-   # Access the browser URL
-   print(planner.url)
+   A MeshCat backend (``start_visualizer(type="meshcat")``) exists in the codebase but is
+   currently being reworked and isn't functional yet, so it isn't documented here. Use the
+   Viser backend above.
 
 
 ViserPlannerInterface (Viser)
@@ -308,34 +219,15 @@ Pass ``share=True`` to generate a publicly accessible Viser share URL:
    # Prints both the local URL and a public share URL
 
 
-MeshCat vs Viser Comparison
------------------------------
+Feature Summary
+---------------
 
-.. list-table::
-   :header-rows: 1
-   :widths: 35 30 30
-
-   * - Feature
-     - VisualPlannerInterface
-     - ViserPlannerInterface
-   * - Dependency
-     - meshcat
-     - viser, trimesh
-   * - Browser → Python communication
-     - One-way (Python drives GUI)
-     - Bidirectional
-   * - Interactive joint sliders
-     - Display only
-     - Fully interactive (callbacks)
-   * - Goal-driven planning (drag + plan)
-     - Not available
-     - Available
-   * - Object editing buttons
-     - Python-driven only
-     - Buttons trigger Python callbacks
-   * - Shareable URLs
-     - Not available
-     - Available (``share=True``)
-   * - Mesh loading
-     - STL, OBJ, DAE
-     - Any format supported by trimesh
+- **Dependency**: ``viser``, ``trimesh``
+- **Browser → Python communication**: Bidirectional — sliders, dropdowns, and buttons
+  trigger Python callbacks
+- **Interactive joint sliders**: Fully interactive, including gripper sliders
+- **Goal-driven planning**: Drag-to-goal + "Plan to goal" via :meth:`add_plan_controls`
+- **Object editing**: Drag gizmos (:meth:`add_object_controls`) and a buttons panel
+  (:meth:`add_gui_controls`)
+- **Shareable URLs**: Available via ``share=True``
+- **Mesh loading**: Any format supported by ``trimesh``
