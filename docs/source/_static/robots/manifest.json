@@ -188,7 +188,76 @@
       "description": "i2rt Big YAM 6-DOF manipulator with parallel gripper (larger/higher-reach variant)",
       "default_qpos": [0, 0, 0, 0, 0, 0],
       "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+    },
+    "ur3": {
+      "archive": "ur3.tar.gz",
+      "urdf": "ur3/ur3.urdf",
+      "srdf": "ur3/ur3.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR3 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur5": {
+      "archive": "ur5.tar.gz",
+      "urdf": "ur5/ur5.urdf",
+      "srdf": "ur5/ur5.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR5 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur10": {
+      "archive": "ur10.tar.gz",
+      "urdf": "ur10/ur10.urdf",
+      "srdf": "ur10/ur10.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR10 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur3e": {
+      "archive": "ur3e.tar.gz",
+      "urdf": "ur3e/ur3e.urdf",
+      "srdf": "ur3e/ur3e.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR3e 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur5e": {
+      "archive": "ur5e.tar.gz",
+      "urdf": "ur5e/ur5e.urdf",
+      "srdf": "ur5e/ur5e.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR5e 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur10e": {
+      "archive": "ur10e.tar.gz",
+      "urdf": "ur10e/ur10e.urdf",
+      "srdf": "ur10e/ur10e.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR10e 6-DOF manipulator (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ur16e": {
+      "archive": "ur16e.tar.gz",
+      "urdf": "ur16e/ur16e.urdf",
+      "srdf": "ur16e/ur16e.srdf",
+      "end_effector": "tool0",
+      "description": "Universal Robots UR16e 6-DOF manipulator, higher payload variant of UR10e (no gripper)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
     }
-  },
-  "all_archive": "all_robots.tar.gz"
+  }
 }

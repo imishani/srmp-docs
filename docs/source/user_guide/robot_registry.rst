@@ -91,6 +91,27 @@ The following robots are available in the registry:
    * - ``big_yam``
      - i2rt Big YAM 6-DOF manipulator with parallel gripper (larger/higher-reach variant)
      - ``gripper``
+   * - ``ur3``
+     - Universal Robots UR3 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur5``
+     - Universal Robots UR5 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur10``
+     - Universal Robots UR10 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur3e``
+     - Universal Robots UR3e 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur5e``
+     - Universal Robots UR5e 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur10e``
+     - Universal Robots UR10e 6-DOF manipulator (no gripper)
+     - ``tool0``
+   * - ``ur16e``
+     - Universal Robots UR16e 6-DOF manipulator, higher payload variant of UR10e (no gripper)
+     - ``tool0``
 
 Using the Registry
 ------------------
@@ -143,7 +164,8 @@ View what robots are available:
    # {'remote': ['panda', 'panda_on_rail', 'panda_stick', 'panda_wristcam', 'so101', 'so107',
    #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot',
    #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite',
-   #             'yam', 'yam_pro', 'yam_ultra', 'big_yam'],
+   #             'yam', 'yam_pro', 'yam_ultra', 'big_yam',
+   #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 

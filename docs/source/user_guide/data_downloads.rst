@@ -47,12 +47,18 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`yam_pro.tar.gz <../_static/robots/yam_pro.tar.gz>` - i2rt YAM Pro 6-DOF manipulator with parallel gripper
 - :download:`yam_ultra.tar.gz <../_static/robots/yam_ultra.tar.gz>` - i2rt YAM Ultra 6-DOF manipulator with parallel gripper
 - :download:`big_yam.tar.gz <../_static/robots/big_yam.tar.gz>` - i2rt Big YAM 6-DOF manipulator with parallel gripper
+- :download:`ur3.tar.gz <../_static/robots/ur3.tar.gz>` - Universal Robots UR3 6-DOF manipulator
+- :download:`ur5.tar.gz <../_static/robots/ur5.tar.gz>` - Universal Robots UR5 6-DOF manipulator
+- :download:`ur10.tar.gz <../_static/robots/ur10.tar.gz>` - Universal Robots UR10 6-DOF manipulator
+- :download:`ur3e.tar.gz <../_static/robots/ur3e.tar.gz>` - Universal Robots UR3e 6-DOF manipulator
+- :download:`ur5e.tar.gz <../_static/robots/ur5e.tar.gz>` - Universal Robots UR5e 6-DOF manipulator
+- :download:`ur10e.tar.gz <../_static/robots/ur10e.tar.gz>` - Universal Robots UR10e 6-DOF manipulator
+- :download:`ur16e.tar.gz <../_static/robots/ur16e.tar.gz>` - Universal Robots UR16e 6-DOF manipulator
 
-**All Robots:**
-
-- :download:`all_robots.tar.gz <../_static/robots/all_robots.tar.gz>` - All available robots in one archive
-
-Each archive contains the URDF, SRDF, and mesh files needed for planning.
+Each archive contains the URDF, SRDF, and mesh files needed for planning. There
+is no longer a single bundled "all robots" archive — with this many robots it
+exceeded GitHub's 100MB file-size limit. Use ``srmp.robots.download_all()``
+to fetch every robot individually instead.
 
 Robot Models
 ------------
