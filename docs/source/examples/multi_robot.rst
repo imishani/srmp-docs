@@ -30,6 +30,13 @@ Here's a complete example of planning for two Panda robots:
    #         end_effector=f"panda{i}_hand"
    #     )
 
+   # Note: add_robot()/add_articulation() return the actual assigned name (str).
+   # If you don't pass a unique `name`, SRMP auto-suffixes collisions
+   # (e.g. "panda" -> "panda1", "panda2", ...), so you can load the same
+   # robot/URDF for multiple robots repeatedly and just use the returned names:
+   #     a = planner.add_robot("panda")   # -> "panda"
+   #     b = planner.add_robot("panda")   # -> "panda1"
+
    # Set base poses for robots using Pose objects
    pose0 = srmp.Pose()
    pose0.p = np.array([-0.5, 0.5, 0])

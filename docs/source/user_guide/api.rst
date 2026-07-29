@@ -15,7 +15,7 @@ The main interface for robot motion planning.
 
    **Methods:**
 
-   .. method:: add_robot(robot, name=None, srdf_path=None, end_effector=None, planned=True, gravity=None, link_names=None, joint_names=None)
+   .. method:: add_robot(robot, name=None, srdf_path=None, end_effector=None, planned=True, gravity=None, link_names=None, joint_names=None, gripper_joint_names=None)
 
       Add a robot from the registry or by file path. This is the recommended way to add robots.
 
@@ -27,6 +27,15 @@ The main interface for robot motion planning.
       :param numpy.ndarray gravity: Gravity vector for the robot (default: [0, 0, 0])
       :param list link_names: Override link names
       :param list joint_names: Override joint names
+      :param list gripper_joint_names: Override the registry entry's gripper joint classification
+         (default: use the registry's own ``gripper_joint_names`` for that robot, if any). Drive
+         gripper joints with :meth:`set_gripper_qpos` instead of :meth:`set_qpos`.
+      :returns: The actual name assigned to the robot. This may differ from ``name``/``robot``
+         if an articulation with that name already exists in the scene — SRMP auto-suffixes it
+         (e.g. ``"panda"`` → ``"panda1"``), which makes it possible to add the same robot/URDF
+         multiple times without picking unique names yourself. Use the returned name, not the
+         input, for subsequent calls like :meth:`set_base_pose` or :meth:`plan`.
+      :rtype: str
       :raises RobotNotFoundError: If robot not in registry and not a valid path
       :raises ValueError: If using file path without srdf_path and end_effector
 
@@ -54,6 +63,10 @@ The main interface for robot motion planning.
       :param list gripper_joint_names: Names of this robot's gripper joints, classified separately
          from the arm move group (default: []). Drive them with :meth:`set_gripper_qpos` instead of
          :meth:`set_qpos`.
+      :returns: The actual name assigned to the articulation (auto-suffixed if ``name`` already
+         exists in the scene, e.g. ``"panda"`` → ``"panda1"``). Use the returned value for
+         subsequent calls when there's any chance of a name collision.
+      :rtype: str
 
    .. method:: remove_articulation(name)
 
@@ -341,6 +354,34 @@ The main interface for robot motion planning.
       :param str name2: Second object name
       :param bool allowed: True to allow collisions, False to disallow
 
+   .. method:: get_active_joint_names(articulation_name)
+
+      Get the names of all active (user-defined) joints for an articulation. This includes
+      every actuated joint (arm + fingers etc.), **not** filtered to the planning move group.
+      Use :meth:`get_move_group_joint_names` for planning.
+
+      :param str articulation_name: Name of the articulation
+      :returns: List of active joint names
+
+   .. method:: get_move_group_joint_names(articulation_name)
+
+      Get the names of the move-group joints for an articulation — the joints in the kinematic
+      chain to the end-effector that the planner actually controls. The start state passed to
+      :meth:`plan` must have exactly ``len(get_move_group_joint_names(...))`` elements.
+
+      :param str articulation_name: Name of the articulation
+      :returns: List of move-group joint names
+
+   .. method:: get_move_group_qpos_dim(articulation_name)
+
+      Get the move-group qpos dimension (velocity-space DOF) for an articulation. This is the
+      authoritative value to size planning states with — prefer it over
+      ``len(get_move_group_joint_names(...))`` when mimic/fixed joints (which contribute 0 DOF)
+      may appear in the move group.
+
+      :param str articulation_name: Name of the articulation
+      :returns: Move-group qpos dimension (int)
+
    .. method:: set_qpos(name, qpos)
 
       Set the joint positions for a named articulation.
@@ -398,6 +439,39 @@ The main interface for robot motion planning.
       are removed; when False, only planner caches and internal data are reset.
 
       :param bool reset_robots: Whether to remove robots and objects during reset
+
+   .. method:: start_visualizer(type="viser", **kwargs)
+
+      Create, attach, and open a visualizer on this planner without subclassing
+      :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface`. This is the recommended
+      way to add visualization to a plain :class:`~srmp.PlannerInterface`, and supports
+      attaching more than one visualizer to the same planner. See :doc:`visualization`.
+
+      :param str type: ``"viser"`` or ``"meshcat"``
+      :param kwargs: Additional arguments passed to the visualizer constructor (e.g. ``port``)
+      :returns: The created visualizer instance
+
+   .. method:: get_visualizer(index=0)
+
+      Get a visualizer previously attached via :meth:`start_visualizer` or
+      :meth:`attach_visualizer`.
+
+      :param int index: Index of the visualizer to get (default: 0)
+      :returns: The visualizer instance, or ``None`` if no visualizer is attached at that index
+
+   .. method:: attach_visualizer(listener)
+
+      Attach a :class:`VisualizerListener` to this planner so it is notified of scene changes
+      (``add_robot``, ``add_box``, etc.) and kept in sync. Used internally by
+      :meth:`start_visualizer`; call directly if you constructed a visualizer yourself.
+
+      :param VisualizerListener listener: The visualizer/listener to attach
+
+   .. method:: detach_visualizer(listener)
+
+      Detach a previously attached visualizer. The visualizer stops receiving scene updates.
+
+      :param VisualizerListener listener: The visualizer/listener to detach
 
 Data Types
 ----------
@@ -525,7 +599,7 @@ Functions
    :returns: Dictionary with keys "remote", "local", and "custom"
    :rtype: dict
 
-.. function:: register(name, urdf_path, srdf_path, end_effector, description=None, default_qpos=None, joint_names=None)
+.. function:: register(name, urdf_path, srdf_path, end_effector, description=None, default_qpos=None, joint_names=None, gripper_joint_names=None)
 
    Register a custom robot for easy reuse.
 
@@ -536,6 +610,9 @@ Functions
    :param str description: Optional description
    :param list default_qpos: Optional default joint configuration
    :param list joint_names: Optional list of joint names
+   :param list gripper_joint_names: Optional list of gripper joint names. When set, robots
+      added via :meth:`~srmp.PlannerInterface.add_robot` use this classification by default,
+      driving those joints with :meth:`~srmp.PlannerInterface.set_gripper_qpos`.
 
 .. function:: unregister(name)
 
@@ -604,6 +681,13 @@ Classes
    .. attribute:: joint_names
 
       Optional list of joint names
+
+      :type: list or None
+
+   .. attribute:: gripper_joint_names
+
+      Optional list of gripper joint names, used by default when this robot is added via
+      :meth:`~srmp.PlannerInterface.add_robot`
 
       :type: list or None
 
@@ -1122,15 +1206,44 @@ ViserPlannerInterface
 
       :param str robot_name: Name of the robot
 
-   .. method:: add_ee_drag_control(robot_name)
+   .. method:: add_plan_controls(on_plan=None)
 
-      Place a 6-DOF transform gizmo at the robot's end-effector.  Dragging
-      the gizmo in the browser triggers IK; on success the joint
-      configuration is updated.  On IK failure the gizmo snaps back to the
-      current end-effector pose.  If :meth:`add_robot_controls` was called
-      first, the joint sliders are kept in sync.
+      Add a collapsible "Plan" folder to the sidebar for goal-driven planning.  Checking a
+      robot's box places a draggable 6-DOF goal gizmo (plus a semi-transparent "ghost" preview
+      robot) at its end-effector; dragging the gizmo updates the ghost via live IK.  Clicking
+      "Plan to goal" runs the planner against the dragged goal(s) and animates the resulting
+      trajectory.  Replaces the older single-robot ``add_ee_drag_control`` gizmo with a
+      multi-robot, planner-integrated workflow.
 
-      :param str robot_name: Name of the robot
+      :param on_plan: Optional ``callable(prompt: str)``.  When provided (agent mode) the
+          "Plan to goal" button calls ``on_plan(prompt)`` instead of planning directly.  When
+          ``None`` (standalone mode) it builds the planner and animates the trajectory itself.
+
+   .. method:: add_object_controls()
+
+      Add drag gizmos to every object currently in the scene, so they can be repositioned
+      directly in the browser.  Each gizmo moves the object's visual representation
+      immediately; the underlying collision world is updated shortly after dragging stops.
+
+      :returns: The folder handle (call ``.remove()`` to tear it down)
+
+   .. method:: add_controls_panel(executor=None, on_result=None, busy_lock=None, on_plan=None, agent=None, agent_preset=None, agent_backend_error=None)
+
+      Add (or update) the top-level "Controls" launcher panel, with on-demand buttons for
+      Robot Controls, Object Controls, Plan Controls, Console, and AI Agent.  Called
+      automatically at the end of :meth:`visualize`, so every ``ViserPlannerInterface`` /
+      ``start_visualizer("viser")`` scene gets this launcher by default — it is the backbone
+      of the :doc:`agent_mode` GUI. Calling it again only updates the stored callback
+      parameters rather than duplicating the panel.
+
+      :param executor: Forwarded to the Console panel, and reused for the "AI Agent" panel
+      :param on_result: Forwarded to the Console panel
+      :param busy_lock: Forwarded to the Console panel
+      :param on_plan: Forwarded to :meth:`add_plan_controls`
+      :param agent: Pre-built agent (see :doc:`agent_mode`). If provided, the "AI Agent" panel
+          opens immediately instead of waiting for the button click
+      :param agent_preset: Backend preset matching ``agent``'s initial backend
+      :param agent_backend_error: Error string if ``agent``'s initial backend failed to construct
 
    .. method:: add_gui_controls()
 

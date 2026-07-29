@@ -182,6 +182,7 @@ Get detailed information about a robot:
    print(robot.end_effector)   # "panda_hand"
    print(robot.default_qpos)   # Default joint configuration
    print(robot.joint_names)    # List of joint names
+   print(robot.gripper_joint_names)  # List of gripper joint names, or None
 
 Custom Robots
 -------------
@@ -200,7 +201,8 @@ Register your own robots for easy reuse:
        end_effector="tool0",
        description="My custom robot arm",
        default_qpos=[0, 0, 0, 0, 0, 0],
-       joint_names=["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+       joint_names=["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"],
+       gripper_joint_names=["left_finger_joint", "right_finger_joint"]  # optional
    )
 
    # Now use it by name
@@ -276,7 +278,7 @@ Registry Functions
 PlannerInterface Method
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. py:method:: PlannerInterface.add_robot(robot, name=None, srdf_path=None, end_effector=None, planned=True, gravity=None, link_names=None, joint_names=None)
+.. py:method:: PlannerInterface.add_robot(robot, name=None, srdf_path=None, end_effector=None, planned=True, gravity=None, link_names=None, joint_names=None, gripper_joint_names=None)
 
    Add a robot from the registry or by file path.
 
@@ -288,6 +290,12 @@ PlannerInterface Method
    :param numpy.ndarray gravity: Gravity vector (default: [0, 0, 0])
    :param list link_names: Override link names
    :param list joint_names: Override joint names
+   :param list gripper_joint_names: Override the registry entry's gripper joint classification
+      (default: use the registry's own value for that robot, if any)
+   :returns: The actual name assigned to the robot (str). SRMP auto-suffixes it if ``name``
+      already exists in the scene (e.g. ``"panda"`` → ``"panda1"``), so the same robot can be
+      added multiple times without picking unique names yourself — use the returned name for
+      subsequent calls.
    :raises RobotNotFoundError: If robot not in registry and not a valid path
    :raises ValueError: If using file path without srdf_path and end_effector
 

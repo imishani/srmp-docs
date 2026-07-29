@@ -154,6 +154,7 @@ The GUI mode provides additional features:
 - **Live Trajectory Animation**: Watch planned trajectories execute in real-time
 - **Backend Presets**: Quickly switch between LLM providers via dropdown
 - **Persistent State**: The planner state persists across conversation turns
+- **Stop Button**: Interrupt an in-flight agent run at any time
 
 How It Works
 ------------

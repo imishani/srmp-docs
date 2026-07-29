@@ -6,7 +6,8 @@ Usage
 Installation
 ------------
 
-SRMP supports Ubuntu>=22.04 and Python 3.9, 3.10, 3.11, 3.12, and 3.13.
+SRMP supports Linux (Ubuntu>=22.04) and macOS (arm64), and Python 3.9 through 3.14.
+Windows is not yet supported.
 
 To use SRMP, first install it using pip:
 
@@ -63,6 +64,32 @@ Alternatively, you can use ``add_articulation`` with explicit file paths:
    planner.add_articulation(name="panda",
                             end_effector="panda_hand",
                             urdf_path="/path/to/panda.urdf")
+
+Gripper Control
+~~~~~~~~~~~~~~~
+
+If a robot has a gripper, its finger joints can be classified separately from the arm move
+group so the planner never has to reason about them. Pass ``gripper_joint_names`` when adding
+the robot (registry robots like ``"yam"`` or ``"so101"`` set this automatically), then drive
+the gripper with ``set_gripper_qpos`` instead of ``set_qpos``:
+
+.. code-block:: python
+
+   # Registry robots with a known gripper classify it automatically
+   planner.add_robot("yam")
+
+   # Or classify explicitly when using add_articulation / a custom robot
+   planner.add_articulation(name="my_arm",
+                            end_effector="tool0",
+                            urdf_path="/path/to/my_arm.urdf",
+                            gripper_joint_names=["left_finger_joint", "right_finger_joint"])
+
+   # Query and drive the gripper independently of the arm
+   gripper_joints = planner.get_gripper_joint_names("my_arm")
+   planner.set_gripper_qpos("my_arm", [0.02, 0.02])  # e.g. open the gripper
+
+   # set_qpos / plan() are unaffected — they only ever see the arm move-group joints
+   move_group_joints = planner.get_move_group_joint_names("my_arm")
 
 Add objects to the environment:
 

@@ -33,6 +33,43 @@ Viser visualizer:
    ``VisualPlannerInterface`` or ``ViserPlannerInterface`` is silently skipped and
    ``srmp.PlannerInterface`` remains fully functional.
 
+Attaching a Visualizer (recommended)
+-------------------------------------
+
+Rather than subclassing :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface`, you can
+start with a plain :class:`~srmp.PlannerInterface` and attach a visualizer to it with
+:meth:`~srmp.PlannerInterface.start_visualizer`. Internally, visualizers are
+``VisualizerListener`` observers that get notified whenever the scene changes (``add_robot``,
+``add_box``, …); this also means a single planner can have **multiple** visualizers attached at
+once (e.g. a Viser GUI and a MeshCat feed side by side):
+
+.. code-block:: python
+
+   import srmp
+   import numpy as np
+
+   planner = srmp.PlannerInterface()
+   planner.add_robot("panda")
+
+   # Starts the server, attaches it, and opens the viewer — equivalent to
+   # ViserPlannerInterface(port=8080) but without subclassing PlannerInterface
+   viz = planner.start_visualizer(type="viser", port=8080)
+   print(viz.url)
+
+   # A second visualizer can be attached to the same planner
+   meshcat_viz = planner.start_visualizer(type="meshcat")
+
+   # Look up an attached visualizer later (e.g. from another function)
+   viz = planner.get_visualizer()  # index=0 by default
+
+   # Detach when done; attach_visualizer() is available for manually-constructed visualizers
+   planner.detach_visualizer(viz)
+
+The :class:`VisualPlannerInterface`/:class:`ViserPlannerInterface` subclasses documented below
+still work — they build a visualizer and attach it to themselves in their constructor — and all
+the ``add_*_controls`` / ``animate_trajectory`` methods below apply equally to a visualizer
+obtained via ``start_visualizer()``.
+
 
 VisualPlannerInterface (MeshCat)
 ---------------------------------
@@ -159,6 +196,18 @@ Basic Usage
    # Stop the server when done
    planner.stop()
 
+Controls Panel (added automatically)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``visualize()`` automatically calls ``add_controls_panel()`` at the end, which builds a
+top-level "Controls" folder in the sidebar with on-demand launch buttons: **Robot Controls**,
+**Object Controls**, **Plan Controls**, **Console**, and **AI Agent**. Each button lazily builds
+the corresponding panel (``add_robot_controls``, ``add_object_controls``, ``add_plan_controls``,
+…) the first time it's clicked, so you don't need to call those methods yourself just to make
+them available — you can still call them directly (as shown throughout this page) to have a
+panel open immediately instead of waiting for a click. This launcher is also the entry point
+used by the :doc:`agent_mode` GUI to embed the chat panel.
+
 Interactive Joint Controls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,24 +229,44 @@ instead of :meth:`~srmp.PlannerInterface.set_qpos`, so moving them does not
 change the arm move group's qpos dimension. Reset also restores gripper
 joints to their default position alongside the arm.
 
-End-Effector Drag Control (IK)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Goal-Driven Planning (Plan Controls)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``add_ee_drag_control()`` places a 6-DOF transform handle at the robot's
-end-effector. Dragging the gizmo in the browser triggers real-time IK:
+``add_plan_controls()`` adds a "Plan" folder to the sidebar for dragging a goal into place and
+planning to it — this replaces the older single-robot ``add_ee_drag_control()`` gizmo with a
+multi-robot, planner-integrated workflow:
 
 .. code-block:: python
 
    planner.visualize()
-   planner.add_robot_controls("panda")   # optional — syncs joint sliders
-   planner.add_ee_drag_control("panda")
+   planner.add_plan_controls()
 
-   # The browser shows a 3-axis gizmo at the end-effector.
-   # Drag it to move the robot via IK.  On failure the gizmo
-   # snaps back to the actual EE pose.
+   # In the browser:
+   # 1. Check a robot's box in the "Plan" folder — this drops a 6-DOF goal
+   #    gizmo at its current end-effector pose, plus a semi-transparent
+   #    "ghost" preview robot that follows the gizmo via live IK.
+   # 2. Drag the gizmo to the desired end-effector pose.
+   # 3. Click "Plan to goal" — SRMP plans to the dragged goal(s) with the
+   #    selected planner and animates the resulting trajectory.
+   #    "Reset EE" snaps the gizmo back to the robot's actual current pose.
 
    import time
    time.sleep(60)  # Keep server alive while interacting
+
+Object Drag Controls
+~~~~~~~~~~~~~~~~~~~~~
+
+``add_object_controls()`` adds a drag gizmo to every object currently in the scene, letting you
+reposition obstacles directly in the browser instead of via ``update_object_from_gui``:
+
+.. code-block:: python
+
+   planner.visualize()
+   planner.add_box("obstacle", np.array([0.1, 0.1, 0.4]), box_pose)
+   planner.add_object_controls()
+
+   # Drag any object's gizmo in the browser. The visual mesh moves
+   # immediately; the collision world updates ~0.4s after dragging stops.
 
 GUI Object Controls (Viser)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +327,7 @@ MeshCat vs Viser Comparison
    * - Interactive joint sliders
      - Display only
      - Fully interactive (callbacks)
-   * - End-effector drag / IK
+   * - Goal-driven planning (drag + plan)
      - Not available
      - Available
    * - Object editing buttons
