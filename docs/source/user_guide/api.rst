@@ -37,7 +37,8 @@ The main interface for robot motion planning.
                                 link_names: List[str] = [],
                                 joint_names: List[str] = [],
                                 gravity: NDArray[np.float64] = np.array([0, 0, 0]),
-                                planned=True)
+                                planned=True,
+                                gripper_joint_names: List[str] = [])
 
       Add a robot to the planning scene with explicit file paths. The `srdf_path` argument is optional — if you
       don't have an SRDF file, you can omit this argument or pass an empty string.
@@ -50,6 +51,9 @@ The main interface for robot motion planning.
       :param list joint_names: List of joint names to include (default: all joints)
       :param numpy.ndarray gravity: Gravity vector for the robot (default: [0, 0, 0])
       :param bool planned: Whether this robot should be planned for (default: True)
+      :param list gripper_joint_names: Names of this robot's gripper joints, classified separately
+         from the arm move group (default: []). Drive them with :meth:`set_gripper_qpos` instead of
+         :meth:`set_qpos`.
 
    .. method:: remove_articulation(name)
 
@@ -343,6 +347,23 @@ The main interface for robot motion planning.
 
       :param str name: Articulation name
       :param numpy.ndarray qpos: Joint positions (1D array)
+
+   .. method:: get_gripper_joint_names(articulation_name)
+
+      Get the names of an articulation's gripper joints, as classified via the
+      ``gripper_joint_names`` argument to :meth:`add_articulation`.
+
+      :param str articulation_name: Name of the articulation
+      :returns: List of gripper joint names (empty if none were classified)
+
+   .. method:: set_gripper_qpos(articulation_name, gripper_qpos)
+
+      Set joint angles for an articulation's gripper joints. Gripper joints are
+      tracked separately from the arm move group, so this does not affect
+      :meth:`set_qpos` or its expected qpos dimension.
+
+      :param str articulation_name: Name of the articulation
+      :param gripper_qpos: Joint angles for the gripper joints
 
    .. method:: set_qpos_all(state)
 

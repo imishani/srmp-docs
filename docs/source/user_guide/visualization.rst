@@ -173,6 +173,13 @@ Moving a slider immediately updates both the Viser geometry and the planner back
    # The browser now shows joint sliders with a Reset button and
    # visibility toggles for visual / collision meshes.
 
+If the robot was added with ``gripper_joint_names`` (see
+:meth:`~srmp.PlannerInterface.add_articulation`), its gripper sliders are
+included in the same panel. They drive :meth:`~srmp.PlannerInterface.set_gripper_qpos`
+instead of :meth:`~srmp.PlannerInterface.set_qpos`, so moving them does not
+change the arm move group's qpos dimension. Reset also restores gripper
+joints to their default position alongside the arm.
+
 End-Effector Drag Control (IK)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
