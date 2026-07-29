@@ -1066,10 +1066,10 @@ Point Cloud Example
 Visualization Classes
 ---------------------
 
-SRMP ships an optional Viser-based visualization backend, :class:`~srmp.ViserPlannerInterface`,
-which extends :class:`~srmp.PlannerInterface` and keeps the 3D scene in sync automatically
-as robots and objects are added or removed. Prefer :meth:`~srmp.PlannerInterface.start_visualizer`
-to attach it to a plain ``PlannerInterface`` without subclassing.
+SRMP ships an optional Viser-based visualizer, :class:`~srmp.ViserPlannerInterface`, which
+keeps the 3D scene in sync automatically as robots and objects are added or removed. Get one
+either via :meth:`~srmp.PlannerInterface.start_visualizer` on an existing planner, or by
+constructing :class:`~srmp.ViserPlannerInterface` directly — both produce the same object.
 
 See the :doc:`visualization` page for installation instructions and full
 usage examples.

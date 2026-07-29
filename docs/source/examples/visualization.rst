@@ -8,18 +8,17 @@ summary.
 Viser Interactive Visualization
 ---------------------------------
 
-Full interactive visualization with joint sliders and goal-driven planning
-using :class:`~srmp.ViserPlannerInterface`:
+Full interactive visualization with joint sliders and goal-driven planning:
 
 .. code-block:: python
 
-   from srmp import ViserPlannerInterface
    import srmp
    import numpy as np
    import time
 
-   # Create planner with Viser visualization
-   planner = ViserPlannerInterface(port=8080)
+   # Create a planner and attach a Viser visualizer to it
+   planner = srmp.PlannerInterface()
+   viz = planner.start_visualizer(type="viser", port=8080)
 
    # Add robot
    planner.add_articulation(
@@ -33,48 +32,45 @@ using :class:`~srmp.ViserPlannerInterface`:
    box_pose.p = np.array([0.5, 0.2, 0.4])
    planner.add_box("obstacle", np.array([0.1, 0.1, 0.4]), box_pose)
 
-   # Start the Viser server
-   planner.visualize()
-   print(f"Open: {planner.url}")   # → http://localhost:8080
+   print(f"Open: {viz.url}")   # → http://localhost:8080
 
    # Add per-joint sliders (drag them in the browser to move the robot)
-   planner.add_robot_controls("panda")
+   viz.add_robot_controls("panda")
 
    # Add goal-driven planning: check the robot, drag its goal gizmo, then
    # click "Plan to goal" in the browser
-   planner.add_plan_controls()
+   viz.add_plan_controls()
 
    # Keep the server alive for interactive use
    time.sleep(120)
 
-   planner.stop()
+   viz.stop()
 
 Viser GUI Object Controls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
-   from srmp import ViserPlannerInterface
    import srmp
    import numpy as np
    import time
 
-   planner = ViserPlannerInterface(port=8080)
+   planner = srmp.PlannerInterface()
+   viz = planner.start_visualizer(type="viser", port=8080)
    planner.add_articulation("panda", "panda_hand", "/path/to/panda.urdf")
-   planner.visualize()
 
    # Add the interactive "Object Controls" panel to the browser sidebar.
    # Clicking "Add Object", "Update Object", or "Remove Object" in the
    # browser directly calls the corresponding Python method.
-   planner.add_gui_controls()
+   viz.add_gui_controls()
 
    # You can still load an existing object into the GUI from Python
    box_pose = srmp.Pose()
    box_pose.p = np.array([0.4, 0.0, 0.5])
    planner.add_box("my_box", np.array([0.1, 0.1, 0.1]), box_pose)
-   planner.load_object_to_gui("my_box")
+   viz.load_object_to_gui("my_box")
 
-   print(f"Open {planner.url} and use the Object Controls panel")
+   print(f"Open {viz.url} and use the Object Controls panel")
    time.sleep(120)
 
 Viser Multi-Robot Animation
@@ -82,11 +78,11 @@ Viser Multi-Robot Animation
 
 .. code-block:: python
 
-   from srmp import ViserPlannerInterface
    import srmp
    import numpy as np
 
-   planner = ViserPlannerInterface(port=8080)
+   planner = srmp.PlannerInterface()
+   viz = planner.start_visualizer(type="viser", port=8080)
 
    # Add two robots
    for i in range(2):
@@ -106,8 +102,6 @@ Viser Multi-Robot Animation
    pose1.p = np.array([0.5, 0.5, 0.0])
    pose1.q = np.array([0, 0, 0, 1])
    planner.set_base_pose("panda1", pose1)
-
-   planner.visualize()
 
    # Configure and run multi-robot planner
    names = ["panda0", "panda1"]
@@ -139,6 +133,6 @@ Viser Multi-Robot Animation
    trajectories = planner.plan_multi(start_states, goal_constraints)
 
    # Animate all robots simultaneously in the browser
-   planner.animate_trajectory(trajectories, dt=0.05)
+   viz.animate_trajectory(trajectories, dt=0.05)
 
-   planner.stop()
+   viz.stop()
