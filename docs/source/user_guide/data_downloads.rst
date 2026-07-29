@@ -43,6 +43,10 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`kinova_gen3.tar.gz <../_static/robots/kinova_gen3.tar.gz>` - Kinova Gen3 7-DOF manipulator with vision module
 - :download:`kinova_gen3_6dof.tar.gz <../_static/robots/kinova_gen3_6dof.tar.gz>` - Kinova Gen3 6-DOF manipulator with vision module
 - :download:`kinova_gen3_lite.tar.gz <../_static/robots/kinova_gen3_lite.tar.gz>` - Kinova Gen3 Lite compact 6-DOF manipulator
+- :download:`yam.tar.gz <../_static/robots/yam.tar.gz>` - i2rt YAM 6-DOF manipulator with parallel gripper
+- :download:`yam_pro.tar.gz <../_static/robots/yam_pro.tar.gz>` - i2rt YAM Pro 6-DOF manipulator with parallel gripper
+- :download:`yam_ultra.tar.gz <../_static/robots/yam_ultra.tar.gz>` - i2rt YAM Ultra 6-DOF manipulator with parallel gripper
+- :download:`big_yam.tar.gz <../_static/robots/big_yam.tar.gz>` - i2rt Big YAM 6-DOF manipulator with parallel gripper
 
 **All Robots:**
 

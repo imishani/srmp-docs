@@ -79,6 +79,18 @@ The following robots are available in the registry:
    * - ``kinova_gen3_lite``
      - Kinova Gen3 Lite compact 6-DOF manipulator
      - ``DUMMY``
+   * - ``yam``
+     - i2rt YAM 6-DOF manipulator with parallel gripper
+     - ``gripper``
+   * - ``yam_pro``
+     - i2rt YAM Pro 6-DOF manipulator with parallel gripper
+     - ``gripper``
+   * - ``yam_ultra``
+     - i2rt YAM Ultra 6-DOF manipulator with parallel gripper
+     - ``gripper``
+   * - ``big_yam``
+     - i2rt Big YAM 6-DOF manipulator with parallel gripper (larger/higher-reach variant)
+     - ``gripper``
 
 Using the Registry
 ------------------
@@ -130,7 +142,8 @@ View what robots are available:
    print(available)
    # {'remote': ['panda', 'panda_on_rail', 'panda_stick', 'panda_wristcam', 'so101', 'so107',
    #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot',
-   #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite'],
+   #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite',
+   #             'yam', 'yam_pro', 'yam_ultra', 'big_yam'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 

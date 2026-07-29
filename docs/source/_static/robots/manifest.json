@@ -152,6 +152,42 @@
       "description": "Kinova Gen3 Lite compact 6-DOF manipulator",
       "default_qpos": [0, -0.28, 1.309, 0, -1.047, 0],
       "joint_names": ["J0", "J1", "J2", "J3", "J4", "J5"]
+    },
+    "yam": {
+      "archive": "yam.tar.gz",
+      "urdf": "yam/yam.urdf",
+      "srdf": "yam/yam.srdf",
+      "end_effector": "gripper",
+      "description": "i2rt YAM 6-DOF manipulator with parallel gripper",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+    },
+    "yam_pro": {
+      "archive": "yam_pro.tar.gz",
+      "urdf": "yam_pro/yam_pro.urdf",
+      "srdf": "yam_pro/yam_pro.srdf",
+      "end_effector": "gripper",
+      "description": "i2rt YAM Pro 6-DOF manipulator with parallel gripper",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+    },
+    "yam_ultra": {
+      "archive": "yam_ultra.tar.gz",
+      "urdf": "yam_ultra/yam_ultra.urdf",
+      "srdf": "yam_ultra/yam_ultra.srdf",
+      "end_effector": "gripper",
+      "description": "i2rt YAM Ultra 6-DOF manipulator with parallel gripper",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["dof_joint1", "dof_joint2", "dof_joint3", "dof_joint4", "dof_joint5", "dof_joint6"]
+    },
+    "big_yam": {
+      "archive": "big_yam.tar.gz",
+      "urdf": "big_yam/big_yam.urdf",
+      "srdf": "big_yam/big_yam.srdf",
+      "end_effector": "gripper",
+      "description": "i2rt Big YAM 6-DOF manipulator with parallel gripper (larger/higher-reach variant)",
+      "default_qpos": [0, 0, 0, 0, 0, 0],
+      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
     }
   },
   "all_archive": "all_robots.tar.gz"
