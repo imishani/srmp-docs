@@ -9,14 +9,12 @@ directly invoke Python callbacks. It watches a :class:`~srmp.PlannerInterface` a
 Installation
 ------------
 
+``viser`` (and its ``trimesh`` dependency, used for mesh-file loading) are installed
+automatically with ``srmp`` — no separate install step is needed:
+
 .. code-block:: console
 
-   $ pip install viser trimesh
-
-.. note::
-
-   This dependency is optional. When it is not installed, visualization is simply unavailable
-   and ``srmp.PlannerInterface`` remains fully functional.
+   $ pip install srmp
 
 Getting a Visualizer
 ---------------------

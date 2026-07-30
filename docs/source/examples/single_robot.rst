@@ -253,6 +253,50 @@ After planning, you can analyze and visualize the resulting trajectory:
    except ImportError:
        print("matplotlib not available for plotting")
 
+Pick-and-Place with a Gripper
+------------------------------
+
+Robots with a gripper (like ``yam``) classify their finger joints separately from the arm
+move group, so the planner never has to reason about them. Open/close the gripper with
+:meth:`~srmp.PlannerInterface.set_gripper_qpos` before and after planning the arm motion —
+it never affects :meth:`~srmp.PlannerInterface.set_qpos`/:meth:`~srmp.PlannerInterface.plan`,
+which only ever see the arm's move-group joints:
+
+.. code-block:: python
+
+   import srmp
+   import srmp.robots as robots
+   import numpy as np
+
+   # yam classifies its two gripper finger joints automatically (see the robot registry)
+   planner = srmp.PlannerInterface()
+   name = planner.add_robot("yam")
+
+   gripper_joints = planner.get_gripper_joint_names(name)
+   print(f"Gripper joints: {gripper_joints}")
+
+   # Open the gripper before approaching the object
+   planner.set_gripper_qpos(name, [0.02, 0.02])
+
+   planner.make_planner([name], {
+       "planner_id": "wAstar",
+       "heuristic": "bfs",
+       "weight": "10."
+   })
+
+   start_state = np.array(robots.get("yam").default_qpos)
+
+   goal_pose = srmp.Pose()
+   goal_pose.p = np.array([0.3, 0.0, 0.2])
+   goal_pose.q = np.array([0.0, 0.0, 0.0, 1.0])
+   goal_constraint = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
+
+   trajectory = planner.plan(start_state, goal_constraint)
+   print(f"Reached object in {len(trajectory.positions)} waypoints")
+
+   # Close the gripper to grasp — arm move-group state is untouched
+   planner.set_gripper_qpos(name, [0.0, 0.0])
+
 Planning with Point Clouds
 ---------------------------
 

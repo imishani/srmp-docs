@@ -46,6 +46,34 @@ Full interactive visualization with joint sliders and goal-driven planning:
 
    viz.stop()
 
+Gripper Sliders
+~~~~~~~~~~~~~~~~
+
+If a robot was added with ``gripper_joint_names`` (registry robots like ``"yam"`` classify
+this automatically), ``add_robot_controls`` includes its gripper sliders in the same panel as
+the arm joints. Dragging one drives :meth:`~srmp.PlannerInterface.set_gripper_qpos` directly —
+the arm's move-group qpos dimension is unaffected, and the sidebar's Reset button restores the
+gripper alongside the arm:
+
+.. code-block:: python
+
+   import srmp
+   import time
+
+   planner = srmp.PlannerInterface()
+   viz = planner.start_visualizer(type="viser", port=8080)
+
+   # yam's two finger joints are classified as gripper joints automatically
+   name = planner.add_robot("yam")
+
+   print(f"Open: {viz.url}")
+
+   # The sidebar now shows arm sliders AND gripper finger sliders together
+   viz.add_robot_controls(name)
+
+   time.sleep(120)
+   viz.stop()
+
 Viser GUI Object Controls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

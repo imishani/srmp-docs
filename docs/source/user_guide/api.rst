@@ -1088,7 +1088,7 @@ ViserPlannerInterface
    :param bool share: Request a public share URL from Viser
        (default: ``False``)
 
-   Requires: ``pip install viser trimesh``
+   ``viser`` and its ``trimesh`` dependency are installed automatically with ``srmp``.
 
    **Additional Methods:**
 
