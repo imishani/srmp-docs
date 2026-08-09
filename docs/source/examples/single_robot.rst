@@ -297,6 +297,84 @@ which only ever see the arm's move-group joints:
    # Close the gripper to grasp — arm move-group state is untouched
    planner.set_gripper_qpos(name, [0.0, 0.0])
 
+Screw Motion: Turning a Valve
+------------------------------
+
+Tasks that rotate about (and optionally translate along) an axis — turning a valve,
+opening a hinged door, driving a screw — are naturally described as a *screw motion*
+rather than a single end-effector pose. :meth:`~srmp.PlannerInterface.plan_screw` walks
+the end effector along that helical path directly, closing the loop on the Jacobian at
+each small step (no IK/FK solve involved), and checks collision and joint limits along
+the way:
+
+.. code-block:: python
+
+   import srmp
+   import numpy as np
+
+   planner = srmp.PlannerInterface()
+   planner.add_robot("panda")
+
+   start_qpos = np.radians([0, -45, 0, -135, 0, 90, 45])
+   planner.set_qpos("panda", start_qpos)
+
+   # Rotate the wrist 90 degrees about a vertical axis through a point on the valve
+   # (pitch=0 means pure rotation, like a valve or a hinged door)
+   traj = planner.plan_screw(
+       "panda", "panda_hand",
+       axis_point=[0.4, 0.0, 0.3],
+       axis_direction=[0, 0, 1],
+       angle=np.radians(90),
+   )
+   print(f"Turned the valve in {len(traj.positions)} steps")
+
+   # start_qpos defaults to the robot's current qpos, so a second screw motion can
+   # continue right where the first left off without tracking qpos yourself
+   traj2 = planner.plan_screw(
+       "panda", "panda_hand",
+       axis_point=[0.4, 0.0, 0.3],
+       axis_direction=[0, 0, 1],
+       angle=np.radians(90),
+   )
+
+A nonzero ``pitch`` turns the same rotate-in-place motion into a true screw thread —
+useful for driving a bolt, where the end effector should advance along the axis as it
+turns:
+
+.. code-block:: python
+
+   traj = planner.plan_screw(
+       "panda", "panda_hand",
+       axis_point=[0.4, 0.0, 0.3],
+       axis_direction=[0, 0, 1],
+       pitch=0.002,              # 2 mm of travel per full revolution
+       angle=np.radians(720),    # two full turns
+   )
+
+You can also aim directly at a target pose and let ``plan_screw`` derive the connecting
+screw automatically:
+
+.. code-block:: python
+
+   target_pose = planner.get_link_pose("panda", "panda_hand")
+   target_pose.p += np.array([0.0, 0.1, 0.0])  # nudge 10 cm sideways
+
+   traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
+
+Wrap the call in ``try``/``except`` if the motion might be infeasible — ``plan_screw``
+raises ``RuntimeError`` on collision, a joint-limit violation, a kinematic singularity
+(stalled progress), or exceeding ``max_steps``:
+
+.. code-block:: python
+
+   try:
+       traj = planner.plan_screw(
+           "panda", "panda_hand",
+           axis_direction=[0, 0, 1], angle=np.radians(720),
+       )
+   except RuntimeError as e:
+       print(f"Screw motion infeasible: {e}")
+
 Planning with Point Clouds
 ---------------------------
 

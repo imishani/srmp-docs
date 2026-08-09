@@ -169,6 +169,45 @@ The main interface for robot motion planning.
       :returns: Dictionary mapping robot names to their trajectories
       :rtype: dict
 
+   .. method:: plan_screw(articulation_name, link_name, start_qpos=None, end_pose=None, axis_point=None, axis_direction=None, pitch=0.0, angle=None, qpos_step=0.1, max_steps=10000)
+
+      Plan a screw motion for ``link_name`` by closing the loop on its Jacobian — a
+      resolved-rate/velocity controller that walks along the screw path in small steps,
+      checking collision (:meth:`is_state_colliding`) and move-group joint limits at every
+      step. No IK/FK solve is involved.
+
+      Specify the motion in exactly one of two ways:
+
+      - ``end_pose``: the target pose for ``link_name``. The unique screw axis/pitch/angle
+        connecting the current pose to it is derived automatically.
+      - ``axis_direction`` + ``angle`` (with optional ``axis_point``/``pitch``): an explicit
+        screw — rotate ``angle`` radians about the line through ``axis_point`` (default: the
+        current position of ``link_name``) along ``axis_direction``, translating ``pitch``
+        linear units per full revolution (default ``0`` = pure rotation, e.g. a hinge/door).
+
+      :param str articulation_name: Articulation name
+      :param str link_name: The link whose motion is being screwed (e.g. the end effector);
+         also determines which Jacobian is used
+      :param numpy.ndarray start_qpos: Move-group joint configuration to start from.
+         Defaults to the articulation's current qpos (:meth:`get_qpos`) if omitted. Sets the
+         articulation's current qpos as a side effect, same as :meth:`set_qpos`.
+      :param Pose end_pose: Target pose for ``link_name`` (pose-to-pose mode)
+      :param numpy.ndarray axis_point: A point on the screw axis, world frame (axis mode;
+         defaults to the current position of ``link_name``)
+      :param numpy.ndarray axis_direction: Direction of the screw axis, world frame, need
+         not be unit length (axis mode; required)
+      :param float pitch: Linear distance traveled per full revolution (axis mode only;
+         ignored in pose-to-pose mode, where it's derived)
+      :param float angle: Total rotation to sweep, radians; sign gives direction via the
+         right-hand rule (axis mode; required)
+      :param float qpos_step: Max joint-space step norm per iteration, radians (default: 0.1)
+      :param int max_steps: Safety cap on the number of iterations (default: 10000)
+      :returns: Joint-space Trajectory (positions only) tracing the screw motion
+      :rtype: Trajectory
+      :raises RuntimeError: Parameters are inconsistent; (pose-to-pose mode) start and end
+         have zero relative rotation; a step would collide or violate a joint limit;
+         progress stalls (kinematic singularity); or ``max_steps`` is exceeded
+
    .. method:: add_box(name, size, pose)
 
       Add a box obstacle to the environment.
@@ -382,12 +421,31 @@ The main interface for robot motion planning.
       :param str articulation_name: Name of the articulation
       :returns: Move-group qpos dimension (int)
 
+   .. method:: get_move_group_joint_limits(articulation_name)
+
+      Get position limits for an articulation's move-group joints, in the same order as
+      :meth:`set_qpos`/:meth:`plan`. Only single-DOF joints (revolute/prismatic/continuous)
+      are supported — raises for anything else.
+
+      :param str articulation_name: Name of the articulation
+      :returns: ``(move_group_qpos_dim, 2)`` array of ``(lower, upper)`` bounds per joint
+      :rtype: numpy.ndarray
+
    .. method:: set_qpos(name, qpos)
 
       Set the joint positions for a named articulation.
 
       :param str name: Articulation name
       :param numpy.ndarray qpos: Joint positions (1D array)
+
+   .. method:: get_qpos(name)
+
+      Get the current joint positions for a named articulation, in move-group order (the
+      same order :meth:`set_qpos`/:meth:`plan` expect).
+
+      :param str name: Articulation name
+      :returns: Move-group qpos
+      :rtype: numpy.ndarray
 
    .. method:: get_gripper_joint_names(articulation_name)
 
@@ -432,6 +490,65 @@ The main interface for robot motion planning.
       :param list ee_pose: Desired end-effector pose [x, y, z, roll, pitch, yaw]
       :param list init_state_val: Initial joint configuration for IK solver
       :returns: Tuple `(success: bool, joint_state: list)`
+
+   .. method:: get_jacobian(articulation_name, link_name, local=False, move_group_only=True)
+
+      Get the Jacobian of a link at the articulation's current qpos.
+
+      :param str articulation_name: Articulation name
+      :param str link_name: Name of the link
+      :param bool local: If True, express the Jacobian in the link's own local frame; if
+         False (default), world frame
+      :param bool move_group_only: If True (default), return only the move-group columns
+         (same order as :meth:`set_qpos`/:meth:`plan`); if False, return all columns (full
+         model DOF, including gripper/frozen joints)
+      :returns: ``(6, N)`` Jacobian array, ``N`` = move-group qpos dim or full model DOF
+      :rtype: numpy.ndarray
+
+   .. method:: compute_jacobian(articulation_name, qpos, link_name, local=False, move_group_only=True)
+
+      Get the Jacobian of a link at an arbitrary qpos, without touching the articulation's
+      current internal state.
+
+      :param str articulation_name: Articulation name
+      :param numpy.ndarray qpos: Move-group joint configuration (same order as
+         :meth:`set_qpos`/:meth:`plan`) to evaluate the Jacobian at; non-move-group joints
+         (gripper/frozen) are taken from the articulation's current state
+      :param str link_name: Name of the link
+      :param bool local: If True, express the Jacobian in the link's own local frame; if
+         False (default), world frame
+      :param bool move_group_only: If True (default), return only the move-group columns;
+         if False, return all columns
+      :returns: ``(6, N)`` Jacobian array
+      :rtype: numpy.ndarray
+
+   .. method:: compute_joint_velocities(articulation_name, link_name, twist, damping=0.0, local=False)
+
+      Map a desired end-effector twist to move-group joint velocities via damped least
+      squares — stays well-behaved near/at kinematic singularities (``damping=0`` gives the
+      plain Moore-Penrose pseudo-inverse solution).
+
+      :param str articulation_name: Articulation name
+      :param str link_name: Name of the link
+      :param numpy.ndarray twist: Desired 6D twist ``[linear; angular]``, in the frame
+         selected by ``local``
+      :param float damping: Damping factor; higher trades tracking accuracy near
+         singularities for stability (default: 0.0)
+      :param bool local: If True, ``twist`` is expressed in the link's own local frame; if
+         False (default), world frame
+      :returns: Move-group joint velocities (same order as :meth:`set_qpos`/:meth:`plan`)
+      :rtype: numpy.ndarray
+
+   .. method:: get_manipulability(articulation_name, link_name)
+
+      Yoshikawa manipulability index of a link's move-group Jacobian: ``sqrt(det(J @ J.T))``.
+      Zero at a kinematic singularity; higher means more dexterous. Frame-invariant (world
+      vs. local Jacobian give the same value).
+
+      :param str articulation_name: Articulation name
+      :param str link_name: Name of the link
+      :returns: Manipulability index (>= 0)
+      :rtype: float
 
    .. method:: reset(reset_robots=True)
 

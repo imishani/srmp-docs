@@ -44,6 +44,7 @@ Learn More
 - :doc:`Getting Started <user_guide/usage>`
 - :doc:`Agent Mode <user_guide/agent_mode>`
 - :doc:`API Reference <user_guide/api>`
+- `Discord <https://discord.gg/JwAWmqE6N>`_
 
 .. toctree::
    :hidden:

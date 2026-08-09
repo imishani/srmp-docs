@@ -91,6 +91,73 @@ the gripper with ``set_gripper_qpos`` instead of ``set_qpos``:
    # set_qpos / plan() are unaffected — they only ever see the arm move-group joints
    move_group_joints = planner.get_move_group_joint_names("my_arm")
 
+Jacobians, Velocity Control & Manipulability
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Beyond joint-space planning, SRMP exposes a link's Jacobian directly — useful for velocity
+control, manipulability/singularity analysis, or anything else built on top of it:
+
+.. code-block:: python
+
+   planner.set_qpos("panda", start_qpos)
+
+   # (6, move_group_dof) Jacobian at the current qpos, world frame
+   J = planner.get_jacobian("panda", "panda_hand")
+
+   # Or at an arbitrary move-group qpos, without touching the robot's real state
+   J_at_q = planner.compute_jacobian("panda", some_other_qpos, "panda_hand")
+
+   # Map a desired end-effector twist [linear; angular] to joint velocities via damped
+   # least squares (damping=0 gives the plain Moore-Penrose pseudo-inverse solution)
+   twist = np.array([0.1, 0.0, 0.0, 0.0, 0.0, 0.0])  # 10 cm/s along world x
+   qdot = planner.compute_joint_velocities("panda", "panda_hand", twist, damping=0.05)
+
+   # Yoshikawa manipulability index (0 at a singularity, higher = more dexterous)
+   manipulability = planner.get_manipulability("panda", "panda_hand")
+
+Screw Motion Planning
+~~~~~~~~~~~~~~~~~~~~~
+
+``plan_screw`` plans a helical (screw) motion for a link — rotation about an axis combined
+with translation along it — by closing the loop on the Jacobian at each small step (a
+resolved-rate/velocity controller, not an IK solve), checking collision and joint limits
+along the way. It's the natural fit for tasks like turning a valve, opening a hinged door,
+or driving a screw/bolt:
+
+.. code-block:: python
+
+   # Pure rotation (pitch=0) about an explicit axis -- e.g. turning a valve 90 degrees
+   traj = planner.plan_screw(
+       "panda", "panda_hand",
+       axis_point=[0.4, 0.0, 0.3],     # a point on the valve's rotation axis, world frame
+       axis_direction=[0, 0, 1],       # axis points straight up
+       angle=np.radians(90),
+   )
+
+   # Or drive straight to a target pose -- the screw connecting the current pose to it
+   # is derived automatically
+   target_pose = srmp.Pose(p=[0.4, 0.1, 0.35], q=[1, 0, 0, 0])
+   traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
+
+``start_qpos`` defaults to the robot's current qpos (:meth:`~srmp.PlannerInterface.get_qpos`)
+if omitted, so you can chain screw motions or mix them with regular ``plan()`` calls without
+tracking the qpos yourself. A nonzero ``pitch`` (linear distance per full revolution) turns
+the same rotate-in-place motion into a true screw thread, e.g. for driving a bolt:
+
+.. code-block:: python
+
+   traj = planner.plan_screw(
+       "panda", "panda_hand",
+       axis_point=[0.4, 0.0, 0.3], axis_direction=[0, 0, 1],
+       pitch=0.002,                     # 2mm of travel per full revolution
+       angle=np.radians(720),           # two full turns
+   )
+
+``plan_screw`` raises ``RuntimeError`` on collision, a joint-limit violation, a kinematic
+singularity (stalled progress), or exceeding ``max_steps`` — wrap it in ``try``/``except``
+if the motion might be infeasible. See :meth:`~srmp.PlannerInterface.plan_screw` for the
+full parameter reference.
+
 Add objects to the environment:
 
 .. code-block:: python
