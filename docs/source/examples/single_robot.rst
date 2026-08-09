@@ -260,7 +260,14 @@ Robots with a gripper (like ``yam``) classify their finger joints separately fro
 move group, so the planner never has to reason about them. Open/close the gripper with
 :meth:`~srmp.PlannerInterface.set_gripper_qpos` before and after planning the arm motion —
 it never affects :meth:`~srmp.PlannerInterface.set_qpos`/:meth:`~srmp.PlannerInterface.plan`,
-which only ever see the arm's move-group joints:
+which only ever see the arm's move-group joints.
+
+A realistic pick-and-place is usually two phases: a search-planned, obstacle-avoiding motion
+to a *pre-grasp* pose, followed by a short, direct final approach into the object. That final
+segment rarely needs a full search plan — it's typically a straight, controlled motion right
+up to the grasp, often combined with a small final twist to align the fingers, which makes it
+a natural fit for :meth:`~srmp.PlannerInterface.plan_screw` instead of another
+:meth:`~srmp.PlannerInterface.plan` call:
 
 .. code-block:: python
 
@@ -285,14 +292,29 @@ which only ever see the arm's move-group joints:
    })
 
    start_state = np.array(robots.get("yam").default_qpos)
+   link_name = robots.get("yam").end_effector
 
-   goal_pose = srmp.Pose()
-   goal_pose.p = np.array([0.3, 0.0, 0.2])
-   goal_pose.q = np.array([0.0, 0.0, 0.0, 1.0])
-   goal_constraint = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
+   # Phase 1: search-plan to a pre-grasp pose, offset back from the object and at a
+   # slightly different orientation than the final grasp
+   pre_grasp_pose = srmp.Pose()
+   pre_grasp_pose.p = np.array([0.2, 0.0, 0.2])
+   pre_grasp_pose.q = np.array([0.2588, 0.0, 0.0, 0.9659])  # 150 degrees about z
+   pre_grasp_goal = srmp.GoalConstraint(srmp.GoalType.POSE, [pre_grasp_pose])
 
-   trajectory = planner.plan(start_state, goal_constraint)
-   print(f"Reached object in {len(trajectory.positions)} waypoints")
+   trajectory = planner.plan(start_state, pre_grasp_goal)
+   print(f"Reached pre-grasp in {len(trajectory.positions)} waypoints")
+   planner.set_qpos(name, trajectory.positions[-1])
+
+   # Phase 2: final approach with plan_screw -- a short translate-and-twist right up to
+   # the object. start_qpos defaults to the robot's current qpos, so it picks up exactly
+   # where phase 1 left off. Still checked for collision and joint limits at every step.
+   grasp_pose = srmp.Pose()
+   grasp_pose.p = np.array([0.3, 0.0, 0.2])
+   grasp_pose.q = np.array([0.0, 0.0, 0.0, 1.0])  # 180 degrees about z
+
+   approach = planner.plan_screw(name, link_name, end_pose=grasp_pose)
+   print(f"Final approach in {len(approach.positions)} steps")
+   planner.set_qpos(name, approach.positions[-1])
 
    # Close the gripper to grasp — arm move-group state is untouched
    planner.set_gripper_qpos(name, [0.0, 0.0])
