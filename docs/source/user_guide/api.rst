@@ -169,17 +169,21 @@ The main interface for robot motion planning.
       :returns: Dictionary mapping robot names to their trajectories
       :rtype: dict
 
-   .. method:: plan_screw(articulation_name, link_name, start_qpos=None, end_pose=None, axis_point=None, axis_direction=None, pitch=0.0, angle=None, qpos_step=0.1, max_steps=10000)
+   .. method:: plan_screw(articulation_name, link_name, start_qpos=None, end_pose=None, axis_point=None, axis_direction=None, pitch=0.0, angle=None, qpos_step=0.1, max_steps=10000, collision_aware=True)
 
       Plan a screw motion for ``link_name`` by closing the loop on its Jacobian — a
       resolved-rate/velocity controller that walks along the screw path in small steps,
-      checking collision (:meth:`is_state_colliding`) and move-group joint limits at every
-      step. No IK/FK solve is involved.
+      checking move-group joint limits at every step and, unless ``collision_aware`` is
+      ``False``, collision as well (:meth:`is_state_colliding`). No IK/FK solve is involved.
 
       Specify the motion in exactly one of two ways:
 
       - ``end_pose``: the target pose for ``link_name``. The unique screw axis/pitch/angle
-        connecting the current pose to it is derived automatically.
+        connecting the current pose to it is derived automatically. A **pure translation**
+        (``end_pose`` has the same orientation as the current pose) is a supported special
+        case: no screw axis exists for it, so the twist is taken directly as
+        ``[delta_p, 0]``. This makes ``plan_screw`` the natural way to run a straight-line
+        approach — see :ref:`screw-translation-only`.
       - ``axis_direction`` + ``angle`` (with optional ``axis_point``/``pitch``): an explicit
         screw — rotate ``angle`` radians about the line through ``axis_point`` (default: the
         current position of ``link_name``) along ``axis_direction``, translating ``pitch``
@@ -202,11 +206,19 @@ The main interface for robot motion planning.
          right-hand rule (axis mode; required)
       :param float qpos_step: Max joint-space step norm per iteration, radians (default: 0.1)
       :param int max_steps: Safety cap on the number of iterations (default: 10000)
+      :param bool collision_aware: Whether to collision-check each step (default: ``True``).
+         Set ``False`` to skip the :meth:`is_state_colliding` call and sweep the path on
+         kinematics alone — useful for a short final approach that deliberately closes on an
+         object, where contact-adjacent configurations would otherwise abort the motion.
+         **Joint limits are still enforced either way**; only the collision check is
+         dropped, so the returned trajectory may pass through obstacles and is your
+         responsibility to validate.
       :returns: Joint-space Trajectory (positions only) tracing the screw motion
       :rtype: Trajectory
-      :raises RuntimeError: Parameters are inconsistent; (pose-to-pose mode) start and end
-         have zero relative rotation; a step would collide or violate a joint limit;
-         progress stalls (kinematic singularity); or ``max_steps`` is exceeded
+      :raises RuntimeError: Parameters are inconsistent; a step would collide (when
+         ``collision_aware``) or violate a joint limit; progress stalls (kinematic
+         singularity); or ``max_steps`` is exceeded. A pose-to-pose call whose start and end
+         differ by a pure translation is supported and does **not** raise.
 
    .. method:: add_box(name, size, pose)
 
@@ -266,6 +278,21 @@ The main interface for robot motion planning.
 
       :param str name: Name of the object to remove
 
+   .. method:: update_object_pose(name, new_pose)
+
+      Move an existing object to a new pose, updating both the collision world and the
+      occupancy grid in place. Use this instead of :meth:`remove_object` followed by a fresh
+      ``add_*`` call — it keeps the object's name, geometry, and any attachment intact, and
+      avoids rebuilding the grid region twice.
+
+      :param str name: Name of the object to move
+      :param Pose new_pose: New world pose of the object
+
+      .. warning::
+
+         Must not be called while a plan is running: it mutates state shared with the
+         collision checker and the heuristics.
+
    .. method:: read_sim(sim, sim_type, articulations=None)
 
       Import objects from a simulation environment.
@@ -273,6 +300,66 @@ The main interface for robot motion planning.
       :param sim: Simulation object
       :param str sim_type: Type of simulator ("sapien", "genesis", "pybullet", "mujoco", "swift")
       :param list articulations: List of articulation names to exclude from import
+      :returns: For SAPIEN, a dict mapping each source actor name to the list of
+         planning-world object names created from it — one actor can contribute several
+         collision shapes, hence a list. ``None`` for backends that do not report it
+         (Genesis, PyBullet, MuJoCo, Swift).
+      :rtype: dict or None
+
+      .. note::
+
+         Imported SAPIEN objects are named ``"<actor>::<shape><n>"`` — e.g.
+         ``"table::box0"``, ``"mug::convex_mesh0"`` — rather than the bare ``"box0"`` /
+         ``"convex_mesh_0"`` used previously. The actor prefix is what makes a generated
+         object traceable back to its source actor, which you need in order to address it
+         later with :meth:`update_object_pose`, :meth:`attach_object`, or
+         :meth:`remove_object`. Prefer the returned dict over reconstructing these names
+         yourself:
+
+         .. code-block:: python
+
+            actor_objects = planner.read_sim(scene, "sapien")
+            for obj_name in actor_objects["mug"]:
+                planner.update_object_pose(obj_name, new_pose)
+
+   .. method:: save_scene(path)
+
+      Write the planning world to ``path`` as a JSON manifest. A ``.npz`` sidecar is written
+      beside it when the scene holds geometry with no file behind it — meshes imported from a
+      simulator, and point clouds. See :doc:`persistence`.
+
+      :param path: Destination for the manifest. Parent directories are created.
+      :returns: The manifest path
+      :rtype: pathlib.Path
+
+   .. method:: load_scene(path, clear=True)
+
+      Rebuild this planner's world from a manifest written by :meth:`save_scene`.
+
+      :param path: The manifest
+      :param bool clear: Reset this planner first (default: ``True``). When ``False``, merge
+         instead — and raise on a name collision rather than silently overwriting.
+
+      .. note::
+
+         A manifest's grid config cannot be applied to an already-constructed planner
+         (planning-world bounds are fixed at construction); a warning is issued if the file
+         has one. Use the module-level :func:`srmp.load_scene` to get a planner *built* with
+         it.
+
+   .. method:: save_plan(path)
+
+      Write the most recent planning episode — the trajectories, start, goal, and planner
+      context from the last :meth:`plan` or :meth:`plan_multi` — to ``path``.
+
+      :param path: Destination. Parent directories are created.
+      :returns: The path written
+      :rtype: pathlib.Path
+      :raises RuntimeError: If :meth:`plan`/:meth:`plan_multi` has not produced a real plan
+         yet. A search that returns zero waypoints does not count, so a failed search cannot
+         be persisted as a file that looks like a success. For a trajectory that did not come
+         from :meth:`plan` — :meth:`plan_screw`, for instance — use the module-level
+         :func:`srmp.save_plan` instead.
 
    .. method:: print_available_planners()
 
@@ -293,6 +380,35 @@ The main interface for robot motion planning.
       Return the list of object names currently present in the planning world.
 
       :returns: List of object names
+
+   .. method:: get_link_names(articulation_name)
+
+      Return every link name for an articulation, in the order the underlying model
+      defines them — so a name's position in this list is its link index.
+
+      :param str articulation_name: Articulation name
+      :returns: List of link names
+      :rtype: list
+
+   .. method:: get_link_index(articulation_name, link_name)
+
+      Resolve a link name to its link index. Useful for the ``link_id`` argument of
+      :meth:`attach_object`.
+
+      :param str articulation_name: Articulation name
+      :param str link_name: Link name
+      :returns: Link index
+      :rtype: int
+
+   .. method:: get_link_pose(articulation_name, link_name)
+
+      World pose of a link at the articulation's **current** qpos. Call :meth:`set_qpos`
+      first to query a different configuration.
+
+      :param str articulation_name: Articulation name
+      :param str link_name: Link name
+      :returns: Pose of the link in the world frame
+      :rtype: Pose
 
    .. method:: has_articulation(name)
 
@@ -589,6 +705,139 @@ The main interface for robot motion planning.
       Detach a previously attached visualizer. The visualizer stops receiving scene updates.
 
       :param VisualizerListener listener: The visualizer/listener to detach
+
+MotionPlanningAgent
+~~~~~~~~~~~~~~~~~~~
+
+The LLM-driven assistant behind :doc:`agent_mode`, usable directly from Python. It pairs an
+LLM backend with a persistent Python executor, so the planner and any variables you build up
+survive across turns.
+
+It is **not** re-exported at the top level, so import it from the subpackage:
+
+.. code-block:: python
+
+   from srmp.agent import MotionPlanningAgent
+
+   with MotionPlanningAgent() as agent:
+       print(agent.run("Add a panda and a table, then plan to a pose above the table"))
+
+.. class:: srmp.agent.MotionPlanningAgent(system_prompt_extra="", backend=..., executor=None, max_tool_iterations=..., execution_timeout=60.0, include_viser=False)
+
+   Supports the context-manager protocol; leaving the ``with`` block calls :meth:`close`.
+
+   :param str system_prompt_extra: Extra context appended to the system prompt
+   :param backend: An LLM backend instance. Omit it to default to ``AnthropicBackend``,
+      which is the right choice for standalone scripting. Pass ``None`` *explicitly* to
+      start without a working backend and hot-swap one in later through the
+      :attr:`backend` setter — what the GUI does before the user picks a provider.
+   :param WorkerExecutor executor: A pre-built executor to share, or ``None`` to create
+      one. See :attr:`executor`.
+   :param int max_tool_iterations: Safety cap on consecutive tool calls in a single turn
+   :param float execution_timeout: Per-call timeout for the code executor, in seconds
+      (default: 60.0)
+   :param bool include_viser: Describe the Viser visualizer API in the system prompt too,
+      so the agent knows it can drive the viewer
+
+   **Methods:**
+
+   .. method:: run(user_prompt, on_tool_output=None)
+
+      Process one user turn, blocking until the LLM produces its final text. The agent may
+      execute Python several times within the turn, up to ``max_tool_iterations``.
+
+      :param str user_prompt: The user's natural-language request
+      :param callable on_tool_output: Optional ``callback(code, result_dict)``, invoked after
+         each tool execution — how the CLI echoes what the agent ran
+      :returns: The LLM's final text response
+      :rtype: str
+      :raises AgentStoppedError: If :meth:`stop` was called during the turn
+
+   .. method:: chat(user_prompt, on_tool_output=None)
+
+      Streaming counterpart to :meth:`run`. Tool calls still execute synchronously; the final
+      response is streamed token-by-token when the backend supports it (Anthropic,
+      OpenAI-compatible) and yielded whole otherwise.
+
+      :param str user_prompt: The user's natural-language request
+      :param callable on_tool_output: Optional ``callback(code, result_dict)``
+      :returns: Generator of string tokens from the final response
+      :rtype: Generator[str, None, None]
+
+      .. note::
+
+         :meth:`stop` does **not** interrupt ``chat()`` — only :meth:`run` checks the stop
+         flag. Use :meth:`run` if you need a turn to be interruptible.
+
+   .. method:: stop()
+
+      Signal the current :meth:`run` to abort once the in-flight LLM call returns, raising
+      :class:`AgentStoppedError` in the thread running the turn. Safe to call from another
+      thread — this is what the GUI's Stop button does. The flag is cleared at the start of
+      the next :meth:`run`.
+
+   .. method:: reset(restart_executor=True)
+
+      Clear the conversation history.
+
+      :param bool restart_executor: Also restart the executor subprocess, wiping all Python
+         state including the planner and any variables (default: ``True``). Pass ``False`` to
+         forget the conversation but keep the world you built.
+
+   .. method:: save_chat(path, scene=None)
+
+      Write this conversation to ``path`` as JSON. See :doc:`persistence`.
+
+      :param path: Destination for the transcript
+      :param str scene: Optional path of the scene this chat ran against, recorded as
+         provenance. It cannot be discovered automatically — the planner lives in the
+         executor subprocess.
+      :returns: The path written
+      :rtype: pathlib.Path
+
+   .. method:: load_chat(path)
+
+      Restore a saved conversation, replacing this agent's history. The messages only: no
+      saved code is re-executed and the executor is not reset, so whatever you had defined
+      before the load is still defined. A note is appended to the system prompt telling the
+      model the transcript came from a file and that the interpreter and planning world may
+      not match what it describes.
+
+      :param path: The transcript file
+
+   .. method:: close()
+
+      Shut down the executor subprocess — but only if this agent created it. An executor
+      passed in through the constructor is left running, since the caller that supplied it
+      owns it.
+
+   **Attributes:**
+
+   .. attribute:: messages
+
+      The conversation so far, as a list of dicts in OpenAI message format. A copy — mutating
+      it does not affect the agent.
+
+   .. attribute:: backend
+
+      The LLM backend. Assignable: setting it hot-swaps the provider and **preserves the
+      conversation history**, which is how the GUI's backend dropdown switches mid-session.
+
+   .. attribute:: executor
+
+      The persistent Python executor holding the planner and your variables. Read-only,
+      exposed so a caller can hand the *same* live executor to another agent instance rather
+      than starting a second subprocess with its own separate planner.
+
+.. exception:: srmp.agent.agent.AgentStoppedError
+
+   Raised by :meth:`~srmp.agent.MotionPlanningAgent.run` when :meth:`stop` was called during
+   the turn. Import it from the module rather than the package — unlike
+   ``MotionPlanningAgent``, it is not listed in ``srmp.agent.__all__``:
+
+   .. code-block:: python
+
+      from srmp.agent.agent import AgentStoppedError
 
 Data Types
 ----------

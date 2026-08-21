@@ -294,8 +294,9 @@ a natural fit for :meth:`~srmp.PlannerInterface.plan_screw` instead of another
    start_state = np.array(robots.get("yam").default_qpos)
    link_name = robots.get("yam").end_effector
 
-   # Phase 1: search-plan to a pre-grasp pose, offset back from the object and at a
-   # slightly different orientation than the final grasp
+   # Phase 1: search-plan to a pre-grasp pose, offset back from the object. The slight
+   # orientation difference from the final grasp is optional -- it just makes phase 2 a
+   # translate-and-twist rather than a straight line; both are supported.
    pre_grasp_pose = srmp.Pose()
    pre_grasp_pose.p = np.array([0.2, 0.0, 0.2])
    pre_grasp_pose.q = np.array([0.2588, 0.0, 0.0, 0.9659])  # 150 degrees about z
@@ -307,7 +308,8 @@ a natural fit for :meth:`~srmp.PlannerInterface.plan_screw` instead of another
 
    # Phase 2: final approach with plan_screw -- a short translate-and-twist right up to
    # the object. start_qpos defaults to the robot's current qpos, so it picks up exactly
-   # where phase 1 left off. Still checked for collision and joint limits at every step.
+   # where phase 1 left off. Joint limits and collision are checked at every step; pass
+   # collision_aware=False if closing on the object trips the collision check.
    grasp_pose = srmp.Pose()
    grasp_pose.p = np.array([0.3, 0.0, 0.2])
    grasp_pose.q = np.array([0.0, 0.0, 0.0, 1.0])  # 180 degrees about z
@@ -319,6 +321,9 @@ a natural fit for :meth:`~srmp.PlannerInterface.plan_screw` instead of another
    # Close the gripper to grasp — arm move-group state is untouched
    planner.set_gripper_qpos(name, [0.0, 0.0])
 
+If the grasp needs no reorientation, give ``end_pose`` the pre-grasp orientation and the
+approach becomes a straight line — see :ref:`screw-translation-only`.
+
 Screw Motion: Turning a Valve
 ------------------------------
 
@@ -326,8 +331,8 @@ Tasks that rotate about (and optionally translate along) an axis — turning a v
 opening a hinged door, driving a screw — are naturally described as a *screw motion*
 rather than a single end-effector pose. :meth:`~srmp.PlannerInterface.plan_screw` walks
 the end effector along that helical path directly, closing the loop on the Jacobian at
-each small step (no IK/FK solve involved), and checks collision and joint limits along
-the way:
+each small step (no IK/FK solve involved), checking joint limits at every step and — unless
+you pass ``collision_aware=False`` — collision as well:
 
 .. code-block:: python
 
@@ -379,13 +384,75 @@ screw automatically:
 .. code-block:: python
 
    target_pose = planner.get_link_pose("panda", "panda_hand")
-   target_pose.p += np.array([0.0, 0.1, 0.0])  # nudge 10 cm sideways
+   target_pose.p += np.array([0.0, 0.1, 0.0])                  # 10 cm sideways
+   target_pose.q = np.array([0.92388, 0.0, 0.0, 0.38268])      # and 45 degrees about z
 
    traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
 
+.. _screw-translation-only:
+
+Translation-only motion
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A target pose that keeps the **current orientation** is a pure translation. No screw axis
+exists for such a motion — any axis parallel to the travel direction reproduces it — so
+``plan_screw`` handles it as a special case, taking the twist directly as
+``[delta_p, 0]``. That makes it the straightforward way to run a straight-line move, with
+no rotation to invent and no IK solve:
+
+.. code-block:: python
+
+   # Straight 10 cm sideways, orientation untouched
+   target_pose = planner.get_link_pose("panda", "panda_hand")
+   target_pose.p += np.array([0.0, 0.1, 0.0])
+
+   traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
+
+This is the usual shape of a final grasp approach: advance along the gripper's approach
+axis without reorienting.
+
+.. code-block:: python
+
+   # Advance 5 cm along the tool's +z, keeping orientation
+   ee_pose = planner.get_link_pose("panda", "panda_hand")
+   approach_dir = ee_pose.to_transformation_matrix()[:3, 2]   # tool +z in world frame
+
+   target_pose = planner.get_link_pose("panda", "panda_hand")
+   target_pose.p += 0.05 * approach_dir
+
+   traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
+
+.. versionchanged:: 0.1.4.7
+
+   Pure translations are supported. Earlier versions raised ``RuntimeError`` ("a screw
+   motion requires a nonzero rotation") whenever ``end_pose`` shared the current
+   orientation, which forced an artificial orientation offset on straight-line moves.
+
+Closing on an object without aborting on contact
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A final approach deliberately drives the gripper *into* contact range, so the per-step
+collision check can abort a motion that is doing exactly what you asked. Pass
+``collision_aware=False`` to sweep the path on kinematics alone:
+
+.. code-block:: python
+
+   traj = planner.plan_screw(
+       "panda", "panda_hand",
+       end_pose=grasp_pose,
+       collision_aware=False,
+   )
+
+Joint limits are still enforced. Only the collision check is dropped, so the returned
+trajectory may pass through obstacles — keep the segment short and validate it yourself
+if anything other than the grasp target is nearby.
+
+.. versionadded:: 0.1.4.7
+   The ``collision_aware`` parameter.
+
 Wrap the call in ``try``/``except`` if the motion might be infeasible — ``plan_screw``
-raises ``RuntimeError`` on collision, a joint-limit violation, a kinematic singularity
-(stalled progress), or exceeding ``max_steps``:
+raises ``RuntimeError`` on collision (when ``collision_aware`` is left on), a joint-limit
+violation, a kinematic singularity (stalled progress), or exceeding ``max_steps``:
 
 .. code-block:: python
 

@@ -155,6 +155,27 @@ The GUI mode provides additional features:
 - **Backend Presets**: Quickly switch between LLM providers via dropdown
 - **Persistent State**: The planner state persists across conversation turns
 - **Stop Button**: Interrupt an in-flight agent run at any time
+- **Save Chat / Load Chat**: Write the conversation to a file and restore it later —
+  see :ref:`agent-chat-persistence` below
+
+.. _agent-chat-persistence:
+
+Saving and Restoring a Conversation
+-----------------------------------
+
+A conversation can be written to a file and picked up again later, from either the Python
+API — see :class:`~srmp.agent.MotionPlanningAgent` in the :doc:`api` for the full agent
+interface — or the GUI's **Save Chat** / **Load Chat** buttons in the **AI Agent** panel:
+
+.. code-block:: python
+
+   agent.save_chat("session.json")
+   agent.save_chat("session.json", scene="bin_picking.json")   # record provenance
+   agent.load_chat("session.json")
+
+Loading restores **the messages only** — no saved code is re-executed, and the Python
+interpreter is not reset. See :doc:`persistence` for what that means in practice and for
+saving scenes and plans alongside the transcript.
 
 How It Works
 ------------

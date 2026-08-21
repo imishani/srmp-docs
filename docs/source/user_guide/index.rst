@@ -9,6 +9,7 @@ User Guide
    robot_registry
    agent_mode
    visualization
+   persistence
    moveit_integration
    api
    data_downloads
