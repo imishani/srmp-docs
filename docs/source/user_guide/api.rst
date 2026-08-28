@@ -9,9 +9,14 @@ PlannerInterface
 
 The main interface for robot motion planning.
 
-.. class:: srmp.PlannerInterface()
+.. class:: srmp.PlannerInterface(grid_config=None)
 
    The primary class for creating and configuring planners.
+
+   :param GridConfig grid_config: Bounds and resolution of the occupancy grid backing the
+      distance field and the BFS heuristic (default: :class:`GridConfig`'s own defaults, a
+      2 m cube at 2 cm resolution). This can only be set at construction — see
+      :class:`GridConfig` for what the defaults mean and when to override them.
 
    **Methods:**
 
@@ -501,6 +506,22 @@ The main interface for robot motion planning.
 
       :returns: Minimum distance to collision (float)
 
+   .. method:: get_grid()
+
+      Get the occupancy grid backing the distance field and the BFS heuristic. The grid is
+      shared with the planner rather than copied, so a handle obtained once reflects every
+      later ``add_*``, :meth:`remove_object`, and :meth:`update_object_pose` call.
+
+      :returns: The planning world's occupancy grid
+      :rtype: OccupancyGrid
+
+      .. code-block:: python
+
+         grid = planner.get_grid()
+         print(grid.bounds, grid.resolution)      # planning volume
+         voxels = grid.get_occupied_voxels()      # (N, 3) obstacle centers
+         clearance = grid.get_distance_from_point(0.5, 0.0, 0.4)
+
    .. method:: set_allowed_collision(name1, name2, allowed)
 
       Set whether collisions between two named objects are allowed.
@@ -914,6 +935,255 @@ Trajectory
       List of joint accelerations along the trajectory
 
       :type: list
+
+
+GridConfig
+~~~~~~~~~~
+
+.. class:: srmp.GridConfig()
+
+   Bounds and resolution of the occupancy grid. Constructed empty and configured by
+   assignment — there is no multi-argument constructor — then passed to
+   :class:`~srmp.PlannerInterface` at construction:
+
+   .. code-block:: python
+
+      config = srmp.GridConfig()
+      config.origin_x, config.origin_y, config.origin_z = -1.5, -1.5, 0.0
+      config.size_x, config.size_y, config.size_z = 3.0, 3.0, 2.0
+      config.resolution = 0.03
+
+      planner = srmp.PlannerInterface(config)
+
+   The grid cannot be reconfigured afterwards. Size it to cover everything the robot can
+   reach: obstacles outside the bounds are simply absent from the grid, so the BFS heuristic
+   and any distance query will not see them.
+
+   **Attributes:**
+
+   .. attribute:: origin_x
+                  origin_y
+                  origin_z
+
+      World coordinates of the grid's minimum corner, in meters. Defaults: -1.0, -1.0, 0.0.
+
+      :type: float
+
+   .. attribute:: size_x
+                  size_y
+                  size_z
+
+      Extent of the grid along each axis, in meters, measured from the origin. Defaults:
+      2.0, 2.0, 2.0.
+
+      :type: float
+
+   .. attribute:: resolution
+
+      Cell side length in meters (default: 0.02). Halving it multiplies both memory and
+      distance-field update cost by roughly eight, so prefer a tighter volume over a finer
+      grid where you can.
+
+      :type: float
+
+   .. attribute:: max_distance
+
+      Distances are propagated only this far, in meters, from an obstacle (default: 0.2).
+      Anything farther reads back as ``max_distance``. Raise it if you need meaningful
+      clearance readings at longer range.
+
+      :type: float
+
+   .. attribute:: ref_counted
+
+      Whether cells count how many objects occupy them (default: True). Needed for removing
+      one object to leave cells that another object also occupies still marked.
+
+      :type: bool
+
+OccupancyGrid
+~~~~~~~~~~~~~
+
+.. class:: srmp.OccupancyGrid
+
+   The voxelized planning world and its distance field. Obtained from
+   :meth:`~srmp.PlannerInterface.get_grid`, never constructed directly.
+
+   The grid is shared with the planner, not a copy, so it reflects every later ``add_*``,
+   :meth:`~srmp.PlannerInterface.remove_object`, and
+   :meth:`~srmp.PlannerInterface.update_object_pose` call. Its contents are read-only from
+   Python: the planner records which voxels belong to which object so that
+   :meth:`~srmp.PlannerInterface.remove_object` can undo an add, and writing to the field
+   directly would desync that bookkeeping. Populate it through the planner's ``add_*``
+   methods.
+
+   .. note::
+
+      Two behaviors are worth knowing before reading distances literally. Objects are
+      voxelized as *surfaces*, so the cells strictly inside a solid box are not marked
+      occupied and the distance at its center is the distance to its nearest face. And the
+      distance field is *bounded*: it propagates in from the grid's own faces as well as
+      from obstacles, so a point near a grid face reports its distance to that face if that
+      is nearer than any obstacle.
+
+   **Properties:**
+
+   .. attribute:: origin
+
+      World coordinates of the grid's minimum corner, as ``(x, y, z)``.
+
+      :type: tuple
+
+   .. attribute:: size
+
+      Extent of the grid in meters, as ``(x, y, z)``.
+
+      :type: tuple
+
+   .. attribute:: bounds
+
+      Axis-aligned world bounds, as ``((min_x, min_y, min_z), (max_x, max_y, max_z))``.
+
+      :type: tuple
+
+   .. attribute:: resolution
+
+      Cell side length in meters.
+
+      :type: float
+
+   .. attribute:: num_cells
+
+      Number of cells along each axis, as ``(x, y, z)``.
+
+      :type: tuple
+
+   .. attribute:: occupied_voxel_count
+
+      Number of cells currently marked occupied.
+
+      :type: int
+
+   .. attribute:: reference_frame
+
+      Name of the frame the grid is expressed in. Read/write; a label only, changing it does
+      not transform anything.
+
+      :type: str
+
+   **Obstacle lookups:**
+
+   Each returns an ``(N, 3)`` float64 array of world-frame voxel centers. The array is
+   always two-dimensional, so ``voxels[:, 0]`` works even on an empty grid.
+
+   .. method:: get_occupied_voxels()
+
+      Get every occupied voxel in the grid.
+
+      :returns: ``(N, 3)`` array of world-frame voxel centers
+      :rtype: numpy.ndarray
+
+   .. method:: get_occupied_voxels(center, radius)
+      :no-index:
+
+      Get the occupied voxels within an axis-aligned cube around a point.
+
+      :param numpy.ndarray center: Cube center ``[x, y, z]``
+      :param float radius: Half the cube's side length, in meters
+      :returns: ``(N, 3)`` array of world-frame voxel centers
+      :rtype: numpy.ndarray
+
+   .. method:: get_occupied_voxels(pose, dims)
+      :no-index:
+
+      Get the occupied voxels within an oriented box.
+
+      :param Pose pose: Pose of the box center
+      :param list dims: Full side lengths of the box, ``[x, y, z]``
+      :returns: ``(N, 3)`` array of world-frame voxel centers
+      :rtype: numpy.ndarray
+      :raises ValueError: If ``dims`` does not have exactly three elements
+
+   **Distance lookups:**
+
+   .. method:: get_distance_from_point(x, y, z)
+
+      Distance from a world point to the nearest occupied cell, clamped to the grid's
+      ``max_distance``.
+
+      :param float x: World x
+      :param float y: World y
+      :param float z: World z
+      :returns: Distance in meters
+      :rtype: float
+
+   .. method:: get_squared_distance_from_point(x, y, z)
+
+      Squared distance from a world point to the nearest occupied cell. Cheaper than
+      :meth:`get_distance_from_point` when you only need to compare distances.
+
+      :returns: Squared distance in meters²
+      :rtype: float
+
+   .. method:: get_distance_to_border(x, y, z)
+
+      Distance from a world point to the nearest grid face, ignoring obstacles. Returns 0.0
+      for a point outside the grid.
+
+      :returns: Distance in meters
+      :rtype: float
+
+   **Cell-indexed lookups:**
+
+   These take integer cell indices rather than meters. They are named apart from the metric
+   methods above deliberately: an overload would dispatch on argument type alone, so
+   ``is_in_bounds(0, 0, 1)`` written for world coordinates would silently be read as cell
+   indices.
+
+   .. method:: get_cell_distance(i, j, k)
+
+      Distance from a cell to the nearest occupied cell, in meters.
+
+      :param int i: Cell index along x
+      :param int j: Cell index along y
+      :param int k: Cell index along z
+      :rtype: float
+
+   .. method:: get_cell_distance_to_border(i, j, k)
+
+      Distance from a cell to the nearest grid face, in meters. Returns 0.0 for a cell
+      outside the grid.
+
+      :rtype: float
+
+   .. method:: is_cell_in_bounds(i, j, k)
+
+      Whether cell indices fall inside the grid.
+
+      :rtype: bool
+
+   **Coordinate conversions:**
+
+   .. method:: grid_to_world(i, j, k)
+
+      World coordinates of a cell's center.
+
+      :returns: ``(x, y, z)``
+      :rtype: tuple
+
+   .. method:: world_to_grid(x, y, z)
+
+      Indices of the cell containing a world point. The result is not clamped — it can be
+      out of bounds. Pair it with :meth:`is_cell_in_bounds` when the point may be outside.
+
+      :returns: ``(i, j, k)``
+      :rtype: tuple
+
+   .. method:: is_in_bounds(x, y, z)
+
+      Whether a world point falls inside the grid.
+
+      :rtype: bool
 
 
 Robot Registry

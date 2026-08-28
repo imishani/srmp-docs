@@ -420,6 +420,56 @@ Supported geometric primitives:
 - **Meshes**: `add_mesh(name, mesh_path, scale, pose)`
 - **Point Clouds**: `add_point_cloud(name, vertices, resolution)`
 
+The Planning Volume
+~~~~~~~~~~~~~~~~~~~
+
+Everything you add is voxelized into an occupancy grid, which backs both the distance field
+and the BFS heuristic. The default grid is a 2 m cube at 2 cm resolution, spanning
+``x, y ∈ [-1, 1]`` and ``z ∈ [0, 2]``. That covers a table-top arm, but not a mobile base or
+a robot on a rail — **obstacles outside the bounds are simply absent from the grid**, so the
+heuristic will not see them. Size the volume at construction, which is the only time it can
+be set:
+
+.. code-block:: python
+
+   config = srmp.GridConfig()
+   config.origin_x, config.origin_y, config.origin_z = -1.5, -1.5, 0.0
+   config.size_x, config.size_y, config.size_z = 3.0, 3.0, 2.0
+   config.resolution = 0.03
+
+   planner = srmp.PlannerInterface(config)
+
+Halving the resolution multiplies memory and distance-field update cost by roughly eight, so
+prefer tightening the volume over refining the grid.
+
+``get_grid()`` hands back the live grid — useful for sanity-checking that your scene lands
+where you think it does, for clearance queries, and for rendering the world the planner
+actually sees:
+
+.. code-block:: python
+
+   grid = planner.get_grid()
+
+   print(grid.bounds)         # ((-1.5, -1.5, 0.0), (1.5, 1.5, 2.0))
+   print(grid.num_cells)      # (100, 100, 67)
+
+   # Every obstacle voxel, as an (N, 3) array of world-frame centers
+   voxels = grid.get_occupied_voxels()
+
+   # Clearance at a point, and just the obstacles near it
+   print(grid.get_distance_from_point(0.5, 0.0, 0.4))
+   nearby = grid.get_occupied_voxels(np.array([0.5, 0.0, 0.4]), 0.2)
+
+The grid is shared with the planner rather than copied, so one handle stays current across
+later ``add_*`` and ``remove_object`` calls. It is read-only from Python — add obstacles
+through the planner, not the grid, so that ``remove_object`` can still undo them.
+
+Two things to know before reading distances literally. Objects are voxelized as *surfaces*,
+so the cells strictly inside a solid box are not marked occupied and the distance at its
+center is the distance to its nearest face. And the distance field is *bounded*: it
+propagates in from the grid's own faces as well as from obstacles, so a point near a grid
+face reports its distance to that face when that is the nearer of the two.
+
 See the :doc:`API <api>` for detailed method signatures and additional functionality.
 
 Troubleshooting Installation
