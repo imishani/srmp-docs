@@ -206,6 +206,84 @@ This example shows how to plan to specific end-effector poses rather than joint 
    print(f"Trajectory length: {len(trajectory.positions)}")
 
 
+.. _collision-aware-ik:
+
+Collision-Aware IK
+------------------
+
+Sometimes you want the *joint configuration* behind a pose rather than a plan to it — to
+seed another routine, to check a grasp is achievable before committing to it, or to turn a
+pose goal into a joint goal. :meth:`~srmp.PlannerInterface.compute_ik` answers that
+kinematically, but it does not look at the planning world and will return configurations
+that drive the arm through obstacles.
+:meth:`~srmp.PlannerInterface.collision_aware_ik` samples IK solutions with escalating
+random restarts and returns only ones that are collision-free:
+
+.. code-block:: python
+
+   import srmp
+   import numpy as np
+
+   planner = srmp.PlannerInterface()
+   planner.add_robot("panda")
+   planner.make_planner(["panda"], {
+       "planner_id": "wAstar",
+       "heuristic": "bfs",
+       "weight": "10."
+   })
+
+   start_state = np.radians([0, -45, 0, -135, 0, 90, 45])
+   planner.set_qpos("panda", start_state)
+
+   # A shelf right above the target -- plain compute_ik would happily solve into it
+   shelf_pose = srmp.Pose()
+   shelf_pose.p = np.array([0.55, -0.1, 0.62])
+   planner.add_box("shelf", np.array([0.4, 0.6, 0.02]), shelf_pose)
+
+   target_pose = srmp.Pose()
+   target_pose.p = np.array([0.55, -0.1, 0.45])
+   target_pose.q = np.array([0.0, 1.0, 0.0, 0.0])
+
+   q, status = planner.collision_aware_ik("panda", target_pose, start_state)
+
+   if status == "found":
+       # Turn the pose into a joint goal -- the planner now searches to a configuration
+       # already known to be reachable and collision-free
+       goal = srmp.GoalConstraint(srmp.GoalType.JOINTS, [q])
+       trajectory = planner.plan(start_state, goal)
+       print(f"Planned {len(trajectory.positions)} waypoints to the IK solution")
+   elif status == "blocked":
+       print("Reachable, but every IK solution collides -- clear the shelf or re-grasp")
+   else:  # "unreachable"
+       print("No IK solution exists -- move the base or pick a different target")
+
+Distinguishing ``'blocked'`` from ``'unreachable'`` is the point of the ``status`` return: a
+bare failure flag cannot tell you whether to move the obstacle or move the robot.
+
+The search escalates its seeds instead of jumping straight to random restarts — first
+``q_seed`` itself, then ``perturbation_steps`` attempts with growing Gaussian noise (up to
+``perturbation_sigma_max`` radians), then uniform samples within the joint limits. That
+biases the answer toward configurations near ``q_seed``. By default it returns the first
+collision-free solution found within ``timeout``; ``best_of=True`` spends the whole budget
+and returns the one closest to ``q_seed`` instead:
+
+.. code-block:: python
+
+   # A hard pose in a cluttered scene: search longer, stay near the current configuration
+   q, status = planner.collision_aware_ik(
+       "panda", target_pose, planner.get_qpos("panda"),
+       timeout=0.25,
+       perturbation_steps=10,
+       perturbation_sigma_max=0.5,
+       best_of=True,
+   )
+
+On success the robot is left at the returned configuration, so you can chain straight into
+:meth:`~srmp.PlannerInterface.plan_screw` or a gripper action without another
+:meth:`~srmp.PlannerInterface.set_qpos`. On failure it is restored to the configuration it
+held when the call started. Attached visualizers see only that final state — not the
+rejected candidates checked along the way.
+
 Trajectory Analysis
 -------------------
 
@@ -323,6 +401,11 @@ a natural fit for :meth:`~srmp.PlannerInterface.plan_screw` instead of another
 
 If the grasp needs no reorientation, give ``end_pose`` the pre-grasp orientation and the
 approach becomes a straight line — see :ref:`screw-translation-only`.
+
+To check up front that the grasp pose is actually achievable in the current scene — and, if
+it is not, whether the problem is reach or clutter — run
+:meth:`~srmp.PlannerInterface.collision_aware_ik` on it before planning phase 1. See
+:ref:`collision-aware-ik`.
 
 Screw Motion: Turning a Valve
 ------------------------------

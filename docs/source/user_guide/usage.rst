@@ -91,6 +91,59 @@ the gripper with ``set_gripper_qpos`` instead of ``set_qpos``:
    # set_qpos / plan() are unaffected — they only ever see the arm move-group joints
    move_group_joints = planner.get_move_group_joint_names("my_arm")
 
+Collision-Aware IK
+~~~~~~~~~~~~~~~~~~
+
+:meth:`~srmp.PlannerInterface.compute_ik` is purely kinematic — it will happily return a
+configuration that puts the arm through the table. ``collision_aware_ik`` wraps it in
+rejection sampling with random restarts and returns only solutions that are also
+collision-free in the current planning world:
+
+.. code-block:: python
+
+   grasp_pose = srmp.Pose(p=[0.4, 0.1, 0.35], q=[1, 0, 0, 0])
+
+   q, status = planner.collision_aware_ik("panda", grasp_pose, planner.get_qpos("panda"))
+
+   if status == "found":
+       goal = srmp.GoalConstraint(srmp.GoalType.JOINTS, [q])
+       traj = planner.plan(start_state, goal)
+
+The returned ``status`` distinguishes the two ways a pose can fail, which a bare
+success/failure flag cannot:
+
+- ``'found'`` — ``q`` is a valid, collision-free configuration.
+- ``'unreachable'`` — IK consistently failed; the pose is kinematically infeasible for this
+  arm. Move the base or pick a different target.
+- ``'blocked'`` — IK succeeded, but every solution found was in collision. The pose *is*
+  reachable; something is in the way, so clear the obstacle or try a different grasp.
+
+Restarts escalate rather than jumping straight to random seeds, so a solution near
+``q_seed`` is preferred when one exists: the first attempt uses ``q_seed`` itself, the next
+``perturbation_steps`` attempts add Gaussian noise of growing magnitude (up to
+``perturbation_sigma_max``), and later attempts sample uniformly within the joint limits.
+The search runs until ``timeout`` (default 50 ms) expires, or stops at the first
+collision-free solution. Pass ``best_of=True`` to spend the whole budget instead and return
+the collision-free solution *closest* to ``q_seed`` — worth it when you want the smallest
+joint-space move rather than the fastest answer:
+
+.. code-block:: python
+
+   q, status = planner.collision_aware_ik(
+       "panda", grasp_pose, planner.get_qpos("panda"),
+       timeout=0.2,                  # spend more time searching
+       perturbation_steps=10,        # more nearby seeds before going fully random
+       perturbation_sigma_max=0.5,
+       best_of=True,                 # return the solution nearest q_seed
+   )
+
+On success the robot is left at the returned configuration; on failure it is restored to
+the configuration it was in when the call started. The candidates rejected along the way
+are never broadcast to attached visualizers, so a viewer only ever sees the final state.
+
+For a worked example — including using the ``status`` to tell reach problems from clutter —
+see :ref:`collision-aware-ik`.
+
 Jacobians, Velocity Control & Manipulability
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

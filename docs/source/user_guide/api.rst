@@ -624,9 +624,72 @@ The main interface for robot motion planning.
       Compute inverse kinematics (CLIK) for a desired end-effector pose.
 
       :param str articulation_name: Articulation name
-      :param list ee_pose: Desired end-effector pose [x, y, z, roll, pitch, yaw]
+      :param ee_pose: Desired end-effector pose — either a :class:`Pose`, or a list
+         ``[x, y, z, roll, pitch, yaw]``
       :param list init_state_val: Initial joint configuration for IK solver
       :returns: Tuple `(success: bool, joint_state: list)`
+
+      .. note::
+
+         This is a purely kinematic solve — the result may well be in collision with the
+         planning world. Use :meth:`collision_aware_ik` when the solution has to be usable.
+
+   .. method:: collision_aware_ik(articulation_name, ee_pose, q_seed, timeout=0.05, perturbation_steps=5, perturbation_sigma_max=0.3, best_of=False)
+
+      Collision-aware IK: rejection sampling over :meth:`compute_ik` with random restarts,
+      returning only configurations that are also collision-free
+      (:meth:`is_state_colliding`). Plain :meth:`compute_ik` is purely kinematic and will
+      happily hand back a solution that puts the arm through a table — use this when the
+      solution has to be usable in the current planning world.
+
+      The restart schedule escalates rather than jumping straight to uniform random seeds,
+      which keeps the solution near ``q_seed`` when a nearby one exists:
+
+      - attempt 0 — ``q_seed`` itself (stay in the current IK basin)
+      - attempts 1 … ``perturbation_steps`` — ``q_seed`` plus Gaussian noise whose standard
+        deviation grows linearly to ``perturbation_sigma_max``, clipped to the joint limits
+      - later attempts — uniform random within the move-group joint limits
+
+      Attempts continue until ``timeout`` expires (or, unless ``best_of``, until the first
+      collision-free solution is found). If IK itself keeps failing while nothing has yet
+      been rejected for collision, the search bails out early and reports ``'unreachable'``
+      instead of burning the full budget on a pose no seed can reach.
+
+      **State side effects:** on success the articulation is left at the returned
+      configuration (listeners/visualizers are notified once, for that final state only —
+      the intermediate candidates it collision-checks are not broadcast). On failure the
+      articulation is restored to the configuration it was in when the call started.
+
+      :param str articulation_name: Name of the planned articulation
+      :param ee_pose: Desired end-effector pose — either a :class:`Pose`, or a list
+         ``[x, y, z, roll, pitch, yaw]`` (same forms :meth:`compute_ik` accepts)
+      :param q_seed: Initial move-group joint configuration to seed and bias the search
+         toward (same order as :meth:`set_qpos`/:meth:`plan`)
+      :param float timeout: Wall-clock budget in seconds for the whole search
+         (default: ``0.05``)
+      :param int perturbation_steps: How many noisy-seed attempts before switching to fully
+         random re-seeds (default: ``5``)
+      :param float perturbation_sigma_max: Max standard deviation (radians) of the Gaussian
+         perturbation, reached at the last perturbation step (default: ``0.3``)
+      :param bool best_of: If ``True``, spend the full ``timeout`` collecting solutions and
+         return the collision-free one closest to ``q_seed`` (smallest joint-space
+         distance) instead of the first one found (default: ``False``)
+      :returns: ``(q, status)``. ``status`` is ``'found'`` (``q`` is a valid, collision-free
+         configuration), ``'unreachable'`` (IK consistently failed — the pose is
+         kinematically infeasible for this arm), or ``'blocked'`` (IK succeeded but every
+         solution found was in collision). ``q`` is ``None`` unless ``status`` is
+         ``'found'``.
+      :rtype: tuple
+
+      .. code-block:: python
+
+         q, status = planner.collision_aware_ik("panda", grasp_pose, planner.get_qpos("panda"))
+         if status == "found":
+             traj = planner.plan(start_state, srmp.GoalConstraint(srmp.GoalType.JOINTS, [q]))
+         elif status == "blocked":
+             print("pose is reachable but every IK solution collides — clear the scene or re-grasp")
+         else:
+             print("pose is out of reach for this arm")
 
    .. method:: get_jacobian(articulation_name, link_name, local=False, move_group_only=True)
 
