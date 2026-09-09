@@ -67,6 +67,9 @@ The following robots are available in the registry:
    * - ``fetch``
      - Fetch mobile manipulator: holonomic base + torso lift + 7-DOF arm + gripper
      - ``gripper_link``
+   * - ``ridgeback_ur10e``
+     - Clearpath Ridgeback omnidirectional base + UR10e arm + Robotiq 2F-85 gripper (base x, y, theta + 6 arm joints)
+     - ``ur_arm_TCP``
    * - ``xlerobot``
      - XLeRobot bimanual mobile manipulator: holonomic base + dual SO-100-style arms + head (single end effector only)
      - ``Fixed_Jaw``
@@ -112,6 +115,31 @@ The following robots are available in the registry:
    * - ``ur16e``
      - Universal Robots UR16e 6-DOF manipulator, higher payload variant of UR10e (no gripper)
      - ``tool0``
+
+Mobile manipulators
+~~~~~~~~~~~~~~~~~~~
+
+``fetch`` and ``ridgeback_ur10e`` carry their base as ordinary joints (``x``, ``y`` prismatic
+and a yaw joint) at the front of the planning group, so the start state and joint goals are
+``[x, y, theta, arm...]`` in metres and radians. SRMP recognises such a group and configures
+itself:
+
+- the occupancy grid grows to the base's limits (plus 1.5 m) at 5 cm when the robot is added,
+  unless the ``PlannerInterface`` was built with a ``GridConfig`` that already covers them;
+- with no ``mprim_path`` the planners compose the omnidirectional-base primitives (0.4 m and
+  10 degree steps, 0.1 m and 2 degree short steps) with the arm's own file, priced in seconds;
+- the ``bfs`` heuristic adds a floor wavefront over the base footprint, so a knee-high obstacle
+  the arm passes over still sends the base around it. Tune it with ``base_footprint_radius``,
+  ``base_height`` and ``arm_reach`` (metres) in the planner context.
+
+.. code-block:: python
+
+   planner = srmp.PlannerInterface()
+   name = planner.add_robot("ridgeback_ur10e")
+   planner.make_planner([name], {"planner_id": "wAstar", "heuristic": "bfs", "weight": "50"})
+   start = np.array([0, 0, 0, 0, -1.0472, -2.0071, 0, 1.5708, 0])        # base at the origin
+   goal = srmp.GoalConstraint(srmp.GoalType.JOINTS, np.array([[2.0, 0, 0, 0, -1.0472, -2.0071, 0, 1.5708, 0]]))
+   traj = planner.plan(start, goal)                                        # drives the base 2 m
 
 Using the Registry
 ------------------
@@ -162,7 +190,7 @@ View what robots are available:
    available = robots.list_available()
    print(available)
    # {'remote': ['panda', 'panda_on_rail', 'panda_stick', 'panda_wristcam', 'so101', 'so107',
-   #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot',
+   #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot', 'ridgeback_ur10e',
    #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite',
    #             'yam', 'yam_pro', 'yam_ultra', 'big_yam',
    #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e'],

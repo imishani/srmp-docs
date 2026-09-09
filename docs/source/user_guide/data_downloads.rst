@@ -39,6 +39,7 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`xarm6_robotiq.tar.gz <../_static/robots/xarm6_robotiq.tar.gz>` - UFactory XArm6 6-DOF manipulator with Robotiq 2F-85 gripper
 - :download:`widowxai.tar.gz <../_static/robots/widowxai.tar.gz>` - Trossen Robotics WidowX AI 6-DOF manipulator with gripper
 - :download:`fetch.tar.gz <../_static/robots/fetch.tar.gz>` - Fetch mobile manipulator (holonomic base + torso + 7-DOF arm + gripper)
+- :download:`ridgeback_ur10e.tar.gz <../_static/robots/ridgeback_ur10e.tar.gz>` - Clearpath Ridgeback omnidirectional base + UR10e arm + Robotiq 2F-85 gripper
 - :download:`xlerobot.tar.gz <../_static/robots/xlerobot.tar.gz>` - XLeRobot bimanual mobile manipulator (holonomic base + dual arms + head)
 - :download:`kinova_gen3.tar.gz <../_static/robots/kinova_gen3.tar.gz>` - Kinova Gen3 7-DOF manipulator with vision module
 - :download:`kinova_gen3_6dof.tar.gz <../_static/robots/kinova_gen3_6dof.tar.gz>` - Kinova Gen3 6-DOF manipulator with vision module

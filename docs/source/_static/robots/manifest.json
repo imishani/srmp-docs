@@ -262,6 +262,16 @@
       "default_qpos": [0, 0, 0, 0, 0, 0],
       "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
                       "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    },
+    "ridgeback_ur10e": {
+      "archive": "ridgeback_ur10e.tar.gz",
+      "urdf": "ridgeback_ur10e/ridgeback_ur10e.urdf",
+      "srdf": "ridgeback_ur10e/ridgeback_ur10e.srdf",
+      "end_effector": "ur_arm_TCP",
+      "description": "Clearpath Ridgeback omnidirectional base + UR10e arm + Robotiq 2F-85 gripper (9-DOF planning group: base x, y, theta + 6 arm joints)",
+      "default_qpos": [0, 0, 0, 0, -1.0472, -2.0071, 0, 1.5708, 0],
+      "joint_names": ["x", "y", "theta", "ur_arm_shoulder_pan_joint", "ur_arm_shoulder_lift_joint", "ur_arm_elbow_joint", "ur_arm_wrist_1_joint", "ur_arm_wrist_2_joint", "ur_arm_wrist_3_joint"],
+      "gripper_joint_names": ["left_outer_knuckle_joint", "left_inner_knuckle_joint", "left_inner_finger_joint", "right_outer_knuckle_joint", "right_inner_knuckle_joint", "right_inner_finger_joint"]
     }
   }
 }
