@@ -57,10 +57,9 @@ Here's a complete example of planning for two Panda robots:
        "low_level_focal_suboptimality": "1.0",
    }
 
-   # Add robot-specific parameters (heuristics and timed mprims)
+   # Per-robot heuristics (optional; timed motion primitives are the default)
    for i, name in enumerate(articulation_names):
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
@@ -137,7 +136,6 @@ This example shows coordination between three robots:
 
    for name in robot_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
@@ -203,7 +201,7 @@ This example shows how to use different goal types for different robots:
    pose1.q = np.array([0, 0, 0, 1])
    planner.set_base_pose("panda1", pose1)
 
-   # Configure planner (use per-robot heuristics and timed motion primitives)
+   # Configure planner (per-robot heuristics; timed motion primitives are the default)
    articulation_names = ["panda0", "panda1"]
    planner_context = {
        "planner_id": "xECBS",
@@ -213,7 +211,6 @@ This example shows how to use different goal types for different robots:
    }
    for name in articulation_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
@@ -223,29 +220,33 @@ This example shows how to use different goal types for different robots:
        "panda1": np.radians([0, -45, 0, -135, 0, 90, 45])
    }
 
-   # Mixed goal types: joint space for panda0, end-effector pose for panda1
+   # A joint goal for panda0, and an end-effector pose for panda1. Multi-robot
+   # planners take joint goals only, so turn the pose into joints with IK first.
    goal_constraints = {}
 
-   # Joint space goal for panda0
    goal_joints = np.radians([45, -30, 0, -120, 0, 90, 0])
    goal_constraints["panda0"] = srmp.GoalConstraint(
        srmp.GoalType.JOINTS, [goal_joints]
    )
 
-   # End-effector pose goal for panda1
+   # World-frame pose, gripper pointing down. IK takes world-frame poses, so
+   # panda1's moved and turned base needs no conversion.
    goal_pose = srmp.Pose()
-   goal_pose.p = np.array([0.5, 0.2, 0.6])
-   goal_pose.q = np.array([0, 0, 0, 1])
+   goal_pose.p = np.array([0.2, 0.2, 0.5])
+   goal_pose.q = np.array([0, 1, 0, 0])
+   q_goal, status = planner.collision_aware_ik(
+       "panda1", goal_pose, start_states["panda1"], timeout=0.5
+   )
+   assert status == "found", status
    goal_constraints["panda1"] = srmp.GoalConstraint(
-       srmp.GoalType.POSE, [goal_pose]
+       srmp.GoalType.JOINTS, [np.asarray(q_goal)]
    )
 
-   # Plan with mixed goals
    trajectories = planner.plan_multi(start_states, goal_constraints)
 
    print("Mixed goal planning results:")
    print(f"  panda0 (joint goal): {len(trajectories['panda0'].positions)} waypoints")
-   print(f"  panda1 (pose goal): {len(trajectories['panda1'].positions)} waypoints")
+   print(f"  panda1 (pose goal via IK): {len(trajectories['panda1'].positions)} waypoints")
 
 Collision Avoidance Between Robots
 -----------------------------------
@@ -290,7 +291,6 @@ This example demonstrates collision avoidance between robots working in close pr
    }
    for name in articulation_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 

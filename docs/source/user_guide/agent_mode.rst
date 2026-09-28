@@ -5,16 +5,21 @@ SRMP provides an **Agent Mode** - an LLM-powered motion planning assistant that 
 
 .. note::
 
-   Agent Mode requires an LLM API key. By default, it uses Google's Gemini (free tier available).
+   Agent Mode needs an LLM: an API key for a cloud backend, a local Ollama model, or a
+   logged-in ``claude`` CLI for the Claude Agent SDK backend. By default it uses Google's
+   Gemini (free tier available).
 
 Installation
 ------------
 
-Agent Mode requires additional dependencies:
+Install the client library for the backend you want:
 
 .. code-block:: console
 
-   (.venv) $ pip install openai
+   (.venv) $ pip install "srmp[agent]"        # Gemini (the default)
+   (.venv) $ pip install anthropic            # Claude via the Anthropic API
+   (.venv) $ pip install openai               # OpenAI, Groq and Ollama
+   (.venv) $ pip install claude-agent-sdk     # Claude Agent SDK (see below)
 
 Set up your API key:
 
@@ -68,8 +73,8 @@ Here's an example conversation with the agent. Robots, obstacles, and planner se
 The agent understands the full SRMP API and can:
 
 - Load robot models (URDF/SRDF)
-- Add obstacles (boxes, spheres, meshes, point clouds)
-- Configure planners (wA*, ARA*, xECBS, etc.)
+- Add obstacles (boxes, spheres, meshes, point clouds), with colors
+- Configure planners (wA*, ARA*, MGS, xECBS, etc.)
 - Plan single and multi-robot motions
 - Compute forward/inverse kinematics
 - Attach/detach objects to end-effectors
@@ -84,14 +89,25 @@ Both CLI and GUI modes support the following options:
    (.venv) $ python -m srmp.agent.cli [OPTIONS]
    (.venv) $ python -m srmp.agent.gui [OPTIONS]
 
-Available options:
+Options for both modes:
 
-- ``--backend {gemini|ollama|groq|anthropic|openai}`` - Select the LLM backend (default: gemini)
-- ``--model MODEL_NAME`` - Specify a particular model (e.g., ``claude-sonnet-4-20250514``)
-- ``--context "TEXT"`` - Pre-populate context with URDF paths or robot information
-- ``--timeout SECONDS`` - Timeout for code execution (default: 30)
-- ``--max-iters N`` - Maximum agent iterations per request (default: 20)
-- ``--no-stream`` - Disable streaming output
+- ``--backend`` - The LLM backend (default: ``gemini``). The CLI accepts ``gemini``,
+  ``ollama``, ``groq``, ``anthropic``, ``openai`` and ``claude-agent-sdk``; the GUI accepts
+  the same list except ``claude-agent-sdk``, which you pick from its **Model** dropdown.
+- ``--model MODEL_NAME`` - A specific model (default: the backend's own default)
+- ``--api-key KEY`` / ``--base-url URL`` - Override the API key or endpoint
+- ``--context "TEXT"`` - Extra text for the system prompt, such as URDF paths
+- ``--timeout SECONDS`` - Advisory timeout per code execution (default: 60 in the CLI,
+  120 in the GUI). The GUI runs code in-process and cannot enforce it.
+- ``--max-iters N`` - Maximum tool calls per request, for every backend (default: 50).
+  A request that hits the limit stops with a message saying so; send ``continue`` to pick
+  up where it left off.
+- ``--port PORT`` - Viser server port (default: 8080)
+
+CLI only:
+
+- ``--viser`` - Open a 3D viewer next to the terminal session
+- ``--no-stream`` - Wait for the full response instead of streaming it
 
 Supported LLM Backends
 ----------------------
@@ -111,6 +127,19 @@ Agent Mode supports multiple LLM providers:
 +-------------+------------------+-------------------------------------------+
 | Ollama      | (local)          | Local models, no API key needed           |
 +-------------+------------------+-------------------------------------------+
+| Claude      | (none)           | Claude Agent SDK harness; uses your       |
+| Agent SDK   |                  | logged-in ``claude`` CLI                  |
++-------------+------------------+-------------------------------------------+
+
+Claude Agent SDK
+~~~~~~~~~~~~~~~~
+
+The Claude Agent SDK backend runs the full Claude Agent SDK harness instead of SRMP's own
+tool-calling loop. It authenticates through your existing ``claude`` CLI login
+(subscription or API key), so it needs no ``ANTHROPIC_API_KEY``. In the GUI, choose
+**Claude Agent SDK** in the **Model** dropdown; in the CLI, pass
+``--backend claude-agent-sdk``. It keeps its own session, so switching to or from it starts
+a new conversation; the 3D scene is kept.
 
 Using Ollama for Local Inference
 --------------------------------
@@ -150,8 +179,11 @@ GUI Features
 
 The GUI mode provides additional features:
 
-- **3D Visualization**: See robots and obstacles in a web-based Viser viewer
+- **3D Visualization**: See robots and obstacles in a web-based Viser viewer. The agent
+  works in this viewer; it does not open a second one.
 - **Live Trajectory Animation**: Watch planned trajectories execute in real-time
+- **Readable Replies**: Replies render as markdown, including tables, and each code step
+  the agent ran can be expanded to show the code and its output
 - **Backend Presets**: Quickly switch between LLM providers via dropdown
 - **Persistent State**: The planner state persists across conversation turns
 - **Stop Button**: Interrupt an in-flight agent run at any time
@@ -190,6 +222,6 @@ Agent Mode uses a tool-calling loop:
    - Provide a final answer
 
 4. Code execution results are fed back to the LLM for reasoning
-5. The loop continues until the task is complete
+5. The loop continues until the task is complete, or until ``--max-iters`` tool calls
 
 The agent maintains persistent state, so variables and the planner object persist across conversation turns. This allows for iterative development and debugging.

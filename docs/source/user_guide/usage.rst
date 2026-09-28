@@ -113,10 +113,16 @@ The returned ``status`` distinguishes the two ways a pose can fail, which a bare
 success/failure flag cannot:
 
 - ``'found'`` — ``q`` is a valid, collision-free configuration.
-- ``'unreachable'`` — IK consistently failed; the pose is kinematically infeasible for this
+- ``'unreachable'`` — IK never succeeded; the pose is kinematically infeasible for this
   arm. Move the base or pick a different target.
-- ``'blocked'`` — IK succeeded, but every solution found was in collision. The pose *is*
-  reachable; something is in the way, so clear the obstacle or try a different grasp.
+- ``'blocked'`` — IK reached the pose at least once, but every solution found was in
+  collision. The pose *is* reachable; something is in the way, so clear the obstacle or try
+  a different grasp.
+
+Target poses are in the world frame, the frame :meth:`~srmp.PlannerInterface.compute_fk`
+returns, for both ``compute_ik`` and ``collision_aware_ik``. That holds for a robot whose
+base has been moved with :meth:`~srmp.PlannerInterface.set_base_pose` too, so an FK pose
+can be fed straight back into IK.
 
 Restarts escalate rather than jumping straight to random seeds, so a solution near
 ``q_seed`` is preferred when one exists: the first attempt uses ``q_seed`` itself, the next
@@ -360,7 +366,6 @@ Configure multi-robot planner:
    }
    for name in articulation_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
@@ -447,7 +452,7 @@ SRMP provides several search-based planning algorithms:
 - **MHAstar**: Multi-heuristic A* - Uses multiple heuristics for better performance
 - **wPASE**: Weighted PASE - Parallel search for improved performance
 - **Astar**: Standard A* - Optimal but potentially slower
-- **E-CBS**: Enhanced Conflict-Based Search - For multi-robot coordination
+- **ECBS**: Enhanced Conflict-Based Search - For multi-robot coordination
 - **xECBS**: Experience Accelerated Conflict-Based Search - For multi-robot coordination
 
 You can view available planners programmatically:

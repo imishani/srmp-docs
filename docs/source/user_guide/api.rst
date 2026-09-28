@@ -99,7 +99,8 @@ The main interface for robot motion planning.
 
       **Single Robot Planner Context Options:**
 
-      Available single-robot planners: "Astar", "wAstar", "ARAstar", "MHAstar", "wPASE"
+      Available single-robot planners: "Astar", "wAstar", "ARAstar", "MHAstar", "wPASE",
+      "MGS", "vamp_rrtc"
 
       **General Parameters:**
 
@@ -107,6 +108,8 @@ The main interface for robot motion planning.
       - ``resolution`` (string): Joint angle discretization in degrees. Default: "1"
       - ``mprim_path`` (string): Path to motion primitives file. Default: auto-generated based on DOF
       - ``time_limit`` or ``allowed_planning_time`` (string): Planning time limit in seconds. Default: "10"
+      - ``validity_backend`` (string): What checks states and motions for collisions — "coal"
+        (default), "vamp" or "auto". See *Validity backends* below.
 
       **Planner-Specific Parameters:**
 
@@ -134,27 +137,103 @@ The main interface for robot motion planning.
         - ``i_weight`` (string): Secondary heuristic weight. Default: "100.0"
         - ``num_threads`` (string): Number of parallel threads. Default: "4"
 
+      *Multi-Graph Search ("MGS"):*
+        Grows a start graph and a goal graph, adds extra graphs rooted at IK solutions of the
+        BFS heuristic's workspace attractors, and connects them. The extra graphs help it out
+        of the local minima that stall a single weighted search. :meth:`get_mgs_roots` reports
+        the roots it added; the viser GUI can draw them (see :doc:`visualization`).
+
+        - ``heuristic`` (string): State-to-state heuristic between graph roots. Default:
+          "joint_steps" (joint distance in discretization steps). "bfs" is rejected, since it
+          cannot measure the distance between two states. "joint_time_floor" suits mobile
+          manipulators: it steers root graphs around obstacles on the floor.
+        - ``anchor_heuristic`` (string): Goal-distance heuristic of the start graph. Default: "bfs"
+        - ``weight`` (string): Suboptimality bound of the start-graph search. Default: "100"
+        - ``g_num`` (string): Maximum number of graphs, start and goal included; at least 2.
+          Default: "10"
+        - ``graph_growth`` (string): "on_stall" (default) adds a root graph whenever the start
+          graph makes no progress for ``stall_window`` expansions, up to ``g_num``; "upfront"
+          creates all ``g_num - 2`` roots before searching. With "on_stall", a scene the start
+          graph solves without stalling gets no extra graphs at all.
+        - ``stall_window`` (string): Expansions without a better heuristic value before a root
+          is added. Default: "50"
+        - ``root_interval`` (string): Also add a root every this many expansions; "0" turns it
+          off. Default: "0"
+        - ``root_selection`` (string): "frontier_nearest" (default) picks the root nearest the
+          stalled frontier's end effector; "sequential" uses the attractors in order.
+        - ``goal_roots`` (string): For pose goals, graphs rooted at collision-free IK solutions
+          of the goal pose. "1" (default) makes the search bidirectional; "0" searches from the
+          start only.
+        - ``root_clearance`` (string): Minimum end-effector clearance of a root, in metres.
+          Attractors sit on obstacle boundaries, so roots are pulled back into free space.
+          Default: "0.05"
+        - ``nonblocking_roots`` (string): "false" (default, deterministic) waits for the next
+          root when a stall asks for one; "true" keeps expanding while roots are prepared in
+          the background.
+        - ``anchor_search`` (string): After the first start–goal connection, keep searching
+          until the cost is within ``weight`` of optimal. Default: "true"
+        - ``lazy_edges`` (string): "true" checks a successor's motion only when it is expanded
+          (Lazy Weighted A*). Default: "false"
+        - ``root_prefetch``, ``root_ik_threads``, ``expansion_threads``, ``snap_ik_seeds``
+          (strings): How much root IK runs before the search starts, and how many threads the
+          root IK, the edge checks and the goal-snap IK use. The defaults suit most scenes.
+
+      *VAMP RRT-Connect ("vamp_rrtc"):*
+        A sampling-based planner that runs entirely on the VAMP backend, so it needs
+        ``validity_backend`` "vamp" (or "auto" on a supported robot). It uses no motion
+        primitives or heuristic.
+
+        - ``rrtc_range`` (string): Maximum extension distance per step
+        - ``rrtc_max_iterations``, ``rrtc_max_samples`` (strings): Search budgets
+        - ``rrtc_simplify`` (string): "true" to simplify the returned path
+
+      **Validity backends:**
+
+      - "coal" (default): COAL collision checking against the full planning world. Works
+        for every robot.
+      - "vamp": SIMD-vectorized checks from VAMP, much faster. Only robots with a compiled
+        VAMP model are supported: ``panda``, ``ur5``, ``fetch``, ``ridgeback_ur10e``,
+        ``static_ridgeback_ur10e`` and ``so107``. Requesting it for any other robot raises an
+        error, as does a build compiled without VAMP (check
+        :meth:`get_available_validity_backends`).
+      - "auto": "vamp" when every robot being planned supports it, "coal" otherwise. It
+        never raises, and prints which backend it chose; :meth:`get_active_validity_backend`
+        reports it too.
+
+      Multi-robot planners accept the same key and use one backend for the whole group.
+
       **Multi-Robot Planner Context Options:**
 
-      Available multi-robot planners: "E-CBS", "xECBS"
+      Available multi-robot planners: "ECBS", "xECBS"
 
       **Required Multi-Robot Parameters:**
 
-      - ``planner_id``: "E-CBS" or "xECBS"
+      - ``planner_id``: "ECBS" or "xECBS". Nothing else is required.
 
-      **Agent-Specific Parameters (per robot):**
+      Multi-robot planners search timed states (joint values plus a time step) and take
+      joint-space goals only: pass :attr:`GoalType.JOINTS` constraints to :meth:`plan_multi`.
+
+      **Agent-Specific Parameters (per robot, all optional):**
 
       For each robot with name ``{robot_name}``:
 
-      - ``heuristic_{robot_name}`` (string): Heuristic for this robot. Default: "bfs" (E-CBS), "joint_euclidean_remove_time" (xECBS)
-      - ``mprim_path_{robot_name}`` (string): Motion primitives path for this robot. Default: auto-generated timed version
+      - ``heuristic_{robot_name}`` (string): Heuristic for this robot: "bfs", "joint_euclidean"
+        or "joint_euclidean_remove_time". Each is used in its time-aware form. Default: "bfs"
+      - ``mprim_path_{robot_name}`` (string): Motion primitives path for this robot. Default:
+        the built-in timed primitives for its DOF
       - ``resolution_{robot_name}`` (string): Discretization for this robot. Default: "1"
 
-      **E-CBS/xECBS Parameters:**
+      **ECBS/xECBS Parameters:**
 
-      - ``weight_low_level_heuristic`` (string): Low-level search weight. Default: "1.0" (E-CBS), "55.0" (xECBS)
+      - ``weight_low_level_heuristic`` (string): Low-level search weight. Default: "1.0"
       - ``high_level_focal_suboptimality`` (string): High-level focal search bound. Default: "1.3"
       - ``low_level_focal_suboptimality`` (string): Low-level focal search bound. Default: "1.3"
+
+      .. code-block:: python
+
+         planner.make_planner(["panda0", "panda1"], {"planner_id": "xECBS", "time_limit": "20"})
+         goals = {n: srmp.GoalConstraint(srmp.GoalType.JOINTS, [q]) for n, q in goal_qs.items()}
+         trajs = planner.plan_multi(start_qs, goals)
 
    .. method:: plan(start, goal_constraint)
 
@@ -225,23 +304,29 @@ The main interface for robot motion planning.
          singularity); or ``max_steps`` is exceeded. A pose-to-pose call whose start and end
          differ by a pure translation is supported and does **not** raise.
 
-   .. method:: add_box(name, size, pose)
+   .. method:: add_box(name, size, pose=None, color=None)
 
       Add a box obstacle to the environment.
 
       :param str name: Unique name for the box
       :param numpy.ndarray size: Box dimensions [x, y, z]
       :param Pose pose: Box pose in world frame
+      :param color: Display color for visualizers — RGB floats in ``[0, 1]``, ints in
+         ``[0, 255]``, or a ``"#rrggbb"`` string (default: ``None``, the visualizer's own
+         default). Display only; see :meth:`set_object_color`.
 
-   .. method:: add_sphere(name, radius, pose)
+   .. method:: add_sphere(name, radius, pose=None, color=None)
 
       Add a sphere obstacle to the environment.
 
       :param str name: Unique name for the sphere
       :param float radius: Sphere radius
       :param Pose pose: Sphere pose in world frame
+      :param color: Display color for visualizers — RGB floats in ``[0, 1]``, ints in
+         ``[0, 255]``, or a ``"#rrggbb"`` string (default: ``None``, the visualizer's own
+         default). Display only; see :meth:`set_object_color`.
 
-   .. method:: add_cylinder(name, radius, height, pose)
+   .. method:: add_cylinder(name, radius, height, pose=None, color=None)
 
       Add a cylinder obstacle to the environment.
 
@@ -249,8 +334,11 @@ The main interface for robot motion planning.
       :param float radius: Cylinder radius
       :param float height: Cylinder height
       :param Pose pose: Cylinder pose in world frame
+      :param color: Display color for visualizers — RGB floats in ``[0, 1]``, ints in
+         ``[0, 255]``, or a ``"#rrggbb"`` string (default: ``None``, the visualizer's own
+         default). Display only; see :meth:`set_object_color`.
 
-   .. method:: add_mesh(name, mesh_path=None, vertices=None, triangles=None, scale=np.ones(3), pose=None, convex=False)
+   .. method:: add_mesh(name, mesh_path=None, vertices=None, triangles=None, scale=np.ones(3), pose=None, convex=False, color=None)
 
       Add a mesh obstacle to the environment.  Either ``mesh_path`` **or** both
       ``vertices`` and ``triangles`` must be provided.
@@ -268,6 +356,10 @@ The main interface for robot motion planning.
       :param Pose pose: Mesh pose in world frame
       :param bool convex: Treat mesh as convex hull during collision checking.
           Only applicable for file-based meshes (default: ``False``)
+      :param color: Display color for visualizers — RGB floats in ``[0, 1]``, ints in
+         ``[0, 255]``, or a ``"#rrggbb"`` string (default: ``None``, the visualizer's own
+         default). Display only; see :meth:`set_object_color`.
+         A color set on a file-based mesh replaces the file's own materials in the viewer.
 
    .. method:: add_point_cloud(name, vertices, resolution=0.01)
 
@@ -297,6 +389,25 @@ The main interface for robot motion planning.
 
          Must not be called while a plan is running: it mutates state shared with the
          collision checker and the heuristics.
+
+   .. method:: set_object_color(name, color)
+
+      Set the color attached visualizers draw an object in. Display only: collision
+      checking and planning ignore it. Visualizers attached later still get it, and
+      :meth:`save_scene` / :meth:`load_scene` keep it. Removing an object and adding it
+      again under the same name drops its color.
+
+      :param str name: Name of an existing object
+      :param color: RGB floats in ``[0, 1]`` (``(1, 0, 0)``), ints in ``[0, 255]``
+         (``(255, 0, 0)``), or a ``"#rrggbb"`` string. A value with any component above
+         ``1`` is read as ``0``–``255``, so ``(1, 1, 1)`` is white.
+      :raises KeyError: If no object has that name
+      :raises ValueError: If ``color`` is not one of the forms above
+
+      .. code-block:: python
+
+         planner.add_box("cube", np.array([0.05, 0.05, 0.05]), cube_pose, color="#d9372b")
+         planner.set_object_color("table", (0.76, 0.6, 0.42))
 
    .. method:: read_sim(sim, sim_type, articulations=None)
 
@@ -373,6 +484,41 @@ The main interface for robot motion planning.
    Note: `add_articulation` accepts an optional `srdf_path` parameter. Many examples
    below include SRDF paths for completeness, but you can call `add_articulation`
    with only the `urdf_path` if no SRDF is required for your use case.
+
+   .. method:: get_planning_stats()
+
+      Statistics of the most recent plan, measured by the planner itself.
+
+      :returns: ``time`` (search-loop seconds, the number the ``[SRMP]: Planning completed in``
+         line prints), ``cost``, ``path_length``, ``num_expanded``, ``num_generated``,
+         ``num_reopened``, ``suboptimality``, and ``bonus_stats`` (planner-specific scalars,
+         e.g. ``num_roots`` for MGS)
+      :rtype: dict
+      :raises RuntimeError: Before :meth:`make_planner`
+
+   .. method:: get_mgs_roots()
+
+      Root graphs MGS added during the most recent plan, in the order it added them.
+
+      :returns: ``(injected_at, configuration)`` pairs: the expansion count at which each root
+         graph was added (``0`` for roots made before the search, with
+         ``graph_growth="upfront"`` or ``goal_roots``), and the joint configuration it is
+         rooted at. The start and goal graphs are not roots and never appear here. Empty when
+         the active planner is not MGS, or MGS added no root.
+      :rtype: list
+
+   .. method:: get_available_validity_backends()
+
+      :returns: Validity backends compiled into this build: always ``"coal"``, plus
+         ``"vamp"`` when built with VAMP
+      :rtype: list
+
+   .. method:: get_active_validity_backend()
+
+      :returns: The backend attached to the current planner — ``"coal"`` or ``"vamp"``
+         (after ``validity_backend="auto"``, what it resolved to), or ``"none"`` before
+         :meth:`make_planner` or after :meth:`reset`
+      :rtype: str
 
    .. method:: get_articulation_names()
 
@@ -617,17 +763,24 @@ The main interface for robot motion planning.
 
       :param str articulation_name: Articulation name
       :param numpy.ndarray qpos: Joint positions
-      :returns: Pose of the end-effector (Pose)
+      :returns: Pose of the end-effector in the world frame (the robot's base pose applied)
+      :rtype: Pose
 
    .. method:: compute_ik(articulation_name, ee_pose, init_state_val)
 
       Compute inverse kinematics (CLIK) for a desired end-effector pose.
 
       :param str articulation_name: Articulation name
-      :param ee_pose: Desired end-effector pose — either a :class:`Pose`, or a list
+      :param ee_pose: Desired end-effector pose in the world frame, the frame
+         :meth:`compute_fk` returns — either a :class:`Pose`, or a list
          ``[x, y, z, roll, pitch, yaw]``
       :param list init_state_val: Initial joint configuration for IK solver
       :returns: Tuple `(success: bool, joint_state: list)`
+
+      .. versionchanged:: 0.1.6
+         ``ee_pose`` is in the world frame, so an FK pose feeds straight back into IK for a
+         robot with a moved base. It used to be read in the robot's base frame; code that
+         converted world poses to the base frame itself should drop that conversion.
 
       .. note::
 
@@ -651,9 +804,10 @@ The main interface for robot motion planning.
       - later attempts — uniform random within the move-group joint limits
 
       Attempts continue until ``timeout`` expires (or, unless ``best_of``, until the first
-      collision-free solution is found). If IK itself keeps failing while nothing has yet
-      been rejected for collision, the search bails out early and reports ``'unreachable'``
-      instead of burning the full budget on a pose no seed can reach.
+      collision-free solution is found). If IK has not succeeded once after five attempts,
+      the search bails out early and reports ``'unreachable'`` instead of burning the full
+      budget on a pose no seed can reach. Once IK has reached the pose, even in collision or
+      with ``best_of`` collecting, it keeps searching.
 
       **State side effects:** on success the articulation is left at the returned
       configuration (listeners/visualizers are notified once, for that final state only —
@@ -675,10 +829,10 @@ The main interface for robot motion planning.
          return the collision-free one closest to ``q_seed`` (smallest joint-space
          distance) instead of the first one found (default: ``False``)
       :returns: ``(q, status)``. ``status`` is ``'found'`` (``q`` is a valid, collision-free
-         configuration), ``'unreachable'`` (IK consistently failed — the pose is
-         kinematically infeasible for this arm), or ``'blocked'`` (IK succeeded but every
-         solution found was in collision). ``q`` is ``None`` unless ``status`` is
-         ``'found'``.
+         configuration), ``'unreachable'`` (IK never succeeded — the pose is
+         kinematically infeasible for this arm), or ``'blocked'`` (IK reached the pose at
+         least once, but every solution found was in collision). ``q`` is ``None`` unless
+         ``status`` is ``'found'``.
       :rtype: tuple
 
       .. code-block:: python
@@ -767,6 +921,10 @@ The main interface for robot motion planning.
          currently being reworked and isn't functional)
       :param kwargs: Additional arguments passed to the visualizer constructor (e.g. ``port``)
       :returns: The created visualizer instance
+
+      If a viser visualizer is already attached and running and no ``port`` is given, it is
+      returned instead of opening a second viewer on another port. Pass ``port`` to open a
+      second one on purpose.
 
    .. method:: get_visualizer(index=0)
 
@@ -1602,7 +1760,6 @@ Multi-Robot Example
    }
    for name in articulation_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 
@@ -1807,6 +1964,30 @@ ViserPlannerInterface
           mapping robot names to trajectories.
       :param float dt: Seconds between frames (default: ``0.05``)
       :param str robot_name: Robot name when a single trajectory is supplied.
+
+   .. method:: show_mgs_roots(robot_name, roots=None)
+
+      Draw the root graphs of the most recent MGS plan as translucent ghost robots, one color
+      per root, all hidden until revealed. Previously drawn roots are removed first.
+
+      :param str robot_name: Robot the roots belong to
+      :param roots: ``(injected_at, configuration)`` pairs to draw (default: the planner's
+         :meth:`~srmp.PlannerInterface.get_mgs_roots`)
+      :returns: How many ghosts were built
+      :rtype: int
+
+   .. method:: set_mgs_roots_revealed(count)
+
+      Show the first ``count`` roots, in the order MGS added them, and hide the rest.
+
+   .. method:: play_mgs_roots(dwell=0.6, hold=1.5)
+
+      Reveal the roots one at a time, ``dwell`` seconds apart, then hold on the full set for
+      ``hold`` seconds. Blocks until done; ``play_mgs_roots_async`` runs it on a thread.
+
+   .. method:: clear_mgs_roots()
+
+      Remove every root ghost from the scene.
 
    .. method:: add_robot_controls(robot_name)
 

@@ -141,7 +141,6 @@ Viser Multi-Robot Animation
    }
    for name in names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(names, planner_context)
 

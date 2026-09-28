@@ -11,7 +11,8 @@ Scenes
 ------
 
 A *scene* is the planning world: every articulation, every collision object, and every
-attachment, with their poses and configurations.
+attachment, with their poses and configurations. Object colors set with ``color=`` or
+:meth:`~srmp.PlannerInterface.set_object_color` are saved too.
 
 .. code-block:: python
 

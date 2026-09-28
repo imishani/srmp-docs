@@ -288,10 +288,9 @@ PyBullet Multi-Robot Example
        "low_level_focal_suboptimality": "1.0",
    }
 
-   # Add per-robot config entries (heuristics and timed mprims)
+   # Per-robot heuristics (optional; timed motion primitives are the default)
    for name in articulation_names:
        planner_context[f"heuristic_{name}"] = "joint_euclidean_remove_time"
-       planner_context[f"mprim_path_{name}"] = "/path/to/config/manip_7dof_timed_mprim.yaml"
 
    planner.make_planner(articulation_names=articulation_names, planner_context=planner_context)
 

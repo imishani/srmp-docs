@@ -32,6 +32,9 @@ Attach a visualizer to a planner with :meth:`~srmp.PlannerInterface.start_visual
    viz = planner.start_visualizer(type="viser", port=8080)
    print(viz.url)  # → http://localhost:8080
 
+Calling ``start_visualizer()`` again without a ``port`` returns the viewer that is already
+running rather than opening a second one; pass a ``port`` to open another on purpose.
+
 ``viz`` is a *visualizer/listener* attached to ``planner`` — it is notified whenever the scene
 changes (``add_robot``, ``add_box``, …) and exposes visualization-specific methods
 (``add_robot_controls``, ``animate_trajectory``, …, all documented below). Any planning method
@@ -136,6 +139,41 @@ planning to it:
    #    selected planner and animates the resulting trajectory.
    #    "Reset EE" snaps the gizmo back to the robot's actual current pose.
 
+Object Colors
+~~~~~~~~~~~~~
+
+Objects are drawn grey unless given a color, either when added or later. Colors are
+display only; planning ignores them, and saved scenes keep them:
+
+.. code-block:: python
+
+   planner.add_box("cube", np.array([0.05, 0.05, 0.05]), cube_pose, color=(0.85, 0.2, 0.2))
+   planner.set_object_color("table", "#c29a6b")        # hex, or ints 0-255: (194, 154, 107)
+
+MGS Root Graphs
+~~~~~~~~~~~~~~~
+
+After a plan with the ``"MGS"`` planner (see :meth:`~srmp.PlannerInterface.make_planner`),
+the controls panel shows an **MGS roots** folder if the search added any root graphs. Each
+root is drawn as a translucent ghost robot in its own color, revealed in the order MGS added
+it: **Roots shown** scrubs through them, **Seconds per root** sets the pace, **Play reveal**
+steps through them one at a time (useful for screen recordings), and **Clear roots** removes
+them. The folder stays hidden after plans that added no roots. With the default
+``graph_growth="on_stall"``, a scene the start graph solves without stalling gets none;
+``graph_growth="upfront"`` always makes them.
+
+The same overlay is available from Python:
+
+.. code-block:: python
+
+   planner.make_planner(["panda"], {"planner_id": "MGS", "graph_growth": "upfront"})
+   traj = planner.plan(start, goal)
+   print(planner.get_mgs_roots())      # [(injected_at, configuration), ...]
+
+   viz.show_mgs_roots("panda")         # build the ghosts (hidden)
+   viz.play_mgs_roots(dwell=0.6)       # reveal them one by one
+   viz.clear_mgs_roots()
+
 Object Drag Controls
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -207,5 +245,7 @@ Feature Summary
 - **Goal-driven planning**: Drag-to-goal + "Plan to goal" via :meth:`add_plan_controls`
 - **Object editing**: Drag gizmos (:meth:`add_object_controls`) and a buttons panel
   (:meth:`add_gui_controls`)
+- **Object colors**: ``color=`` on ``add_*``, or :meth:`~srmp.PlannerInterface.set_object_color`
+- **MGS root graphs**: Ghosts of the extra graphs MGS grew, revealed in order
 - **Shareable URLs**: Available via ``share=True``
 - **Mesh loading**: Any format supported by ``trimesh``
