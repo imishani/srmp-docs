@@ -42,6 +42,7 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`ridgeback_ur10e.tar.gz <../_static/robots/ridgeback_ur10e.tar.gz>` - Clearpath Ridgeback omnidirectional base + UR10e arm + Robotiq 2F-85 gripper
 - :download:`xlerobot.tar.gz <../_static/robots/xlerobot.tar.gz>` - XLeRobot bimanual mobile manipulator (holonomic base + dual arms + head)
 - :download:`kinova_gen3.tar.gz <../_static/robots/kinova_gen3.tar.gz>` - Kinova Gen3 7-DOF manipulator with vision module
+- :download:`kinova_gen3_robotiq_2f85.tar.gz <../_static/robots/kinova_gen3_robotiq_2f85.tar.gz>` - Kinova Gen3 7-DOF manipulator with vision module and Robotiq 2F-85 gripper
 - :download:`kinova_gen3_6dof.tar.gz <../_static/robots/kinova_gen3_6dof.tar.gz>` - Kinova Gen3 6-DOF manipulator with vision module
 - :download:`kinova_gen3_lite.tar.gz <../_static/robots/kinova_gen3_lite.tar.gz>` - Kinova Gen3 Lite compact 6-DOF manipulator
 - :download:`yam.tar.gz <../_static/robots/yam.tar.gz>` - i2rt YAM 6-DOF manipulator with parallel gripper

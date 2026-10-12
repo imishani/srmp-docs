@@ -135,6 +135,17 @@
       "default_qpos": [1.57, -0.35, 3.14, -2.00, 0, -1.00, 1.57],
       "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6", "joint_7"]
     },
+    "kinova_gen3_robotiq_2f85": {
+      "archive": "kinova_gen3_robotiq_2f85.tar.gz",
+      "urdf": "kinova_gen3_robotiq_2f85/kinova_gen3_robotiq_2f85.urdf",
+      "srdf": "kinova_gen3_robotiq_2f85/kinova_gen3_robotiq_2f85.srdf",
+      "end_effector": "grasp_link",
+      "description": "Kinova Gen3 7-DOF manipulator with vision module and Robotiq 2F-85 gripper (from ros2_kortex)",
+      "default_qpos": [1.57, -0.35, 3.14, -2.00, 0, -1.00, 1.57],
+      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6", "joint_7"],
+      "gripper_joint_names": ["robotiq_85_left_knuckle_joint", "robotiq_85_left_inner_knuckle_joint", "robotiq_85_left_finger_tip_joint",
+                              "robotiq_85_right_knuckle_joint", "robotiq_85_right_inner_knuckle_joint", "robotiq_85_right_finger_tip_joint"]
+    },
     "kinova_gen3_6dof": {
       "archive": "kinova_gen3_6dof.tar.gz",
       "urdf": "kinova_gen3_6dof/kinova_gen3_6dof.urdf",

@@ -76,6 +76,9 @@ The following robots are available in the registry:
    * - ``kinova_gen3``
      - Kinova Gen3 7-DOF manipulator with vision module
      - ``end_effector_link``
+   * - ``kinova_gen3_robotiq_2f85``
+     - Kinova Gen3 7-DOF manipulator with vision module and Robotiq 2F-85 gripper
+     - ``grasp_link``
    * - ``kinova_gen3_6dof``
      - Kinova Gen3 6-DOF manipulator with vision module
      - ``end_effector_link``
@@ -191,7 +194,7 @@ View what robots are available:
    print(available)
    # {'remote': ['panda', 'panda_on_rail', 'panda_stick', 'panda_wristcam', 'so101', 'so107',
    #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot', 'ridgeback_ur10e',
-   #             'kinova_gen3', 'kinova_gen3_6dof', 'kinova_gen3_lite',
+   #             'kinova_gen3', 'kinova_gen3_robotiq_2f85', 'kinova_gen3_6dof', 'kinova_gen3_lite',
    #             'yam', 'yam_pro', 'yam_ultra', 'big_yam',
    #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e'],
    #  'local': ['panda'],  # already downloaded
