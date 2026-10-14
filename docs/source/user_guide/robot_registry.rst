@@ -343,10 +343,12 @@ Exceptions
 ~~~~~~~~~~
 
 .. py:exception:: srmp.robots.RobotNotFoundError
+   :no-index:
 
    Raised when a robot is not found in the registry. The error message includes
    a list of available robots and instructions for downloading or registering.
 
 .. py:exception:: srmp.robots.DownloadError
+   :no-index:
 
    Raised when downloading robot data fails.
