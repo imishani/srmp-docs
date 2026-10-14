@@ -191,16 +191,46 @@ The main interface for robot motion planning.
 
       - "coal" (default): COAL collision checking against the full planning world. Works
         for every robot.
-      - "vamp": SIMD-vectorized checks from VAMP, much faster. Only robots with a compiled
-        VAMP model are supported: ``panda``, ``ur5``, ``fetch``, ``ridgeback_ur10e``,
-        ``static_ridgeback_ur10e`` and ``so107``. Requesting it for any other robot raises an
-        error, as does a build compiled without VAMP (check
+      - "vamp": SIMD-vectorized checks from VAMP, much faster. It needs a VAMP model of the
+        robot: one built into srmp, or a plugin (see :doc:`vamp_plugins`). Requesting it for a
+        robot without one raises an error, as does a build compiled without VAMP (check
         :meth:`get_available_validity_backends`).
       - "auto": "vamp" when every robot being planned supports it, "coal" otherwise. It
         never raises, and prints which backend it chose; :meth:`get_active_validity_backend`
         reports it too.
 
       Multi-robot planners accept the same key and use one backend for the whole group.
+
+      A VAMP model is used only for a robot it actually describes. Besides its name and joint
+      count, its end-effector kinematics must agree with the robot's at several
+      configurations (within 2 mm / 0.01 rad); otherwise "auto" falls back to coal and "vamp"
+      raises, naming the disagreement. :meth:`is_robot_vamp_supported` answers this per robot.
+      Among the registry robots, ``panda``, ``ridgeback_ur10e``, ``static_ridgeback_ur10e``
+      and ``so107`` match a built-in model, and ``kinova_gen3_robotiq_2f85`` has a published
+      plugin that :meth:`add_robot` installs automatically. srmp also contains VAMP models
+      named ``ur5`` and ``fetch``, but they describe other robot models than the registry's
+      ``ur5`` and ``fetch``, so those plan on coal.
+
+      .. warning::
+
+         VAMP models keep the gripper fingers at a fixed opening: :meth:`set_gripper_qpos`
+         does not reach them. With the fingers closed on or near an object, VAMP can miss a
+         collision that coal reports. Use "coal" for grasping motions.
+
+      **VAMP scene translation** (all optional, in metres unless noted). VAMP sees mesh
+      obstacles and attached meshes as sampled spheres; these keys tune that:
+
+      - ``mesh_sampling_resolution``: Surface sample spacing for mesh obstacles and attached
+        meshes. Default: "0.01"
+      - ``pointcloud_point_radius``: Radius of point-cloud points; raised automatically to
+        cover the mesh sample spacing when that is coarser. Default: "0.01"
+      - ``articulation_link_sampling_resolution``: Sample spacing for the mesh links of robots
+        that are not being planned. Default: "0.05"
+      - ``attachment_spherization_resolution``: Sphere pitch for attached primitives (box,
+        cylinder). Default: "0.05"
+      - ``attachment_max_spheres``: Sphere budget for one attached object. An attached mesh
+        over it raises (raise the budget, or attach a primitive such as :meth:`add_box`
+        instead); a primitive is coarsened to fit. Default: "512"
 
       **Multi-Robot Planner Context Options:**
 
@@ -520,6 +550,31 @@ The main interface for robot motion planning.
          :meth:`make_planner` or after :meth:`reset`
       :rtype: str
 
+   .. method:: get_vamp_supported_robots()
+
+      :returns: Names of the robots with a VAMP model in this build: built-in models and
+         loaded plugins, sorted. A name here still has to match the articulation's
+         kinematics (see :meth:`is_robot_vamp_supported`).
+      :rtype: list
+
+   .. method:: is_robot_vamp_supported(articulation_name)
+
+      Whether ``validity_backend="vamp"`` can be used for this articulation: a VAMP model of
+      that name exists, has the same number of joints, and its end-effector kinematics match
+      the articulation's.
+
+      :param str articulation_name: Name of the articulation
+      :rtype: bool
+
+   .. method:: is_vamp_state_valid(articulation_name, q)
+
+      VAMP's verdict on one configuration, with the current scene: ``True`` when it is
+      collision-free. Useful to compare VAMP against coal (:meth:`is_state_colliding`).
+
+      :param str articulation_name: Name of the articulation
+      :param q: Move-group joint configuration
+      :rtype: bool
+
    .. method:: get_articulation_names()
 
       Return the list of articulation names currently present in the planning world.
@@ -596,29 +651,46 @@ The main interface for robot motion planning.
       :param str name: Object name
       :returns: True if attached, False otherwise
 
-   .. method:: attach_object(name, art_name, link_id, touch_links=None)
+   .. method:: attach_object(name, art_name, link_id, touch_links=None, is_link_name=False)
 
-      Attach an existing object to a robot link so it moves with the robot.
+      Attach an existing object to a robot link so it moves with the robot. From then on,
+      collisions between the object and the robot's other links, other robots and the world
+      are checked.
 
       :param str name: Object name
       :param str art_name: Articulation name to attach to
-      :param int link_id: Index of the link to attach the object to
-      :param list touch_links: Optional list of link names allowed to touch the object
+      :param link_id: Index of the link to attach the object to, or its name with
+         ``is_link_name=True``
+      :param list touch_links: Link names allowed to touch the object. When omitted, every
+         link of this robot that overlaps the object at the moment of attaching (the hand, the
+         fingers holding it) is allowed to touch it.
+      :param bool is_link_name: Treat ``link_id`` as a link name
+
+      .. code-block:: python
+
+         planner.attach_object("mug", "panda", "panda_hand", is_link_name=True)
+         planner.attach_object("tray", "panda", "panda_hand", ["panda_hand", "panda_link7"],
+                               is_link_name=True)
+
+      The object is attached where it currently is; an attachment offset (``pose=``) is not
+      supported. Saved scenes (:doc:`persistence`) record explicit touch links.
 
    .. method:: detach_object(name, also_remove=False)
 
       Detach an attached object from its robot. Optionally remove it from the world.
 
       :param str name: Object name
-      :param bool also_remove: If True, remove the object from the world after detaching
-      :returns: True if successful
+      :param bool also_remove: If True, remove the object from the world after detaching,
+         including its occupancy-grid cells (as :meth:`remove_object` does)
+      :returns: True if the object was attached
 
    .. method:: detach_all_objects(also_remove=False)
 
       Detach all attached objects. Optionally remove them from the world.
 
-      :param bool also_remove: If True, remove detached objects from the world
-      :returns: True if successful
+      :param bool also_remove: If True, remove detached objects from the world and the
+         occupancy grid
+      :returns: True if any object was attached
 
    .. method:: is_state_colliding(articulation_name="")
 
@@ -668,13 +740,36 @@ The main interface for robot motion planning.
          voxels = grid.get_occupied_voxels()      # (N, 3) obstacle centers
          clearance = grid.get_distance_from_point(0.5, 0.0, 0.4)
 
+   .. method:: set_grid(grid_config)
+
+      Rebuild the occupancy grid from a :class:`GridConfig`. Every object already in the
+      scene is voxelized again into the new grid, and cached planners are dropped, so the next
+      :meth:`make_planner` builds its BFS heuristic on it. Grids returned earlier by
+      :meth:`get_grid` stay valid but stale. A scene saved afterwards (:doc:`persistence`)
+      records the new configuration.
+
+      :param GridConfig grid_config: Size, origin and resolution of the new grid
+
    .. method:: set_allowed_collision(name1, name2, allowed)
 
-      Set whether collisions between two named objects are allowed.
+      Allow (or disallow) collisions between two named things. Each name can be:
 
-      :param str name1: First object name
-      :param str name2: Second object name
+      - a world object (attached ones included);
+      - a robot's name, which stands for all of its links;
+      - a link name as :meth:`get_link_names` returns it (``"panda_hand"``), when exactly one
+        robot has that link;
+      - a link's full name ``"<robot>_<link>"`` (``"panda0_panda_hand"``), needed when several
+        robots share the link name.
+
+      :param str name1: Object, robot or link name
+      :param str name2: Object, robot or link name
       :param bool allowed: True to allow collisions, False to disallow
+      :raises ValueError: A name matches nothing, or names a link several robots share
+
+      .. code-block:: python
+
+         planner.set_allowed_collision("sponge", "panda_hand", True)   # one link
+         planner.set_allowed_collision("table", "panda", True)         # every link of the robot
 
    .. method:: get_active_joint_names(articulation_name)
 
@@ -804,10 +899,10 @@ The main interface for robot motion planning.
       - later attempts — uniform random within the move-group joint limits
 
       Attempts continue until ``timeout`` expires (or, unless ``best_of``, until the first
-      collision-free solution is found). If IK has not succeeded once after five attempts,
-      the search bails out early and reports ``'unreachable'`` instead of burning the full
-      budget on a pose no seed can reach. Once IK has reached the pose, even in collision or
-      with ``best_of`` collecting, it keeps searching.
+      collision-free solution is found). ``'unreachable'`` therefore means that IK never
+      succeeded within ``timeout``, and an unreachable pose costs the whole ``timeout``. There
+      is no early exit: about one reachable Panda pose in ten is solved only from a uniform
+      random seed, sometimes after dozens of them.
 
       **State side effects:** on success the articulation is left at the returned
       configuration (listeners/visualizers are notified once, for that final state only —

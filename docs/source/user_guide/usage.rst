@@ -6,8 +6,13 @@ Usage
 Installation
 ------------
 
-SRMP supports Linux (Ubuntu>=22.04) and macOS (arm64), and Python 3.9 through 3.14.
-Windows is not yet supported.
+SRMP supports Linux (Ubuntu>=22.04, x86-64, a CPU with AVX2: Intel Haswell 2013+ / AMD Zen+)
+and Python 3.9 through 3.14. Windows is not yet supported.
+
+.. note::
+
+   srmp 0.2.0 ships Linux wheels only. On macOS (arm64), ``pip install srmp`` installs the
+   last release with macOS wheels (0.1.6), which predates the changes in :doc:`release_notes`.
 
 To use SRMP, first install it using pip:
 
@@ -113,8 +118,9 @@ The returned ``status`` distinguishes the two ways a pose can fail, which a bare
 success/failure flag cannot:
 
 - ``'found'`` — ``q`` is a valid, collision-free configuration.
-- ``'unreachable'`` — IK never succeeded; the pose is kinematically infeasible for this
-  arm. Move the base or pick a different target.
+- ``'unreachable'`` — IK never succeeded within ``timeout``; the pose is most likely
+  kinematically infeasible for this arm. Move the base or pick a different target (or raise
+  ``timeout`` if you expect it to be reachable).
 - ``'blocked'`` — IK reached the pose at least once, but every solution found was in
   collision. The pose *is* reachable; something is in the way, so clear the obstacle or try
   a different grasp.

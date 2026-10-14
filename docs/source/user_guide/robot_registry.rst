@@ -144,6 +144,15 @@ itself:
    goal = srmp.GoalConstraint(srmp.GoalType.JOINTS, np.array([[2.0, 0, 0, 0, -1.0472, -2.0071, 0, 1.5708, 0]]))
    traj = planner.plan(start, goal)                                        # drives the base 2 m
 
+VAMP support
+~~~~~~~~~~~~
+
+These registry robots can use the fast VAMP validity backend (``validity_backend: "vamp"`` or
+``"auto"``): ``panda``, ``ridgeback_ur10e`` and ``so107`` (built in), and
+``kinova_gen3_robotiq_2f85`` (a published plugin, installed by the first ``add_robot``). Any
+other robot plans on coal, and can get a VAMP model through :doc:`vamp_plugins`.
+``planner.is_robot_vamp_supported(name)`` tells which applies.
+
 Using the Registry
 ------------------
 

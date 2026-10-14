@@ -23,6 +23,7 @@ Key Features
 - **Reliable and Consistent Trajectories**: Generates predictable and repeatable motions, making it ideal for high-precision and safety-critical applications.
 - **Agent Mode**: LLM-powered natural language interface for motion planning - describe what you want in plain English and let the agent handle the code.
 - **Seamless Integration**: Compatible with major simulators, including MuJoCo, Sapien, Genesis, PyBullet and Isaac.
+- **Fast Collision Checking**: Optional SIMD-vectorized checks with VAMP, extensible to any robot through :doc:`plugins <user_guide/vamp_plugins>`.
 - **Multi-Lingual**: Available in both Python and C++ for easy integration into research and industrial workflows.
 - **MoveIt! Plugin**: Enables deployment on real-world robotic systems with minimal setup.
 
@@ -46,6 +47,7 @@ Learn More
 - :doc:`Getting Started <user_guide/usage>`
 - :doc:`Agent Mode <user_guide/agent_mode>`
 - :doc:`API Reference <user_guide/api>`
+- :doc:`Release Notes <user_guide/release_notes>`
 - `Discord <https://discord.gg/JwAWmqE6N>`_
 
 .. toctree::
