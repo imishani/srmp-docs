@@ -8,9 +8,24 @@
       "srdf": "panda/panda.srdf",
       "end_effector": "panda_hand",
       "description": "Franka Emika Panda 7-DOF manipulator",
-      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
-      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
-                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+      "default_qpos": [
+        0,
+        -0.785,
+        0,
+        -2.356,
+        0,
+        1.571,
+        0.785
+      ],
+      "joint_names": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ]
     },
     "panda_on_rail": {
       "archive": "panda_on_rail.tar.gz",
@@ -25,9 +40,24 @@
       "srdf": "panda_stick/panda_stick.srdf",
       "end_effector": "panda_hand",
       "description": "Franka Emika Panda 7-DOF manipulator with rigid stick end-effector (no gripper, for pushing tasks)",
-      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
-      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
-                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+      "default_qpos": [
+        0,
+        -0.785,
+        0,
+        -2.356,
+        0,
+        1.571,
+        0.785
+      ],
+      "joint_names": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ]
     },
     "panda_wristcam": {
       "archive": "panda_wristcam.tar.gz",
@@ -35,9 +65,24 @@
       "srdf": "panda_wristcam/panda_wristcam.srdf",
       "end_effector": "panda_hand",
       "description": "Franka Emika Panda 7-DOF manipulator with wrist-mounted RealSense D415 camera",
-      "default_qpos": [0, -0.785, 0, -2.356, 0, 1.571, 0.785],
-      "joint_names": ["panda_joint1", "panda_joint2", "panda_joint3",
-                      "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"]
+      "default_qpos": [
+        0,
+        -0.785,
+        0,
+        -2.356,
+        0,
+        1.571,
+        0.785
+      ],
+      "joint_names": [
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ]
     },
     "so101": {
       "archive": "so101.tar.gz",
@@ -45,9 +90,22 @@
       "srdf": "so101/so101.srdf",
       "end_effector": "gripper_frame_link",
       "description": "SO101 6-DOF manipulator with gripper",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex",
-                      "wrist_flex", "wrist_roll", "gripper"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan",
+        "shoulder_lift",
+        "elbow_flex",
+        "wrist_flex",
+        "wrist_roll",
+        "gripper"
+      ]
     },
     "so107": {
       "archive": "so107.tar.gz",
@@ -55,9 +113,24 @@
       "srdf": "so107/so107.srdf",
       "end_effector": "gripper_frame_link",
       "description": "SO107 7-DOF manipulator with gripper (SO101 + forearm roll)",
-      "default_qpos": [0, 0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan", "shoulder_lift", "elbow_flex", "forearm_roll",
-                      "wrist_flex", "wrist_roll", "gripper"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan",
+        "shoulder_lift",
+        "elbow_flex",
+        "forearm_roll",
+        "wrist_flex",
+        "wrist_roll",
+        "gripper"
+      ]
     },
     "koch": {
       "archive": "koch.tar.gz",
@@ -65,8 +138,20 @@
       "srdf": "koch/koch.srdf",
       "end_effector": "gripper_tcp",
       "description": "Koch v1.1 6-DOF manipulator arm with gripper",
-      "default_qpos": [0, 2.2, 3.017, -0.25, 0],
-      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
+      "default_qpos": [
+        0,
+        2.2,
+        3.017,
+        -0.25,
+        0
+      ],
+      "joint_names": [
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5"
+      ]
     },
     "xarm7_ability": {
       "archive": "xarm7_ability.tar.gz",
@@ -74,8 +159,24 @@
       "srdf": "xarm7_ability/xarm7_ability.srdf",
       "end_effector": "base",
       "description": "UFactory XArm7 7-DOF arm with Psyonic Ability dexterous hand (10-DOF, not part of the planned move group)",
-      "default_qpos": [0.0, -0.4, 0.0, 0.5, 0.0, 0.9, -3.0],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6", "joint7"]
+      "default_qpos": [
+        0.0,
+        -0.4,
+        0.0,
+        0.5,
+        0.0,
+        0.9,
+        -3.0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6",
+        "joint7"
+      ]
     },
     "xarm6": {
       "archive": "xarm6.tar.gz",
@@ -83,8 +184,22 @@
       "srdf": "xarm6/xarm6.srdf",
       "end_effector": "link6",
       "description": "UFactory XArm6 6-DOF manipulator (no gripper)",
-      "default_qpos": [0.00156, -1.10912, -0.09713, 0.00015, 1.20607, 0.00166],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+      "default_qpos": [
+        0.00156,
+        -1.10912,
+        -0.09713,
+        0.00015,
+        1.20607,
+        0.00166
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ]
     },
     "xarm6_robotiq": {
       "archive": "xarm6_robotiq.tar.gz",
@@ -92,8 +207,22 @@
       "srdf": "xarm6_robotiq/xarm6_robotiq.srdf",
       "end_effector": "eef",
       "description": "UFactory XArm6 6-DOF manipulator with Robotiq 2F-85 gripper",
-      "default_qpos": [0, 0.22, -1.23, 0, 1.01, 0],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+      "default_qpos": [
+        0,
+        0.22,
+        -1.23,
+        0,
+        1.01,
+        0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ]
     },
     "widowxai": {
       "archive": "widowxai.tar.gz",
@@ -101,8 +230,22 @@
       "srdf": "widowxai/widowxai.srdf",
       "end_effector": "ee_gripper_link",
       "description": "Trossen Robotics WidowX AI 6-DOF manipulator with gripper",
-      "default_qpos": [0.0, 1.38, 1.04, -1.26, 0.0, 0.0],
-      "joint_names": ["joint_0", "joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
+      "default_qpos": [
+        0.0,
+        1.38,
+        1.04,
+        -1.26,
+        0.0,
+        0.0
+      ],
+      "joint_names": [
+        "joint_0",
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5"
+      ]
     },
     "fetch": {
       "archive": "fetch.tar.gz",
@@ -110,11 +253,32 @@
       "srdf": "fetch/fetch.srdf",
       "end_effector": "gripper_link",
       "description": "Fetch mobile manipulator: holonomic base + torso lift + 7-DOF arm + gripper",
-      "default_qpos": [0, 0, 0, 0.386, 0.562, -1.032, 0.695, 0.955, -0.1, 2.077, 0],
-      "joint_names": ["root_x_axis_joint", "root_y_axis_joint", "root_z_rotation_joint",
-                      "torso_lift_joint", "shoulder_pan_joint", "shoulder_lift_joint",
-                      "upperarm_roll_joint", "elbow_flex_joint", "forearm_roll_joint",
-                      "wrist_flex_joint", "wrist_roll_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0.386,
+        0.562,
+        -1.032,
+        0.695,
+        0.955,
+        -0.1,
+        2.077,
+        0
+      ],
+      "joint_names": [
+        "root_x_axis_joint",
+        "root_y_axis_joint",
+        "root_z_rotation_joint",
+        "torso_lift_joint",
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "upperarm_roll_joint",
+        "elbow_flex_joint",
+        "forearm_roll_joint",
+        "wrist_flex_joint",
+        "wrist_roll_joint"
+      ]
     },
     "xlerobot": {
       "archive": "xlerobot.tar.gz",
@@ -122,9 +286,26 @@
       "srdf": "xlerobot/xlerobot.srdf",
       "end_effector": "Fixed_Jaw",
       "description": "XLeRobot bimanual mobile manipulator: holonomic base + dual SO-100-style arms + head (registry exposes the primary/left arm as the single end effector; no license available from upstream)",
-      "default_qpos": [0.0, 0.0, 0.0, 0, 3.14, 3.14, 0, 1.57],
-      "joint_names": ["root_x_axis_joint", "root_y_axis_joint", "root_z_rotation_joint",
-                      "Rotation", "Pitch", "Elbow", "Wrist_Pitch", "Wrist_Roll"]
+      "default_qpos": [
+        0.0,
+        0.0,
+        0.0,
+        0,
+        3.14,
+        3.14,
+        0,
+        1.57
+      ],
+      "joint_names": [
+        "root_x_axis_joint",
+        "root_y_axis_joint",
+        "root_z_rotation_joint",
+        "Rotation",
+        "Pitch",
+        "Elbow",
+        "Wrist_Pitch",
+        "Wrist_Roll"
+      ]
     },
     "kinova_gen3": {
       "archive": "kinova_gen3.tar.gz",
@@ -132,8 +313,24 @@
       "srdf": "kinova_gen3/kinova_gen3.srdf",
       "end_effector": "end_effector_link",
       "description": "Kinova Gen3 7-DOF manipulator with vision module",
-      "default_qpos": [1.57, -0.35, 3.14, -2.00, 0, -1.00, 1.57],
-      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6", "joint_7"]
+      "default_qpos": [
+        1.57,
+        -0.35,
+        3.14,
+        -2.0,
+        0,
+        -1.0,
+        1.57
+      ],
+      "joint_names": [
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5",
+        "joint_6",
+        "joint_7"
+      ]
     },
     "kinova_gen3_robotiq_2f85": {
       "archive": "kinova_gen3_robotiq_2f85.tar.gz",
@@ -141,10 +338,43 @@
       "srdf": "kinova_gen3_robotiq_2f85/kinova_gen3_robotiq_2f85.srdf",
       "end_effector": "grasp_link",
       "description": "Kinova Gen3 7-DOF manipulator with vision module and Robotiq 2F-85 gripper (from ros2_kortex)",
-      "default_qpos": [1.57, -0.35, 3.14, -2.00, 0, -1.00, 1.57],
-      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6", "joint_7"],
-      "gripper_joint_names": ["robotiq_85_left_knuckle_joint", "robotiq_85_left_inner_knuckle_joint", "robotiq_85_left_finger_tip_joint",
-                              "robotiq_85_right_knuckle_joint", "robotiq_85_right_inner_knuckle_joint", "robotiq_85_right_finger_tip_joint"]
+      "default_qpos": [
+        1.57,
+        -0.35,
+        3.14,
+        -2.0,
+        0,
+        -1.0,
+        1.57
+      ],
+      "joint_names": [
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5",
+        "joint_6",
+        "joint_7"
+      ],
+      "gripper_joint_names": [
+        "robotiq_85_left_knuckle_joint",
+        "robotiq_85_left_inner_knuckle_joint",
+        "robotiq_85_left_finger_tip_joint",
+        "robotiq_85_right_knuckle_joint",
+        "robotiq_85_right_inner_knuckle_joint",
+        "robotiq_85_right_finger_tip_joint"
+      ],
+      "vamp_plugins": {
+        "49f92c61b0429029": "49f92c61b0429029/kinova_gen3_robotiq_2f85-49f92c61b0429029.so"
+      },
+      "vamp_plugins_sha256": {
+        "49f92c61b0429029": {
+          "so": "c9dde3c3b0694358da5226582c044361a86cfa2b9a0bcd0de9de54b03e6584a6",
+          "urdf": "5fecad1ee00260ea8d5326e7615325224ef2cfe8bad15a4bf76ab9f3e37c334d",
+          "srdf": "45512de1fdf328158b9f6d7afa5509963139db94c6df251d74a745be02ffe233",
+          "fit_checked": true
+        }
+      }
     },
     "kinova_gen3_6dof": {
       "archive": "kinova_gen3_6dof.tar.gz",
@@ -152,8 +382,22 @@
       "srdf": "kinova_gen3_6dof/kinova_gen3_6dof.srdf",
       "end_effector": "end_effector_link",
       "description": "Kinova Gen3 6-DOF manipulator with vision module",
-      "default_qpos": [1.57, -0.35, -2.00, 0, -1.00, 1.57],
-      "joint_names": ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
+      "default_qpos": [
+        1.57,
+        -0.35,
+        -2.0,
+        0,
+        -1.0,
+        1.57
+      ],
+      "joint_names": [
+        "joint_1",
+        "joint_2",
+        "joint_3",
+        "joint_4",
+        "joint_5",
+        "joint_6"
+      ]
     },
     "kinova_gen3_lite": {
       "archive": "kinova_gen3_lite.tar.gz",
@@ -161,8 +405,22 @@
       "srdf": "kinova_gen3_lite/kinova_gen3_lite.srdf",
       "end_effector": "DUMMY",
       "description": "Kinova Gen3 Lite compact 6-DOF manipulator",
-      "default_qpos": [0, -0.28, 1.309, 0, -1.047, 0],
-      "joint_names": ["J0", "J1", "J2", "J3", "J4", "J5"]
+      "default_qpos": [
+        0,
+        -0.28,
+        1.309,
+        0,
+        -1.047,
+        0
+      ],
+      "joint_names": [
+        "J0",
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5"
+      ]
     },
     "yam": {
       "archive": "yam.tar.gz",
@@ -170,9 +428,26 @@
       "srdf": "yam/yam.srdf",
       "end_effector": "gripper",
       "description": "i2rt YAM 6-DOF manipulator with parallel gripper",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"],
-      "gripper_joint_names": ["joint7", "joint8"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ],
+      "gripper_joint_names": [
+        "joint7",
+        "joint8"
+      ]
     },
     "yam_pro": {
       "archive": "yam_pro.tar.gz",
@@ -180,9 +455,26 @@
       "srdf": "yam_pro/yam_pro.srdf",
       "end_effector": "gripper",
       "description": "i2rt YAM Pro 6-DOF manipulator with parallel gripper",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"],
-      "gripper_joint_names": ["joint7", "joint8"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ],
+      "gripper_joint_names": [
+        "joint7",
+        "joint8"
+      ]
     },
     "yam_ultra": {
       "archive": "yam_ultra.tar.gz",
@@ -190,9 +482,26 @@
       "srdf": "yam_ultra/yam_ultra.srdf",
       "end_effector": "gripper",
       "description": "i2rt YAM Ultra 6-DOF manipulator with parallel gripper",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["dof_joint1", "dof_joint2", "dof_joint3", "dof_joint4", "dof_joint5", "dof_joint6"],
-      "gripper_joint_names": ["dof_joint7", "dof_joint8"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "dof_joint1",
+        "dof_joint2",
+        "dof_joint3",
+        "dof_joint4",
+        "dof_joint5",
+        "dof_joint6"
+      ],
+      "gripper_joint_names": [
+        "dof_joint7",
+        "dof_joint8"
+      ]
     },
     "big_yam": {
       "archive": "big_yam.tar.gz",
@@ -200,9 +509,26 @@
       "srdf": "big_yam/big_yam.srdf",
       "end_effector": "gripper",
       "description": "i2rt Big YAM 6-DOF manipulator with parallel gripper (larger/higher-reach variant)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"],
-      "gripper_joint_names": ["joint7", "joint8"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ],
+      "gripper_joint_names": [
+        "joint7",
+        "joint8"
+      ]
     },
     "ur3": {
       "archive": "ur3.tar.gz",
@@ -210,9 +536,22 @@
       "srdf": "ur3/ur3.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR3 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur5": {
       "archive": "ur5.tar.gz",
@@ -220,9 +559,22 @@
       "srdf": "ur5/ur5.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR5 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur10": {
       "archive": "ur10.tar.gz",
@@ -230,9 +582,22 @@
       "srdf": "ur10/ur10.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR10 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur3e": {
       "archive": "ur3e.tar.gz",
@@ -240,9 +605,22 @@
       "srdf": "ur3e/ur3e.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR3e 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur5e": {
       "archive": "ur5e.tar.gz",
@@ -250,9 +628,22 @@
       "srdf": "ur5e/ur5e.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR5e 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur10e": {
       "archive": "ur10e.tar.gz",
@@ -260,9 +651,22 @@
       "srdf": "ur10e/ur10e.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR10e 6-DOF manipulator (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ur16e": {
       "archive": "ur16e.tar.gz",
@@ -270,9 +674,22 @@
       "srdf": "ur16e/ur16e.srdf",
       "end_effector": "tool0",
       "description": "Universal Robots UR16e 6-DOF manipulator, higher payload variant of UR10e (no gripper)",
-      "default_qpos": [0, 0, 0, 0, 0, 0],
-      "joint_names": ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-                      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ]
     },
     "ridgeback_ur10e": {
       "archive": "ridgeback_ur10e.tar.gz",
@@ -280,9 +697,37 @@
       "srdf": "ridgeback_ur10e/ridgeback_ur10e.srdf",
       "end_effector": "ur_arm_TCP",
       "description": "Clearpath Ridgeback omnidirectional base + UR10e arm + Robotiq 2F-85 gripper (9-DOF planning group: base x, y, theta + 6 arm joints)",
-      "default_qpos": [0, 0, 0, 0, -1.0472, -2.0071, 0, 1.5708, 0],
-      "joint_names": ["x", "y", "theta", "ur_arm_shoulder_pan_joint", "ur_arm_shoulder_lift_joint", "ur_arm_elbow_joint", "ur_arm_wrist_1_joint", "ur_arm_wrist_2_joint", "ur_arm_wrist_3_joint"],
-      "gripper_joint_names": ["left_outer_knuckle_joint", "left_inner_knuckle_joint", "left_inner_finger_joint", "right_outer_knuckle_joint", "right_inner_knuckle_joint", "right_inner_finger_joint"]
+      "default_qpos": [
+        0,
+        0,
+        0,
+        0,
+        -1.0472,
+        -2.0071,
+        0,
+        1.5708,
+        0
+      ],
+      "joint_names": [
+        "x",
+        "y",
+        "theta",
+        "ur_arm_shoulder_pan_joint",
+        "ur_arm_shoulder_lift_joint",
+        "ur_arm_elbow_joint",
+        "ur_arm_wrist_1_joint",
+        "ur_arm_wrist_2_joint",
+        "ur_arm_wrist_3_joint"
+      ],
+      "gripper_joint_names": [
+        "left_outer_knuckle_joint",
+        "left_inner_knuckle_joint",
+        "left_inner_finger_joint",
+        "right_outer_knuckle_joint",
+        "right_inner_knuckle_joint",
+        "right_inner_finger_joint"
+      ]
     }
-  }
+  },
+  "vamp_plugins_base_url": "https://srmp.readthedocs.io/en/latest/_static/robots/plugins/"
 }
