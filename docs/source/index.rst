@@ -9,11 +9,30 @@ Have questions or want to chat with the community? Join our `Discord channel <ht
 
 .. raw:: html
 
-   <div style="text-align: center; margin: 20px 0;">
-      <video width="80%" controls>
-         <source src="_static/assets/srmp-video.mp4" type="video/mp4">
-         Your browser does not support the video tag.
-      </video>
+   <style>
+     .srmp-videos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
+     .srmp-videos figure { margin: 0; }
+     .srmp-videos video { width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); }
+     .srmp-videos figcaption { font-size: 0.9em; text-align: center; margin-top: 0.4rem; opacity: 0.85; }
+     @media (max-width: 720px) { .srmp-videos { grid-template-columns: 1fr; } }
+   </style>
+   <div class="srmp-videos">
+     <figure>
+       <video src="_static/assets/srmp_consistency.mp4" poster="_static/assets/srmp_consistency.jpg" autoplay muted loop playsinline preload="metadata"></video>
+       <figcaption>SRMP vs. OMPL on similar queries: SRMP returns consistent motions.</figcaption>
+     </figure>
+     <figure>
+       <video src="_static/assets/srmp_multi_arm.mp4" poster="_static/assets/srmp_multi_arm.jpg" autoplay muted loop playsinline preload="metadata"></video>
+       <figcaption>Multi-arm planning in simulation and on real robots.</figcaption>
+     </figure>
+     <figure>
+       <video src="_static/assets/srmp_agent_mode.mp4" poster="_static/assets/srmp_agent_mode.jpg" autoplay muted loop playsinline preload="metadata"></video>
+       <figcaption>Asking the agent to build a small warehouse with arms and test their reachability.</figcaption>
+     </figure>
+     <figure>
+       <video src="_static/assets/srmp_python_api.mp4" poster="_static/assets/srmp_python_api.jpg" autoplay muted loop playsinline preload="metadata"></video>
+       <figcaption>Planning from Python and running the plan in a simulator and in MoveIt!.</figcaption>
+     </figure>
    </div>
 
 Key Features
