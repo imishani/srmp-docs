@@ -7,7 +7,8 @@ Installation
 ------------
 
 SRMP supports Linux (Ubuntu>=22.04, x86-64, a CPU with AVX2: Intel Haswell 2013+ / AMD Zen+)
-and Python 3.9 through 3.14. Windows is not yet supported.
+and Python 3.9 through 3.14. There is no native Windows build; on Windows, use WSL2 (see
+`Windows (WSL2)`_ below).
 
 .. note::
 
@@ -30,6 +31,37 @@ Then, import it in your script and follow the instructions on the docs:
 
    import srmp
    import numpy as np
+
+Windows (WSL2)
+~~~~~~~~~~~~~~
+
+SRMP has no native Windows build, but the Linux package runs under WSL2 (Windows Subsystem for
+Linux) on Windows 10 and 11, VAMP backend included.
+
+1. In PowerShell as administrator, install WSL2 with Ubuntu 24.04 (22.04 or newer is
+   required), then restart if asked:
+
+   .. code-block:: console
+
+      PS> wsl --install -d Ubuntu-24.04
+
+2. Open the Ubuntu terminal and install SRMP into a virtual environment:
+
+   .. code-block:: console
+
+      $ sudo apt update && sudo apt install -y python3-venv
+      $ python3 -m venv ~/srmp-venv && source ~/srmp-venv/bin/activate
+      (srmp-venv) $ pip install srmp
+
+Notes:
+
+- Keep your project files inside the Linux file system (e.g. ``~/projects``), not under
+  ``/mnt/c``; file access across the boundary is much slower.
+- The viser visualizer prints a ``http://localhost:<port>`` address; open it in your Windows
+  browser (WSL2 forwards ``localhost`` by default).
+- Building your own VAMP plugins (:doc:`vamp_plugins`) needs Docker inside WSL2: Docker Desktop
+  with WSL integration enabled, or Docker Engine installed in the Ubuntu distribution.
+- The CPU requirement (AVX2) applies inside WSL2 too.
 
 Basic Single Robot Planning
 ---------------------------
