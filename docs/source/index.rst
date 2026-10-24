@@ -39,12 +39,12 @@ Key Features
 ============
 
 - **Multi-Robot Motion Planning**: First-of-its-kind support for planning coordinated motions in multi-manipulator systems.
-- **Reliable and Consistent Trajectories**: Generates predictable and repeatable motions, making it ideal for high-precision and safety-critical applications.
+- **Reliable and Consistent Trajectories**: Generates predictable and repeatable motions, suited to applications where consistency matters.
 - **Agent Mode**: LLM-powered natural language interface for motion planning - describe what you want in plain English and let the agent handle the code.
-- **Seamless Integration**: Compatible with major simulators, including MuJoCo, Sapien, Genesis, PyBullet and Isaac.
+- **Simulator Examples**: Examples for running plans in MuJoCo, SAPIEN, Genesis and PyBullet.
 - **Fast Collision Checking**: Optional SIMD-vectorized checks with VAMP, extensible to any robot through :doc:`plugins <user_guide/vamp_plugins>`.
-- **Multi-Lingual**: Available in both Python and C++ for easy integration into research and industrial workflows.
-- **MoveIt! Plugin**: Enables deployment on real-world robotic systems with minimal setup.
+- **Python API, with a C++ core**: Easy to integrate into research and industrial workflows.
+- **MoveIt! Plugin**: Enables deployment on real-world robotic systems (tested with 0.1.x).
 
 Getting Started
 ===============
