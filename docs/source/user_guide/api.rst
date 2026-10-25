@@ -391,13 +391,20 @@ The main interface for robot motion planning.
          default). Display only; see :meth:`set_object_color`.
          A color set on a file-based mesh replaces the file's own materials in the viewer.
 
-   .. method:: add_point_cloud(name, vertices, resolution=0.01)
+   .. method:: add_point_cloud(name, points, colors=None, pose=None, resolution=0.01)
 
       Add a point cloud as a collision object to the environment.
 
       :param str name: Unique name for the point cloud
-      :param numpy.ndarray vertices: Point cloud vertices as Nx3 matrix where each row is [x, y, z]
+      :param numpy.ndarray points: Point cloud as an Nx3 matrix where each row is [x, y, z]
+      :param numpy.ndarray colors: Optional per-point colors, used only by visualizers
+      :param Pose pose: Optional pose applied to the points (default: identity)
       :param float resolution: Voxel resolution for octomap representation (default: 0.01)
+
+      .. note::
+
+         srmp 0.2.1 and earlier reject ``resolution`` with a ``TypeError``; omit it there
+         to get the 0.01 default.
 
    .. method:: remove_object(name)
 

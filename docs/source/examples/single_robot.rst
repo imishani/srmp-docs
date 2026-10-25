@@ -287,7 +287,8 @@ rejected candidates checked along the way.
 Trajectory Analysis
 -------------------
 
-After planning, you can analyze and visualize the resulting trajectory:
+After planning, you can analyze and visualize the resulting trajectory. The plots use
+matplotlib, which srmp does not install (``pip install matplotlib``):
 
 .. code-block:: python
 
@@ -449,16 +450,18 @@ you pass ``collision_aware=False`` — collision as well:
 
 A nonzero ``pitch`` turns the same rotate-in-place motion into a true screw thread —
 useful for driving a bolt, where the end effector should advance along the axis as it
-turns:
+turns. How far one call can turn is bounded by the arm's joint limits (about half a turn
+for the Panda here); a longer drive repeats shorter turns with a regrasp in between:
 
 .. code-block:: python
 
+   planner.set_qpos("panda", start_qpos)   # back to the start of the example
    traj = planner.plan_screw(
        "panda", "panda_hand",
        axis_point=[0.4, 0.0, 0.3],
        axis_direction=[0, 0, 1],
-       pitch=0.002,              # 2 mm of travel per full revolution
-       angle=np.radians(720),    # two full turns
+       pitch=0.01,               # 1 cm of travel per full revolution
+       angle=np.radians(180),    # half a turn, so 5 mm of travel
    )
 
 You can also aim directly at a target pose and let ``plan_screw`` derive the connecting
@@ -466,9 +469,11 @@ screw automatically:
 
 .. code-block:: python
 
+   planner.set_qpos("panda", start_qpos)
    target_pose = planner.get_link_pose("panda", "panda_hand")
    target_pose.p += np.array([0.0, 0.1, 0.0])                  # 10 cm sideways
-   target_pose.q = np.array([0.92388, 0.0, 0.0, 0.38268])      # and 45 degrees about z
+   yaw_45 = srmp.Pose(q=[0.92388, 0.0, 0.0, 0.38268])          # 45 degrees about world z
+   target_pose.q = (yaw_45 * target_pose).q                    # applied to the current orientation
 
    traj = planner.plan_screw("panda", "panda_hand", end_pose=target_pose)
 

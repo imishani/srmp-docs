@@ -20,7 +20,7 @@ attachment, with their poses and configurations. Object colors set with ``color=
 
    planner = srmp.PlannerInterface()
    planner.add_robot("panda")
-   planner.add_box("table", [0.8, 0.6, 0.05], table_pose)
+   planner.add_box("table", [0.8, 0.6, 0.05], srmp.Pose(p=[0.5, 0.0, 0.2]))
 
    planner.save_scene("bin_picking.json")
 

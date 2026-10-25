@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+0.2.1
+-----
+
+Linux x86-64 wheels for Python 3.9–3.14, as in 0.2.0. The published VAMP plugins still apply.
+
+Fixes
+~~~~~
+
+- **Objects held by the robot get one collision verdict everywhere.** Contact between two held
+  objects was skipped when the check named the robot (:meth:`~srmp.PlannerInterface.is_state_colliding`,
+  and the start check of wAstar and Astar) but counted by wPASE, so a state could be free in
+  one place and in collision in another. Now every check treats them alike: objects attached
+  to the **same link** may touch (they move rigidly together, as with a multi-piece grasp),
+  and objects on different links or different robots may not.
+
 0.2.0
 -----
 
