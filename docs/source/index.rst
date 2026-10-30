@@ -49,8 +49,8 @@ Key Features
 Getting Started
 ===============
 
-To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <user_guide/usage>`.
-Check out the :doc:`quick start tutorial <examples/single_robot>` for an example of how to set up and run SRMP for your application.
+To install SRMP and begin planning motions for your robotic system, follow our :doc:`installation guide <get_started/install>`.
+Check out the :doc:`quick start tutorial <get_started/first_plan>` for an example of how to set up and run SRMP for your application.
 
 Why SRMP?
 =========
@@ -64,7 +64,7 @@ Learn More
 
 .. - `Documentation <https://srmp-docs.readthedocs.io>`_
 
-- :doc:`Getting Started <user_guide/usage>`
+- :doc:`Getting Started <get_started/index>`
 - :doc:`Agent Mode <user_guide/agent_mode>`
 - :doc:`API Reference <user_guide/api>`
 - :doc:`Release Notes <user_guide/release_notes>`
@@ -74,5 +74,8 @@ Learn More
    :hidden:
    :maxdepth: 2
 
-   user_guide/index
-   examples/index
+   get_started/index
+   tutorials/index
+   guides/index
+   concepts/index
+   reference/index
