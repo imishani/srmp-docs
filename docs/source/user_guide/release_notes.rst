@@ -4,7 +4,12 @@ Release Notes
 0.2.1
 -----
 
-Linux x86-64 wheels for Python 3.9–3.14, as in 0.2.0. The published VAMP plugins still apply.
+Wheels for Python 3.9–3.14 on Linux x86-64, as in 0.2.0, and on **macOS 11+ on Apple Silicon**,
+the first macOS wheels since 0.1.6. The published VAMP plugins still apply (Linux only).
+
+The macOS wheels were built a little later than the Linux ones and also include the opt-in
+``postprocess_vamp_simplify`` setting (see :doc:`../guides/postprocessing`). It is off by
+default, so planning behaves the same on both platforms.
 
 Fixes
 ~~~~~
