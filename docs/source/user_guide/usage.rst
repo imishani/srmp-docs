@@ -12,3 +12,8 @@ This page was split up:
 - Planners: :doc:`../guides/choosing_a_planner` and :doc:`../reference/planner_settings`
 - Several robots: :doc:`../examples/multi_robot`
 - Simulators: :doc:`../examples/simulator_integration`
+
+Windows (WSL2)
+--------------
+
+Moved to :ref:`the installation page <installation>`.
