@@ -64,6 +64,8 @@ These archives are used by the :doc:`robot_registry` for automatic downloads. Yo
 - :download:`vx300s.tar.gz <../_static/robots/vx300s.tar.gz>` - Trossen Robotics (Interbotix) ViperX 300 6-DOF manipulator with Interbotix parallel gripper
 - :download:`wx250s.tar.gz <../_static/robots/wx250s.tar.gz>` - Trossen Robotics (Interbotix) WidowX 250 6-DOF manipulator with Interbotix parallel gripper
 - :download:`ur5e_robotiq_2f85.tar.gz <../_static/robots/ur5e_robotiq_2f85.tar.gz>` - Universal Robots UR5e 6-DOF manipulator with Robotiq 2F-85 gripper
+- :download:`iiwa14_robotiq_2f85.tar.gz <../_static/robots/iiwa14_robotiq_2f85.tar.gz>` - KUKA LBR iiwa 14 R820 7-DOF manipulator with Robotiq 2F-85 gripper
+- :download:`iiwa14_wsg50.tar.gz <../_static/robots/iiwa14_wsg50.tar.gz>` - KUKA LBR iiwa 14 R820 7-DOF manipulator with Schunk WSG 50 gripper
 
 Each archive contains the URDF, SRDF, and mesh files needed for planning. There
 is no longer a single bundled "all robots" archive — with this many robots it

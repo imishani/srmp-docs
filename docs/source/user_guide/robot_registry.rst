@@ -142,6 +142,12 @@ The following robots are available in the registry:
    * - ``ur5e_robotiq_2f85``
      - Universal Robots UR5e 6-DOF manipulator with Robotiq 2F-85 gripper
      - ``grasp_link``
+   * - ``iiwa14_robotiq_2f85``
+     - KUKA LBR iiwa 14 R820 7-DOF manipulator with Robotiq 2F-85 gripper
+     - ``grasp_link``
+   * - ``iiwa14_wsg50``
+     - KUKA LBR iiwa 14 R820 7-DOF manipulator with Schunk WSG 50 gripper
+     - ``grasp_frame``
 
 Mobile manipulators
 ~~~~~~~~~~~~~~~~~~~
@@ -231,7 +237,7 @@ View what robots are available:
    #             'yam', 'yam_pro', 'yam_ultra', 'big_yam',
    #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e',
    #             'fr3', 'openarm', 'piper', 'iiwa14', 'iiwa7', 'vx300s', 'wx250s',
-   #             'ur5e_robotiq_2f85'],
+   #             'ur5e_robotiq_2f85', 'iiwa14_robotiq_2f85', 'iiwa14_wsg50'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 

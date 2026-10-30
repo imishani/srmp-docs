@@ -949,6 +949,68 @@
         "robotiq_85_right_inner_knuckle_joint",
         "robotiq_85_right_finger_tip_joint"
       ]
+    },
+    "iiwa14_robotiq_2f85": {
+      "archive": "iiwa14_robotiq_2f85.tar.gz",
+      "urdf": "iiwa14_robotiq_2f85/iiwa14_robotiq_2f85.urdf",
+      "srdf": "iiwa14_robotiq_2f85/iiwa14_robotiq_2f85.srdf",
+      "end_effector": "grasp_link",
+      "description": "KUKA LBR iiwa 14 R820 7-DOF manipulator with Robotiq 2F-85 gripper",
+      "default_qpos": [
+        0.0,
+        0.5,
+        0.0,
+        -1.2,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "joint_names": [
+        "lbr_A1",
+        "lbr_A2",
+        "lbr_A3",
+        "lbr_A4",
+        "lbr_A5",
+        "lbr_A6",
+        "lbr_A7"
+      ],
+      "gripper_joint_names": [
+        "robotiq_85_left_knuckle_joint",
+        "robotiq_85_left_inner_knuckle_joint",
+        "robotiq_85_left_finger_tip_joint",
+        "robotiq_85_right_knuckle_joint",
+        "robotiq_85_right_inner_knuckle_joint",
+        "robotiq_85_right_finger_tip_joint"
+      ]
+    },
+    "iiwa14_wsg50": {
+      "archive": "iiwa14_wsg50.tar.gz",
+      "urdf": "iiwa14_wsg50/iiwa14_wsg50.urdf",
+      "srdf": "iiwa14_wsg50/iiwa14_wsg50.srdf",
+      "end_effector": "grasp_frame",
+      "description": "KUKA LBR iiwa 14 R820 7-DOF manipulator with Schunk WSG 50 gripper",
+      "default_qpos": [
+        0.0,
+        0.5,
+        0.0,
+        -1.2,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "joint_names": [
+        "lbr_A1",
+        "lbr_A2",
+        "lbr_A3",
+        "lbr_A4",
+        "lbr_A5",
+        "lbr_A6",
+        "lbr_A7"
+      ],
+      "gripper_joint_names": [
+        "left_finger_sliding_joint",
+        "right_finger_sliding_joint"
+      ]
     }
   },
   "vamp_plugins_base_url": "https://srmp.readthedocs.io/en/latest/_static/robots/plugins/"
