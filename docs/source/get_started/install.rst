@@ -3,8 +3,12 @@
 Installation
 ============
 
-SRMP runs on Linux (Ubuntu 22.04 or newer, x86-64) with Python 3.9 through 3.14. The CPU
-needs AVX2 (Intel Haswell from 2013 or later, AMD Zen+ or later).
+SRMP runs with Python 3.9 through 3.14 on:
+
+- **Linux**: Ubuntu 22.04 or newer, x86-64. The CPU needs AVX2 (Intel Haswell from 2013 or
+  later, AMD Zen+ or later).
+- **macOS**: macOS 11 or newer on Apple Silicon (M1 or later). Intel Macs are not supported.
+- **Windows**: through WSL2, see below.
 
 .. code-block:: console
 
@@ -22,9 +26,8 @@ agent mode. Robot models are downloaded on first use (see :doc:`../user_guide/ro
 
 .. note::
 
-   srmp 0.2.x ships Linux wheels only. On macOS (arm64), ``pip install srmp`` installs the last
-   release with macOS wheels (0.1.6), which predates the changes in
-   :doc:`../user_guide/release_notes`.
+   :doc:`VAMP plugins <../user_guide/vamp_plugins>` need Linux x86-64. On macOS, only the
+   robots built into srmp can use the VAMP backend.
 
 Windows (WSL2)
 --------------
