@@ -118,6 +118,30 @@ The following robots are available in the registry:
    * - ``ur16e``
      - Universal Robots UR16e 6-DOF manipulator, higher payload variant of UR10e (no gripper)
      - ``tool0``
+   * - ``fr3``
+     - Franka Research 3 7-DOF manipulator with Franka Hand
+     - ``fr3_hand_tcp``
+   * - ``openarm``
+     - Enactic OpenArm v2.0 7-DOF manipulator with pinch gripper
+     - ``openarm_right_grasp_frame``
+   * - ``piper``
+     - AgileX Piper 6-DOF manipulator with parallel gripper
+     - ``gripper_base``
+   * - ``iiwa14``
+     - KUKA LBR iiwa 14 R820 7-DOF manipulator (no gripper)
+     - ``lbr_link_ee``
+   * - ``iiwa7``
+     - KUKA LBR iiwa 7 R800 7-DOF manipulator (no gripper)
+     - ``lbr_link_ee``
+   * - ``vx300s``
+     - Trossen Robotics (Interbotix) ViperX 300 6-DOF manipulator with Interbotix parallel gripper
+     - ``vx300s/ee_gripper_link``
+   * - ``wx250s``
+     - Trossen Robotics (Interbotix) WidowX 250 6-DOF manipulator with Interbotix parallel gripper
+     - ``wx250s/ee_gripper_link``
+   * - ``ur5e_robotiq_2f85``
+     - Universal Robots UR5e 6-DOF manipulator with Robotiq 2F-85 gripper
+     - ``grasp_link``
 
 Mobile manipulators
 ~~~~~~~~~~~~~~~~~~~
@@ -205,7 +229,9 @@ View what robots are available:
    #             'koch', 'xarm7_ability', 'xarm6', 'xarm6_robotiq', 'widowxai', 'fetch', 'xlerobot', 'ridgeback_ur10e',
    #             'kinova_gen3', 'kinova_gen3_robotiq_2f85', 'kinova_gen3_6dof', 'kinova_gen3_lite',
    #             'yam', 'yam_pro', 'yam_ultra', 'big_yam',
-   #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e'],
+   #             'ur3', 'ur5', 'ur10', 'ur3e', 'ur5e', 'ur10e', 'ur16e',
+   #             'fr3', 'openarm', 'piper', 'iiwa14', 'iiwa7', 'vx300s', 'wx250s',
+   #             'ur5e_robotiq_2f85'],
    #  'local': ['panda'],  # already downloaded
    #  'custom': []}        # user-registered
 

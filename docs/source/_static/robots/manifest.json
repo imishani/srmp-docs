@@ -727,6 +727,228 @@
         "right_inner_knuckle_joint",
         "right_inner_finger_joint"
       ]
+    },
+    "fr3": {
+      "archive": "fr3.tar.gz",
+      "urdf": "fr3/fr3.urdf",
+      "srdf": "fr3/fr3.srdf",
+      "end_effector": "fr3_hand_tcp",
+      "description": "Franka Research 3 7-DOF manipulator with Franka Hand",
+      "default_qpos": [
+        0.0,
+        -0.7853981633974483,
+        0.0,
+        -2.356194490192345,
+        0.0,
+        1.5707963267948966,
+        0.7853981633974483
+      ],
+      "joint_names": [
+        "fr3_joint1",
+        "fr3_joint2",
+        "fr3_joint3",
+        "fr3_joint4",
+        "fr3_joint5",
+        "fr3_joint6",
+        "fr3_joint7"
+      ],
+      "gripper_joint_names": [
+        "fr3_finger_joint1",
+        "fr3_finger_joint2"
+      ]
+    },
+    "openarm": {
+      "archive": "openarm.tar.gz",
+      "urdf": "openarm/openarm.urdf",
+      "srdf": "openarm/openarm.srdf",
+      "end_effector": "openarm_right_grasp_frame",
+      "description": "Enactic OpenArm v2.0 7-DOF manipulator with pinch gripper",
+      "default_qpos": [
+        -0.6,
+        3.141592653589793,
+        0.0,
+        1.0,
+        0.0,
+        -0.4,
+        0.0
+      ],
+      "joint_names": [
+        "openarm_right_joint1",
+        "openarm_right_joint2",
+        "openarm_right_joint3",
+        "openarm_right_joint4",
+        "openarm_right_joint5",
+        "openarm_right_joint6",
+        "openarm_right_joint7"
+      ],
+      "gripper_joint_names": [
+        "openarm_right_finger_joint1",
+        "openarm_right_finger_joint2"
+      ]
+    },
+    "piper": {
+      "archive": "piper.tar.gz",
+      "urdf": "piper/piper.urdf",
+      "srdf": "piper/piper.srdf",
+      "end_effector": "gripper_base",
+      "description": "AgileX Piper 6-DOF manipulator with parallel gripper",
+      "default_qpos": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint_names": [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6"
+      ],
+      "gripper_joint_names": [
+        "joint7",
+        "joint8"
+      ]
+    },
+    "iiwa14": {
+      "archive": "iiwa14.tar.gz",
+      "urdf": "iiwa14/iiwa14.urdf",
+      "srdf": "iiwa14/iiwa14.srdf",
+      "end_effector": "lbr_link_ee",
+      "description": "KUKA LBR iiwa 14 R820 7-DOF manipulator (no gripper)",
+      "default_qpos": [
+        0.0,
+        0.5,
+        0.0,
+        -1.2,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "joint_names": [
+        "lbr_A1",
+        "lbr_A2",
+        "lbr_A3",
+        "lbr_A4",
+        "lbr_A5",
+        "lbr_A6",
+        "lbr_A7"
+      ]
+    },
+    "iiwa7": {
+      "archive": "iiwa7.tar.gz",
+      "urdf": "iiwa7/iiwa7.urdf",
+      "srdf": "iiwa7/iiwa7.srdf",
+      "end_effector": "lbr_link_ee",
+      "description": "KUKA LBR iiwa 7 R800 7-DOF manipulator (no gripper)",
+      "default_qpos": [
+        0.0,
+        0.5,
+        0.0,
+        -1.2,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "joint_names": [
+        "lbr_A1",
+        "lbr_A2",
+        "lbr_A3",
+        "lbr_A4",
+        "lbr_A5",
+        "lbr_A6",
+        "lbr_A7"
+      ]
+    },
+    "vx300s": {
+      "archive": "vx300s.tar.gz",
+      "urdf": "vx300s/vx300s.urdf",
+      "srdf": "vx300s/vx300s.srdf",
+      "end_effector": "vx300s/ee_gripper_link",
+      "description": "Trossen Robotics (Interbotix) ViperX 300 6-DOF manipulator with Interbotix parallel gripper",
+      "default_qpos": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint_names": [
+        "waist",
+        "shoulder",
+        "elbow",
+        "forearm_roll",
+        "wrist_angle",
+        "wrist_rotate"
+      ],
+      "gripper_joint_names": [
+        "gripper",
+        "left_finger",
+        "right_finger"
+      ]
+    },
+    "wx250s": {
+      "archive": "wx250s.tar.gz",
+      "urdf": "wx250s/wx250s.urdf",
+      "srdf": "wx250s/wx250s.srdf",
+      "end_effector": "wx250s/ee_gripper_link",
+      "description": "Trossen Robotics (Interbotix) WidowX 250 6-DOF manipulator with Interbotix parallel gripper",
+      "default_qpos": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "joint_names": [
+        "waist",
+        "shoulder",
+        "elbow",
+        "forearm_roll",
+        "wrist_angle",
+        "wrist_rotate"
+      ],
+      "gripper_joint_names": [
+        "gripper",
+        "left_finger",
+        "right_finger"
+      ]
+    },
+    "ur5e_robotiq_2f85": {
+      "archive": "ur5e_robotiq_2f85.tar.gz",
+      "urdf": "ur5e_robotiq_2f85/ur5e_robotiq_2f85.urdf",
+      "srdf": "ur5e_robotiq_2f85/ur5e_robotiq_2f85.srdf",
+      "end_effector": "grasp_link",
+      "description": "Universal Robots UR5e 6-DOF manipulator with Robotiq 2F-85 gripper",
+      "default_qpos": [
+        0,
+        -1.57,
+        1.57,
+        -1.57,
+        -1.57,
+        0
+      ],
+      "joint_names": [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint"
+      ],
+      "gripper_joint_names": [
+        "robotiq_85_left_knuckle_joint",
+        "robotiq_85_left_inner_knuckle_joint",
+        "robotiq_85_left_finger_tip_joint",
+        "robotiq_85_right_knuckle_joint",
+        "robotiq_85_right_inner_knuckle_joint",
+        "robotiq_85_right_finger_tip_joint"
+      ]
     }
   },
   "vamp_plugins_base_url": "https://srmp.readthedocs.io/en/latest/_static/robots/plugins/"
