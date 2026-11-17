@@ -1,6 +1,38 @@
 Release Notes
 =============
 
+0.2.2
+-----
+
+New
+~~~
+
+- **SRMP for coding assistants.** ``pip install "srmp[mcp]"`` adds a skill and an MCP server
+  (``srmp mcp``) for Claude Code, Codex, Gemini CLI, Antigravity and Cursor. The assistant can
+  write SRMP code from verified examples, and run plans in a live session with a 3D viewer.
+  ``srmp skill install --for <tool>`` and ``srmp mcp install --for <tool>`` set it up. Claude
+  Code users can install both as a plugin from ``imishani/srmp-assistant``. See
+  :doc:`coding_assistants`.
+- **Path simplification on Linux.** The opt-in ``postprocess_vamp_simplify`` setting, which
+  0.2.1 shipped only in the macOS wheels, is now in the Linux wheels too (see
+  :doc:`../guides/postprocessing`).
+
+Fixes
+~~~~~
+
+- **Agent Mode CLI returned stale results after a plan.** SRMP's C++ core prints progress
+  lines during ``plan()``, and those lines broke the CLI's link to its worker process. From
+  the first plan on, every tool call returned the previous call's output. Each call now gets
+  its own output, C++ lines included. The worker no longer freezes on heavy error output, and
+  a crash reports the worker's last error lines.
+- **Quaternion order in examples and docs.** ``Pose.q`` is ``[w, x, y, z]``. The README quick
+  start, Agent Mode's built-in examples and several documentation examples used
+  ``[0, 0, 0, 1]``, which is a 180° turn about z, not the identity.
+- **Type stubs.** The stubs now include ``plan_screw``, ``attach_visualizer``,
+  ``detach_visualizer``, ``is_vamp_state_valid`` and ``Pose.to_transformation_matrix``.
+  ``collision_aware_ik`` is now documented as returning ``(q, status)``, which matches what
+  it actually returns.
+
 0.2.1
 -----
 
