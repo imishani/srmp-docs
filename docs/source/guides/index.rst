@@ -15,3 +15,4 @@ Task-focused pages: each answers one "how do I…" question.
    ../user_guide/visualization
    ../user_guide/persistence
    ../user_guide/agent_mode
+   ../user_guide/coding_assistants

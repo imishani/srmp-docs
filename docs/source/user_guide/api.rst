@@ -1039,7 +1039,7 @@ Pose
 
    .. attribute:: q
 
-      Orientation as quaternion [x, y, z, w]
+      Orientation as quaternion ``[w, x, y, z]`` (scalar first; identity is ``[1, 0, 0, 0]``)
 
       :type: numpy.ndarray
 

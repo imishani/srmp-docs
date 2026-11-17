@@ -268,12 +268,12 @@ PyBullet Multi-Robot Example
    # Set base poses to match PyBullet
    pose0 = srmp.Pose()
    pose0.p = np.array([-0.5, 0, 0])
-   pose0.q = np.array([0, 0, 0, 1])
+   pose0.q = np.array([1, 0, 0, 0])  # identity; SRMP is [w, x, y, z], PyBullet is [x, y, z, w]
    planner.set_base_pose("panda0", pose0)
 
    pose1 = srmp.Pose()
    pose1.p = np.array([0.5, 0, 0])
-   pose1.q = np.array([0, 0, 1, 0])
+   pose1.q = np.array([0, 0, 0, 1])  # 180 degrees about z, same as PyBullet's [0, 0, 1, 0]
    planner.set_base_pose("panda1", pose1)
 
    # Import scene obstacles

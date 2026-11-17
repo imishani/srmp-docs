@@ -66,6 +66,7 @@ Learn More
 
 - :doc:`Getting Started <get_started/index>`
 - :doc:`Agent Mode <user_guide/agent_mode>`
+- :doc:`Coding Assistants (Claude Code, Codex, Gemini, Cursor) <user_guide/coding_assistants>`
 - :doc:`API Reference <user_guide/api>`
 - :doc:`Release Notes <user_guide/release_notes>`
 - `Discord <https://discord.gg/JwAWmqE6N>`_

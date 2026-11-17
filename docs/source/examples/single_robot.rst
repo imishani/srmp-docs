@@ -98,7 +98,7 @@ This example shows how to add obstacles to the environment and plan around them:
    # Goal as end-effector pose
    goal_pose = srmp.Pose()
    goal_pose.p = np.array([0.642, -0.068, 0.505])
-   goal_pose.q = np.array([0.0, 0.0, 0.0, 1.0])
+   goal_pose.q = np.array([0.0, 1.0, 0.0, 0.0])  # [w, x, y, z]: gripper pointing down
    goal_constraint = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
 
    trajectory = planner.plan(start_state, goal_constraint)
@@ -131,7 +131,7 @@ This example shows how to plan to specific end-effector poses rather than joint 
    # Goal as 6DOF pose
    goal_pose = srmp.Pose()
    goal_pose.p = np.array([0.6, -0.1, 0.5])    # Position [x, y, z]
-   goal_pose.q = np.array([0.0, 0.0, 0.0, 1.0])  # Quaternion [x, y, z, w]
+   goal_pose.q = np.array([0.0, 1.0, 0.0, 0.0])  # Quaternion [w, x, y, z]: gripper pointing down
 
    # Normalize quaternion to be safe
    goal_pose.q = goal_pose.q / np.linalg.norm(goal_pose.q)
@@ -294,7 +294,7 @@ SRMP supports point cloud obstacles for sensor-based planning:
 
    goal_pose = srmp.Pose()
    goal_pose.p = np.array([0.5, 0.0, 0.6])  # Above table
-   goal_pose.q = np.array([0, 0, 0, 1])
+   goal_pose.q = np.array([0, 1, 0, 0])  # [w, x, y, z]: gripper pointing down
    goal_constraint = srmp.GoalConstraint(srmp.GoalType.POSE, [goal_pose])
 
    trajectory = planner.plan(start_state, goal_constraint)
