@@ -365,11 +365,18 @@
         "robotiq_85_right_finger_tip_joint"
       ],
       "vamp_plugins": {
-        "49f92c61b0429029": "49f92c61b0429029/kinova_gen3_robotiq_2f85-49f92c61b0429029.so"
+        "49f92c61b0429029": "49f92c61b0429029/kinova_gen3_robotiq_2f85-49f92c61b0429029.so",
+        "96091cd13816ac1f": "96091cd13816ac1f/kinova_gen3_robotiq_2f85-96091cd13816ac1f.so"
       },
       "vamp_plugins_sha256": {
         "49f92c61b0429029": {
           "so": "c9dde3c3b0694358da5226582c044361a86cfa2b9a0bcd0de9de54b03e6584a6",
+          "urdf": "5fecad1ee00260ea8d5326e7615325224ef2cfe8bad15a4bf76ab9f3e37c334d",
+          "srdf": "45512de1fdf328158b9f6d7afa5509963139db94c6df251d74a745be02ffe233",
+          "fit_checked": true
+        },
+        "96091cd13816ac1f": {
+          "so": "1e043f11215e47976ed9e387ace55b73cde4f32203c995fa067a16dce8e23829",
           "urdf": "5fecad1ee00260ea8d5326e7615325224ef2cfe8bad15a4bf76ab9f3e37c334d",
           "srdf": "45512de1fdf328158b9f6d7afa5509963139db94c6df251d74a745be02ffe233",
           "fit_checked": true
