@@ -129,8 +129,7 @@ non-finite number.
 
 .. note::
 
-   **macOS wheels of 0.2.1 only so far** (Linux gets it in the next release):
-   ``"postprocess_vamp_simplify": "true"`` runs
+   Since 0.2.2 (0.2.1 on macOS only), ``"postprocess_vamp_simplify": "true"`` runs
    VAMP's own shortcut-and-B-spline simplifier (the one ``vamp_rrtc`` uses) on the search path
    before the steps above. It needs ``validity_backend`` ``"vamp"``.
 

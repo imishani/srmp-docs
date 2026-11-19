@@ -103,6 +103,28 @@ Objects attached to the same link may touch each other; objects on different lin
 may not. :meth:`~srmp.PlannerInterface.set_allowed_collision` allows any other pair to touch,
 by object, link or robot name. :doc:`../examples/single_robot` has a full pick-and-place.
 
+.. _base-contact:
+
+A robot base resting on a table
+-------------------------------
+
+When a table sits flush with a robot's base, the base link touches it in every
+configuration, so every state, the start included, is in collision ("Start state is not
+valid"). This is common in scenes imported with
+:meth:`~srmp.PlannerInterface.read_sim`, which warns when it happens. Since 0.3.0 you can
+allow it per robot:
+
+.. code-block:: python
+
+   print(planner.get_base_contacts("panda"))   # [('panda_link0', 'table')]
+   planner.set_base_contact_allowed("panda", True)
+
+Only the robot's fixed links (:meth:`~srmp.PlannerInterface.get_fixed_link_names`) may then
+touch static objects. Moving links, held objects and other robots are still checked. VAMP
+cannot skip its base check: if the base overlaps an object, ``validity_backend="auto"``
+plans on coal instead and ``"vamp"`` raises, naming the object. To keep VAMP, lower the table
+a few millimetres, or cut a hole in it under the base.
+
 .. _planning-volume:
 
 The planning volume

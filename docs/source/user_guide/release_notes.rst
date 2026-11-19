@@ -1,6 +1,63 @@
 Release Notes
 =============
 
+0.3.0
+-----
+
+Wheels for Python 3.9–3.14 on Linux x86-64 and macOS 11+ on Apple Silicon.
+
+.. important::
+
+   **VAMP plugins must be rebuilt.** This release changes the plugin ABI tag. Published
+   registry plugins (``kinova_gen3_robotiq_2f85``) are fetched again for the new tag
+   automatically. Plugins you built yourself are skipped at ``import srmp`` with a warning
+   until you run ``srmp vamp rebuild-all`` (or set ``SRMP_VAMP_AUTO_REBUILD=1``). See
+   :doc:`vamp_plugins`.
+
+New
+~~~
+
+- **A fixed robot base can rest on a table.** When a table sits flush with a robot's base
+  (common in scenes imported with :meth:`~srmp.PlannerInterface.read_sim`), the base link
+  touches it in every configuration, so every state, the start included, was reported in
+  collision ("Start state is not valid").
+  :meth:`~srmp.PlannerInterface.set_base_contact_allowed` lets a robot's fixed links touch
+  static scene objects. It is off by default, and moving links, held objects and other
+  robots are still checked. :meth:`~srmp.PlannerInterface.get_base_contacts` lists what the
+  base touches, and ``read_sim`` warns when an imported scene has such a contact. VAMP
+  cannot skip its base check: with the switch on and the base overlapping an object,
+  ``validity_backend="auto"`` falls back to coal and ``"vamp"`` raises with an explanation.
+  See :ref:`base-contact`.
+
+Fixes
+~~~~~
+
+- **plan_screw ended off target when the robot's base was moved.** World-frame Jacobians
+  ignored the base's position (only its orientation was applied), so with
+  :meth:`~srmp.PlannerInterface.set_base_pose`, any screw motion with a rotation ended up to
+  tens of centimetres off. Affects :meth:`~srmp.PlannerInterface.get_jacobian` (world frame),
+  :meth:`~srmp.PlannerInterface.compute_jacobian`,
+  :meth:`~srmp.PlannerInterface.compute_joint_velocities` and
+  :meth:`~srmp.PlannerInterface.plan_screw`. World-frame Jacobians are now spatial twists
+  about the world origin.
+- **Held objects were misplaced when the robot's base was moved.** An attached object was
+  placed as if the robot stood at the origin, under both coal and VAMP, so collisions were
+  checked in the wrong place. VAMP was also off by its end-effector offset (about 10 cm on
+  the Panda). Held objects now follow the hand wherever the base is.
+- **VAMP's held cylinders are tight.** They reached 2–3 cm past the real cylinder whatever
+  ``attachment_spherization_resolution`` said. They now follow that setting: within a few
+  millimetres at ``"0.005"``.
+- **VAMP replanning after a scene edit is fast with many meshes.** Any edit, such as adding a
+  small object, made VAMP resample every static mesh. VAMP now keeps the mesh point cloud
+  when it is unchanged (with 30 static meshes, an edit plus replan went from about 740 ms to
+  20 ms).
+- **is_vamp_state_valid uses the planner's VAMP scene.** It used to build a second scene with
+  default settings, which disagreed with the planner when the context changed
+  ``mesh_sampling_resolution`` or ``pointcloud_point_radius``, and doubled the memory.
+- **Viewer: the IK ghost follows the robot's base.** The Plan panel's IK preview stayed at
+  the old base pose after the base was moved.
+- ``read_sim`` keeps the orientation of SAPIEN planes (tilted planes were flattened).
+
 0.2.2
 -----
 

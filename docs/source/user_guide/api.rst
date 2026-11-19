@@ -414,6 +414,10 @@ The main interface for robot motion planning.
       VAMP's verdict on one configuration, with the current scene: ``True`` when it is
       collision-free. Useful to compare VAMP against coal (:meth:`is_state_colliding`).
 
+      When the current planner (:meth:`make_planner`) uses VAMP for this robot, its scene
+      and context settings (``mesh_sampling_resolution``, ``pointcloud_point_radius``, ...)
+      are used. Otherwise a scene is built once with default settings and reused.
+
       :param str articulation_name: Name of the articulation
       :param q: Move-group joint configuration
       :rtype: bool
@@ -614,6 +618,46 @@ The main interface for robot motion planning.
          planner.set_allowed_collision("sponge", "panda_hand", True)   # one link
          planner.set_allowed_collision("table", "panda", True)         # every link of the robot
 
+   .. method:: set_base_contact_allowed(articulation_name, allowed)
+
+      Let a robot's fixed links (:meth:`get_fixed_link_names`, such as ``panda_link0``) touch
+      static scene objects. A fixed link touches a static object the same way in every
+      configuration, so a table flush with the base makes every state collide. When allowed,
+      those pairs are not checked under coal; moving links, attached objects and other
+      robots still are. Off by default, and not saved in scene files. See
+      :ref:`base-contact`.
+
+      VAMP still checks its base spheres. When they overlap a static object,
+      ``validity_backend="auto"`` falls back to coal and ``"vamp"`` raises, naming the
+      object.
+
+      *New in 0.3.0.*
+
+      :param str articulation_name: Name of the robot
+      :param bool allowed: True to allow base contacts
+      :raises RuntimeError: Unknown robot
+
+   .. method:: get_base_contact_allowed(articulation_name)
+
+      Whether :meth:`set_base_contact_allowed` is on for a robot. *New in 0.3.0.*
+
+      :rtype: bool
+
+   .. method:: get_fixed_link_names(articulation_name)
+
+      Links no joint moves: the root link, plus links joined to it by fixed joints only.
+      *New in 0.3.0.*
+
+      :rtype: list[str]
+
+   .. method:: get_base_contacts(articulation_name)
+
+      ``(fixed link, static object)`` pairs in contact right now, under coal. Reports them
+      whatever :meth:`set_base_contact_allowed` says, but leaves out pairs allowed with
+      :meth:`set_allowed_collision`. *New in 0.3.0.*
+
+      :rtype: list[tuple[str, str]]
+
    .. method:: get_active_joint_names(articulation_name)
 
       Get the names of all active (user-defined) joints for an articulation. This includes
@@ -786,6 +830,10 @@ The main interface for robot motion planning.
    .. method:: get_jacobian(articulation_name, link_name, local=False, move_group_only=True)
 
       Get the Jacobian of a link at the articulation's current qpos.
+
+      In the world frame (``local=False``), each column is a spatial twist about the world
+      origin, so it accounts for the robot's base pose. Before 0.3.0 it ignored the base's
+      position, which was wrong after :meth:`set_base_pose`.
 
       :param str articulation_name: Articulation name
       :param str link_name: Name of the link

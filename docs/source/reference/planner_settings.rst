@@ -154,7 +154,8 @@ obstacles and attached meshes as sampled spheres; these keys tune that:
 - ``articulation_link_sampling_resolution``: Sample spacing for the mesh links of robots
   that are not being planned. Default: "0.05"
 - ``attachment_spherization_resolution``: Sphere pitch for attached primitives (box,
-  cylinder). Default: "0.05"
+  cylinder). Smaller values fit the shape more tightly with more spheres (cylinders follow
+  it since 0.3.0). Default: "0.05"
 - ``attachment_max_spheres``: Sphere budget for one attached object. An attached mesh
   over it raises (raise the budget, or attach a primitive such as :meth:`add_box`
   instead); a primitive is coarsened to fit. Default: "512"
